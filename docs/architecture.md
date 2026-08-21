@@ -686,3 +686,21 @@ Kiến trúc không sử dụng Microservices hoặc các pattern quá phức t�
 
 Tài liệu này là **baseline kỹ thuật của Development Team**. Mọi thay đổi lớn về kiến trúc, Database hoặc coding convention trong quá trình phát triển cần được trao đổi và thống nhất với các thành viên trước khi áp dụng.
 
+---
+
+# **19\. Technical Baseline Repository**
+
+Phiên bản nền tảng được chốt:
+
+* **Backend:** .NET 10 LTS, ASP.NET Core Web API.
+* **Frontend:** React, TypeScript, Vite, Node.js 24 LTS.
+* **Test:** xUnit cho Backend; Vitest và Testing Library cho Frontend.
+
+Repository gồm một API project `backend/src/ECommerce.Api`, một test project `backend/tests/ECommerce.Api.Tests` và một ứng dụng độc lập trong `frontend`. Không áp dụng Clean Architecture, Microservices hoặc Docker trong baseline này.
+
+API nền tảng cung cấp `GET /api/health` để kiểm tra khả năng khởi động. OpenAPI được bật trong môi trường Development. `ExceptionHandlingMiddleware` chuyển lỗi không được xử lý thành Problem Details an toàn; stack trace không được trả cho Client.
+
+Connection string và JWT signing key không được lưu trong Git. Developer dùng .NET User Secrets hoặc biến môi trường. CORS Development chỉ cho phép origin Frontend được cấu hình; Production phải cung cấp danh sách origin riêng.
+
+Các thư mục `Entities`, `DTOs`, `Services`, `Data` và các thư mục Frontend đã được chuẩn bị, nhưng baseline không triển khai Entity, Migration, API hoặc UI nghiệp vụ của Sprint 1. Những phần này chỉ được tạo trong Jira task/User Story tương ứng sau khi Acceptance Criteria được làm rõ.
+
