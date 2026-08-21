@@ -142,7 +142,7 @@ The PowerShell validator must enumerate the seven expected skill directories and
 Run:
 
 ```powershell
-pwsh -NoProfile -File .agents/tests/validate-skills.ps1
+powershell.exe -NoProfile -File .agents/tests/validate-skills.ps1
 ```
 
 Expected: FAIL because the skill files do not exist.
@@ -191,7 +191,7 @@ Define Product Backlog and Sprint Backlog authority, ambiguity escalation, Accep
 Run:
 
 ```powershell
-pwsh -NoProfile -File .agents/tests/validate-skills.ps1
+powershell.exe -NoProfile -File .agents/tests/validate-skills.ps1
 rg -n "docs/architecture.md|docs/Sprint_backlog.md|docs/Sprint1.md" .agents AGENTS.md
 ```
 
@@ -535,7 +535,7 @@ dotnet test backend/ECommerce.slnx --configuration Release --no-build
 npm --prefix frontend ci
 npm --prefix frontend test
 npm --prefix frontend run build
-pwsh -NoProfile -File .agents/tests/validate-skills.ps1
+powershell.exe -NoProfile -File .agents/tests/validate-skills.ps1
 ```
 
 Expected: every command exits with code 0.
@@ -583,7 +583,7 @@ dotnet test backend/ECommerce.slnx --configuration Release --no-build
 npm --prefix frontend ci
 npm --prefix frontend test
 npm --prefix frontend run build
-pwsh -NoProfile -File .agents/tests/validate-skills.ps1
+powershell.exe -NoProfile -File .agents/tests/validate-skills.ps1
 ```
 
 Expected: every command exits with code 0.
