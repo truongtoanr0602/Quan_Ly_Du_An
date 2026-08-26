@@ -1,13 +1,13 @@
 namespace ECommerce.Api.DTOs.Products;
 
 public record ProductDto(
-    int Id,
-    int CategoryId,
+    int ProductID,
+    int CategoryID,
     string CategoryName,
-    string Name,
+    string ProductName,
     string? Description,
     decimal Price,
-    string? Brand,
+    string? BrandName,
     string? ImageUrl,
     int StockQuantity,
     DateTime CreatedAt,

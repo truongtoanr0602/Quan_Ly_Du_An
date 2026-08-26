@@ -10,39 +10,63 @@ public class AppDbContext : DbContext
     {
     }
 
+    // ─── Auth & Users ────────────────────────────────────────
+    public DbSet<Role> Roles => Set<Role>();
+    public DbSet<User> Users => Set<User>();
+    public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
+    public DbSet<PasswordResetToken> PasswordResetTokens => Set<PasswordResetToken>();
+
+    // ─── Profile ─────────────────────────────────────────────
+    public DbSet<Address> Addresses => Set<Address>();
+
+    // ─── Catalog ─────────────────────────────────────────────
     public DbSet<Category> Categories => Set<Category>();
+    public DbSet<Brand> Brands => Set<Brand>();
     public DbSet<Product> Products => Set<Product>();
+    public DbSet<ProductImage> ProductImages => Set<ProductImage>();
+    public DbSet<InventoryTransaction> InventoryTransactions => Set<InventoryTransaction>();
+
+    // ─── Cart ────────────────────────────────────────────────
+    public DbSet<Cart> Carts => Set<Cart>();
+    public DbSet<CartItem> CartItems => Set<CartItem>();
+
+    // ─── Orders ──────────────────────────────────────────────
+    public DbSet<Order> Orders => Set<Order>();
+    public DbSet<OrderDetail> OrderDetails => Set<OrderDetail>();
+    public DbSet<OrderStatusHistory> OrderStatusHistories => Set<OrderStatusHistory>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
         modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
     }
-    
+
     public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
-        var entries = ChangeTracker
-            .Entries()
-            .Where(e => e.Entity is Category || e.Entity is Product);
+        var entries = ChangeTracker.Entries()
+            .Where(e => e.State == EntityState.Added || e.State == EntityState.Modified);
 
         foreach (var entityEntry in entries)
         {
+            // Set CreatedAt khi thêm mới
             if (entityEntry.State == EntityState.Added)
             {
-                if (entityEntry.Entity is Category category)
+                var createdAtProp = entityEntry.Properties
+                    .FirstOrDefault(p => p.Metadata.Name == "CreatedAt");
+                if (createdAtProp != null && createdAtProp.CurrentValue is DateTime dt && dt == default)
                 {
-                    category.CreatedAt = DateTime.UtcNow;
-                }
-                else if (entityEntry.Entity is Product product)
-                {
-                    product.CreatedAt = DateTime.UtcNow;
+                    createdAtProp.CurrentValue = DateTime.UtcNow;
                 }
             }
-            else if (entityEntry.State == EntityState.Modified)
+
+            // Set UpdatedAt khi cập nhật
+            if (entityEntry.State == EntityState.Modified)
             {
-                if (entityEntry.Entity is Product product)
+                var updatedAtProp = entityEntry.Properties
+                    .FirstOrDefault(p => p.Metadata.Name == "UpdatedAt");
+                if (updatedAtProp != null)
                 {
-                    product.UpdatedAt = DateTime.UtcNow;
+                    updatedAtProp.CurrentValue = DateTime.UtcNow;
                 }
             }
         }

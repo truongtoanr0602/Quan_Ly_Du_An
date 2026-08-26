@@ -18,20 +18,22 @@ public class ProductService : IProductService
     {
         var query = _context.Products
             .Include(p => p.Category)
+            .Include(p => p.Brand)
+            .Include(p => p.Images)
             .AsNoTracking()
             .AsQueryable();
 
-        // Filter by Keyword (Name or Description)
+        // Filter by Keyword (ProductName or Description)
         if (!string.IsNullOrWhiteSpace(request.Keyword))
         {
-            query = query.Where(p => p.Name.Contains(request.Keyword) || 
+            query = query.Where(p => p.ProductName.Contains(request.Keyword) || 
                                      (p.Description != null && p.Description.Contains(request.Keyword)));
         }
 
         // Filter by Category
         if (request.CategoryId.HasValue)
         {
-            query = query.Where(p => p.CategoryId == request.CategoryId.Value);
+            query = query.Where(p => p.CategoryID == request.CategoryId.Value);
         }
 
         // Filter by Price Range
@@ -47,7 +49,7 @@ public class ProductService : IProductService
         // Filter by Brand
         if (!string.IsNullOrWhiteSpace(request.Brand))
         {
-            query = query.Where(p => p.Brand == request.Brand);
+            query = query.Where(p => p.Brand.BrandName == request.Brand);
         }
 
         // Calculate total count before pagination
@@ -59,14 +61,14 @@ public class ProductService : IProductService
             .Skip((request.PageNumber - 1) * request.PageSize)
             .Take(request.PageSize)
             .Select(p => new ProductDto(
-                p.Id,
-                p.CategoryId,
-                p.Category.Name,
-                p.Name,
+                p.ProductID,
+                p.CategoryID,
+                p.Category.CategoryName,
+                p.ProductName,
                 p.Description,
                 p.Price,
-                p.Brand,
-                p.ImageUrl,
+                p.Brand.BrandName,
+                p.Images.Where(i => i.IsPrimary).Select(i => i.ImageURL).FirstOrDefault(),
                 p.StockQuantity,
                 p.CreatedAt,
                 p.UpdatedAt

@@ -10,34 +10,66 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
     {
         builder.ToTable("Products");
 
-        builder.HasKey(p => p.Id);
+        builder.HasKey(p => p.ProductID);
 
-        builder.Property(p => p.Name)
+        builder.Property(p => p.ProductID)
+            .UseIdentityColumn();
+
+        builder.Property(p => p.SKU)
+            .IsRequired()
+            .HasMaxLength(100)
+            .IsUnicode(false);
+
+        builder.Property(p => p.ProductName)
             .IsRequired()
             .HasMaxLength(200);
 
         builder.Property(p => p.Description)
-            .HasMaxLength(2000);
+            .HasColumnType("nvarchar(max)");
+
+        builder.Property(p => p.Specifications)
+            .HasColumnType("nvarchar(max)");
 
         builder.Property(p => p.Price)
-            .HasColumnType("decimal(18,2)")
-            .IsRequired();
-
-        // Price >= 0 constraint
-        builder.ToTable(t => t.HasCheckConstraint("CK_Product_Price_Positive", "[Price] >= 0"));
-
-        builder.Property(p => p.Brand)
-            .HasMaxLength(100);
-
-        builder.Property(p => p.ImageUrl)
-            .HasMaxLength(500);
+            .IsRequired()
+            .HasColumnType("decimal(18,2)");
 
         builder.Property(p => p.StockQuantity)
-            .IsRequired();
-            
-        // Stock non-negative constraint
-        builder.ToTable(t => t.HasCheckConstraint("CK_Product_StockQuantity_NonNegative", "[StockQuantity] >= 0"));
+            .IsRequired()
+            .HasDefaultValue(0);
 
-        // Navigation property is configured in CategoryConfiguration
+        builder.Property(p => p.IsActive)
+            .IsRequired()
+            .HasDefaultValue(true);
+
+        builder.Property(p => p.CreatedAt)
+            .IsRequired()
+            .HasDefaultValueSql("SYSDATETIME()");
+
+        // Unique
+        builder.HasIndex(p => p.SKU)
+            .IsUnique()
+            .HasDatabaseName("UQ_Products_SKU");
+
+        // Check constraints
+        builder.ToTable(t =>
+        {
+            t.HasCheckConstraint("CK_Products_Price", "[Price] >= 0");
+            t.HasCheckConstraint("CK_Products_Stock", "[StockQuantity] >= 0");
+        });
+
+        // FK â†’ Categories
+        builder.HasOne(p => p.Category)
+            .WithMany(c => c.Products)
+            .HasForeignKey(p => p.CategoryID)
+            .OnDelete(DeleteBehavior.NoAction)
+            .HasConstraintName("FK_Products_Categories");
+
+        // FK â†’ Brands
+        builder.HasOne(p => p.Brand)
+            .WithMany(b => b.Products)
+            .HasForeignKey(p => p.BrandID)
+            .OnDelete(DeleteBehavior.NoAction)
+            .HasConstraintName("FK_Products_Brands");
     }
 }
