@@ -8,6 +8,10 @@ public sealed class HealthEndpointTests
     [Fact]
     public async Task GetHealthReturnsHealthyStatus()
     {
+        Environment.SetEnvironmentVariable("Jwt__Key", null);
+        Environment.SetEnvironmentVariable("Jwt__Issuer", null);
+        Environment.SetEnvironmentVariable("Jwt__Audience", null);
+
         using var factory = new ApiWebApplicationFactory();
         using var client = factory.CreateAnonymousClient();
 

@@ -3,7 +3,6 @@ using ECommerce.Api.Data;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
@@ -22,15 +21,6 @@ public sealed class ApiWebApplicationFactory : WebApplicationFactory<Program>
         builder.UseEnvironment("Testing");
         builder.ConfigureLogging(logging => logging.ClearProviders());
 
-        builder.ConfigureAppConfiguration((_, configuration) =>
-        {
-            configuration.AddInMemoryCollection(new Dictionary<string, string?>
-            {
-                ["Jwt:Key"] = TestJwt.SigningKey,
-                ["Jwt:Issuer"] = TestJwt.Issuer,
-                ["Jwt:Audience"] = TestJwt.Audience
-            });
-        });
 
         builder.ConfigureServices(services =>
         {
