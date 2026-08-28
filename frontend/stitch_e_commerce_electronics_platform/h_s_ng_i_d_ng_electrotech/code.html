@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+
+<html class="light" lang="vi"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Hồ sơ người dùng - ElectroTech</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-primary-fixed-variant": "#003ea8",
+                        "secondary-fixed-dim": "#b7c8e1",
+                        "primary-fixed": "#dbe1ff",
+                        "primary-container": "#2563eb",
+                        "on-primary-fixed": "#00174b",
+                        "on-tertiary": "#ffffff",
+                        "surface-variant": "#e0e3e5",
+                        "on-secondary-fixed-variant": "#38485d",
+                        "surface-container": "#eceef0",
+                        "on-secondary": "#ffffff",
+                        "on-tertiary-fixed-variant": "#783200",
+                        "tertiary-container": "#b54e00",
+                        "background": "#f7f9fb",
+                        "inverse-surface": "#2d3133",
+                        "on-surface-variant": "#434655",
+                        "surface-tint": "#0053db",
+                        "on-primary": "#ffffff",
+                        "on-secondary-container": "#54647a",
+                        "on-tertiary-container": "#ffece5",
+                        "surface-container-lowest": "#ffffff",
+                        "primary": "#004ac6",
+                        "on-background": "#191c1e",
+                        "outline": "#737686",
+                        "secondary-container": "#d0e1fb",
+                        "secondary-fixed": "#d3e4fe",
+                        "surface-container-low": "#f2f4f6",
+                        "outline-variant": "#c3c6d7",
+                        "surface-bright": "#f7f9fb",
+                        "error-container": "#ffdad6",
+                        "primary-fixed-dim": "#b4c5ff",
+                        "on-error": "#ffffff",
+                        "surface": "#f7f9fb",
+                        "on-error-container": "#93000a",
+                        "inverse-on-surface": "#eff1f3",
+                        "tertiary-fixed": "#ffdbca",
+                        "error": "#ba1a1a",
+                        "tertiary-fixed-dim": "#ffb690",
+                        "on-surface": "#191c1e",
+                        "on-secondary-fixed": "#0b1c30",
+                        "inverse-primary": "#b4c5ff",
+                        "secondary": "#505f76",
+                        "on-tertiary-fixed": "#341100",
+                        "tertiary": "#8e3c00",
+                        "on-primary-container": "#eeefff",
+                        "surface-container-highest": "#e0e3e5",
+                        "surface-container-high": "#e6e8ea",
+                        "surface-dim": "#d8dadc"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "unit": "4px",
+                        "gutter": "24px",
+                        "max-width": "1280px",
+                        "margin-mobile": "16px",
+                        "margin-desktop": "64px"
+                    },
+                    "fontFamily": {
+                        "body-lg": ["Inter"],
+                        "display-lg": ["Inter"],
+                        "body-md": ["Inter"],
+                        "label-md": ["Inter"],
+                        "spec-code": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "headline-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "label-md": ["14px", { "lineHeight": "20px", "fontWeight": "500" }],
+                        "spec-code": ["13px", { "lineHeight": "18px", "fontWeight": "600" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "headline-md": ["20px", { "lineHeight": "28px", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined.filled {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md min-h-screen flex flex-col">
+<!-- TopNavBar -->
+<header class="bg-surface-container-lowest border-b border-outline-variant docked full-width top-0 sticky z-50">
+<div class="flex justify-between items-center px-gutter py-4 w-full max-w-max-width mx-auto">
+<div class="flex items-center gap-8">
+<a class="font-display-lg text-headline-md font-bold text-primary" href="#">ElectroTech</a>
+<nav class="hidden md:flex items-center gap-6">
+<a class="text-secondary hover:text-primary font-label-md text-label-md transition-colors duration-200" href="#">Deals</a>
+<a class="text-secondary hover:text-primary font-label-md text-label-md transition-colors duration-200" href="#">New Arrivals</a>
+<a class="text-secondary hover:text-primary font-label-md text-label-md transition-colors duration-200" href="#">Laptops</a>
+<a class="text-secondary hover:text-primary font-label-md text-label-md transition-colors duration-200" href="#">Components</a>
+<a class="text-secondary hover:text-primary font-label-md text-label-md transition-colors duration-200" href="#">Mobile</a>
+<a class="text-secondary hover:text-primary font-label-md text-label-md transition-colors duration-200" href="#">Peripherals</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative hidden md:block">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-secondary">search</span>
+<input class="pl-10 pr-4 py-2 bg-surface-container-low border border-outline-variant rounded-full font-body-md text-on-surface focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 w-64 transition-all" placeholder="Tìm kiếm sản phẩm..." type="text"/>
+</div>
+<button aria-label="shopping_cart" class="p-2 text-secondary hover:bg-surface-container-low rounded-full transition-colors duration-200">
+<span class="material-symbols-outlined" data-icon="shopping_cart">shopping_cart</span>
+</button>
+<button aria-label="person" class="p-2 text-primary bg-surface-container-low rounded-full transition-colors duration-200 border-b-2 border-primary">
+<span class="material-symbols-outlined filled" data-icon="person">person</span>
+</button>
+</div>
+</div>
+</header>
+<!-- Main Content -->
+<main class="flex-grow w-full max-w-max-width mx-auto px-gutter py-margin-desktop grid grid-cols-1 md:grid-cols-12 gap-gutter">
+<!-- Sidebar Navigation -->
+<aside class="md:col-span-3">
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-4 sticky top-24 shadow-sm">
+<div class="flex items-center gap-4 mb-6 pb-6 border-b border-outline-variant">
+<div class="w-16 h-16 rounded-full overflow-hidden border border-outline-variant bg-surface-container-low">
+<img alt="User Avatar" class="w-full h-full object-cover" data-alt="A professional headshot of a person looking directly at the camera, modern minimalist style, soft studio lighting, subtle blue undertones to match a tech aesthetic, white background, high quality photography." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCWUgeo9wowtvUrEAoIim6LiBg0AYWmqEn0vKe4_IHXFpVsKW6f4iJ_NDdJRHoaafkGnUVO1bFavpIgKDtr9_yPsOY7MsUyBH0jdA6D01Vqe_kZ9FMhE76kzInYrhRkbmnHR9LNwBaGwCHQxdxMtg_Q3IMzHIpAS-zXwJhurxibghahU0oZwBaOd6W-RgCV3vyslP-ZCLOt7sh2mdJuFMSQEFN-HDLXAH5FzGoFE-w-rI9rlp6Uehfb"/>
+</div>
+<div>
+<h2 class="font-headline-md text-headline-md text-on-surface mb-1">Nguyễn Văn A</h2>
+<p class="font-body-md text-body-md text-secondary">Thành viên thân thiết</p>
+</div>
+</div>
+<nav class="flex flex-col gap-2">
+<a class="flex items-center gap-3 bg-secondary-container text-on-secondary-container rounded-xl px-4 py-3 font-label-md text-label-md transition-all duration-150" href="#">
+<span class="material-symbols-outlined filled" data-icon="person">person</span>
+                        Thông tin cá nhân
+                    </a>
+<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-variant/50 rounded-xl px-4 py-3 font-label-md text-label-md transition-all duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="shopping_bag">shopping_bag</span>
+                        Đơn mua của tôi
+                    </a>
+<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-variant/50 rounded-xl px-4 py-3 font-label-md text-label-md transition-all duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+                        Thông báo
+                        <span class="ml-auto bg-error text-on-error text-[10px] font-bold px-2 py-0.5 rounded-full">3</span>
+</a>
+<a class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-variant/50 rounded-xl px-4 py-3 font-label-md text-label-md transition-all duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="lock">lock</span>
+                        Đổi mật khẩu
+                    </a>
+</nav>
+</div>
+</aside>
+<!-- Profile Form Area -->
+<section class="md:col-span-9">
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-6 md:p-8 shadow-sm">
+<div class="mb-8 border-b border-outline-variant pb-6">
+<h1 class="font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-surface mb-2">Hồ sơ của tôi</h1>
+<p class="font-body-md text-body-md text-secondary">Quản lý thông tin hồ sơ để bảo mật tài khoản</p>
+</div>
+<form action="#" class="space-y-6" method="POST">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<!-- Họ tên -->
+<div class="space-y-2">
+<label class="block font-label-md text-label-md text-on-surface-variant" for="fullName">Họ và tên</label>
+<input class="w-full px-4 py-3 bg-surface border border-outline-variant rounded-lg font-body-md text-on-surface focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all" id="fullName" name="fullName" type="text" value="Nguyễn Văn A"/>
+</div>
+<!-- Số điện thoại -->
+<div class="space-y-2">
+<label class="block font-label-md text-label-md text-on-surface-variant" for="phone">Số điện thoại</label>
+<input class="w-full px-4 py-3 bg-surface border border-outline-variant rounded-lg font-body-md text-on-surface focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all" id="phone" name="phone" type="tel" value="0987654321"/>
+</div>
+<!-- Email -->
+<div class="space-y-2">
+<label class="block font-label-md text-label-md text-on-surface-variant" for="email">Email</label>
+<input class="w-full px-4 py-3 bg-surface border border-outline-variant rounded-lg font-body-md text-on-surface focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all" id="email" name="email" type="email" value="nguyenvana@example.com"/>
+</div>
+<!-- Ngày sinh -->
+<div class="space-y-2">
+<label class="block font-label-md text-label-md text-on-surface-variant" for="dob">Ngày sinh</label>
+<input class="w-full px-4 py-3 bg-surface border border-outline-variant rounded-lg font-body-md text-on-surface focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all" id="dob" name="dob" type="date" value="1990-01-01"/>
+</div>
+<!-- Địa chỉ -->
+<div class="space-y-2 md:col-span-2">
+<label class="block font-label-md text-label-md text-on-surface-variant" for="address">Địa chỉ giao hàng mặc định</label>
+<input class="w-full px-4 py-3 bg-surface border border-outline-variant rounded-lg font-body-md text-on-surface focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all" id="address" name="address" type="text" value="123 Đường Điện Tử, Quận Công Nghệ, TP. HCM"/>
+</div>
+<!-- Giới tính -->
+<div class="space-y-2 md:col-span-2">
+<label class="block font-label-md text-label-md text-on-surface-variant mb-2">Giới tính</label>
+<div class="flex items-center gap-6">
+<label class="flex items-center gap-2 cursor-pointer">
+<input checked="" class="text-primary focus:ring-primary border-outline-variant" name="gender" type="radio" value="male"/>
+<span class="font-body-md text-body-md text-on-surface">Nam</span>
+</label>
+<label class="flex items-center gap-2 cursor-pointer">
+<input class="text-primary focus:ring-primary border-outline-variant" name="gender" type="radio" value="female"/>
+<span class="font-body-md text-body-md text-on-surface">Nữ</span>
+</label>
+<label class="flex items-center gap-2 cursor-pointer">
+<input class="text-primary focus:ring-primary border-outline-variant" name="gender" type="radio" value="other"/>
+<span class="font-body-md text-body-md text-on-surface">Khác</span>
+</label>
+</div>
+</div>
+</div>
+<div class="pt-6 border-t border-outline-variant flex justify-end">
+<button class="bg-[#f97316] hover:bg-[#ea580c] text-white font-label-md text-label-md px-8 py-3 rounded-lg transition-colors shadow-sm flex items-center gap-2" type="submit">
+<span class="material-symbols-outlined text-[20px]" data-icon="save">save</span>
+                            Lưu thay đổi
+                        </button>
+</div>
+</form>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="bg-surface-dim border-t border-outline-variant full-width mt-auto">
+<div class="grid grid-cols-1 md:grid-cols-4 gap-gutter px-gutter py-margin-desktop w-full max-w-max-width mx-auto">
+<div class="col-span-1 md:col-span-2">
+<a class="font-display-lg text-headline-md font-bold text-primary mb-4 block" href="#">ElectroTech</a>
+<p class="font-body-md text-body-md text-secondary max-w-sm mb-6">© 2024 ElectroTech Inc. Precision Engineering for Tech Enthusiasts.</p>
+<div class="flex gap-4">
+<span class="material-symbols-outlined text-secondary hover:text-primary cursor-pointer transition-colors" data-icon="language">language</span>
+<span class="material-symbols-outlined text-secondary hover:text-primary cursor-pointer transition-colors" data-icon="mail">mail</span>
+</div>
+</div>
+<div>
+<h3 class="font-label-md text-label-md text-on-surface font-bold mb-4">Hỗ trợ khách hàng</h3>
+<ul class="space-y-3">
+<li><a class="font-body-md text-body-md text-secondary hover:text-primary underline transition-all" href="#">About Us</a></li>
+<li><a class="font-body-md text-body-md text-secondary hover:text-primary underline transition-all" href="#">Privacy Policy</a></li>
+<li><a class="font-body-md text-body-md text-secondary hover:text-primary underline transition-all" href="#">Terms of Service</a></li>
+</ul>
+</div>
+<div>
+<h3 class="font-label-md text-label-md text-on-surface font-bold mb-4">Dịch vụ</h3>
+<ul class="space-y-3">
+<li><a class="font-body-md text-body-md text-secondary hover:text-primary underline transition-all" href="#">Shipping Info</a></li>
+<li><a class="font-body-md text-body-md text-secondary hover:text-primary underline transition-all" href="#">Contact Support</a></li>
+</ul>
+</div>
+</div>
+</footer>
+</body></html>

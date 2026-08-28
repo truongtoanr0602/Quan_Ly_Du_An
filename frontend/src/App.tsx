@@ -1,12 +1,8 @@
 import './App.css'
+import AppRouter from './routes/AppRouter'
 
 function App() {
-  return (
-    <main className="app-shell">
-      <h1>ECommerce</h1>
-      <p>Technical baseline ready</p>
-    </main>
-  )
+  return <AppRouter />
 }
 
 export default App

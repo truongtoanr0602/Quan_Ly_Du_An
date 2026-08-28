@@ -65,8 +65,10 @@ public class ProductService : IProductService
                 p.CategoryID,
                 p.Category.CategoryName,
                 p.ProductName,
+                p.SKU,
                 p.Description,
                 p.Price,
+                p.BrandID,
                 p.Brand.BrandName,
                 p.Images.Where(i => i.IsPrimary).Select(i => i.ImageURL).FirstOrDefault(),
                 p.StockQuantity,
@@ -82,5 +84,115 @@ public class ProductService : IProductService
             PageNumber = request.PageNumber,
             PageSize = request.PageSize
         };
+    }
+
+    public async Task<ProductDto> GetProductByIdAsync(int id, CancellationToken cancellationToken = default)
+    {
+        var product = await _context.Products
+            .Include(p => p.Category)
+            .Include(p => p.Brand)
+            .Include(p => p.Images)
+            .AsNoTracking()
+            .FirstOrDefaultAsync(p => p.ProductID == id, cancellationToken);
+
+        if (product == null)
+            throw new KeyNotFoundException($"Product with ID {id} not found.");
+
+        return new ProductDto(
+            product.ProductID,
+            product.CategoryID,
+            product.Category?.CategoryName ?? "",
+            product.ProductName,
+            product.SKU,
+            product.Description,
+            product.Price,
+            product.BrandID,
+            product.Brand?.BrandName,
+            product.Images?.Where(i => i.IsPrimary).Select(i => i.ImageURL).FirstOrDefault(),
+            product.StockQuantity,
+            product.CreatedAt,
+            product.UpdatedAt
+        );
+    }
+
+    public async Task<ProductDto> CreateProductAsync(ProductCreateDto dto, CancellationToken cancellationToken = default)
+    {
+        var product = new ECommerce.Api.Entities.Product
+        {
+            CategoryID = dto.CategoryID,
+            ProductName = dto.ProductName,
+            SKU = dto.SKU,
+            Description = dto.Description,
+            Price = dto.Price,
+            BrandID = dto.BrandID,
+            StockQuantity = dto.StockQuantity,
+            IsActive = true
+        };
+
+        if (!string.IsNullOrEmpty(dto.ImageUrl))
+        {
+            product.Images.Add(new ECommerce.Api.Entities.ProductImage
+            {
+                ImageURL = dto.ImageUrl,
+                IsPrimary = true
+            });
+        }
+
+        _context.Products.Add(product);
+        await _context.SaveChangesAsync(cancellationToken);
+
+        return await GetProductByIdAsync(product.ProductID, cancellationToken);
+    }
+
+    public async Task<ProductDto> UpdateProductAsync(int id, ProductUpdateDto dto, CancellationToken cancellationToken = default)
+    {
+        var product = await _context.Products
+            .Include(p => p.Images)
+            .FirstOrDefaultAsync(p => p.ProductID == id, cancellationToken);
+
+        if (product == null)
+            throw new KeyNotFoundException($"Product with ID {id} not found.");
+
+        product.CategoryID = dto.CategoryID;
+        product.ProductName = dto.ProductName;
+        product.SKU = dto.SKU;
+        product.Description = dto.Description;
+        product.Price = dto.Price;
+        product.BrandID = dto.BrandID;
+        product.StockQuantity = dto.StockQuantity;
+        product.IsActive = dto.IsActive;
+
+        // Xử lý ảnh cơ bản (ghi đè ảnh primary nếu có truyền lên ImageUrl mới)
+        if (!string.IsNullOrEmpty(dto.ImageUrl))
+        {
+            var primaryImage = product.Images.FirstOrDefault(i => i.IsPrimary);
+            if (primaryImage != null)
+            {
+                primaryImage.ImageURL = dto.ImageUrl;
+            }
+            else
+            {
+                product.Images.Add(new ECommerce.Api.Entities.ProductImage
+                {
+                    ImageURL = dto.ImageUrl,
+                    IsPrimary = true
+                });
+            }
+        }
+
+        await _context.SaveChangesAsync(cancellationToken);
+
+        return await GetProductByIdAsync(product.ProductID, cancellationToken);
+    }
+
+    public async Task DeleteProductAsync(int id, CancellationToken cancellationToken = default)
+    {
+        var product = await _context.Products.FindAsync(new object[] { id }, cancellationToken);
+        if (product == null)
+            throw new KeyNotFoundException($"Product with ID {id} not found.");
+
+        // Soft delete bằng cách set IsActive = false (tùy nghiệp vụ)
+        product.IsActive = false;
+        await _context.SaveChangesAsync(cancellationToken);
     }
 }
