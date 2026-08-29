@@ -1,3 +1,4 @@
+using ECommerce.Api.Configuration;
 using ECommerce.Api.Data;
 using ECommerce.Api.Middleware;
 using ECommerce.Api.Services.Products;
@@ -41,6 +42,23 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddSingleton(serviceProvider =>
+{
+    var section = serviceProvider
+        .GetRequiredService<IConfiguration>()
+        .GetSection("BootstrapAdmin");
+
+    return new BootstrapAdminOptions(
+        section["Email"],
+        section["Password"],
+        section["FullName"]);
+});
+builder.Services.AddScoped<DevelopmentAdminBootstrapper>();
+
+if (builder.Environment.IsDevelopment())
+{
+    builder.Services.AddHostedService<DevelopmentAdminBootstrapHostedService>();
+}
 
 builder.Services.AddAuthentication(options =>
 {
