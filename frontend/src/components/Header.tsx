@@ -1,6 +1,15 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 
 export default function Header() {
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login', { replace: true });
+  };
+
   return (
     <header className="bg-surface-container-lowest border-b border-outline-variant sticky top-0 z-50 w-full">
       <div className="flex justify-between items-center px-4 sm:px-6 lg:px-8 py-4 w-full max-w-7xl mx-auto">
@@ -34,9 +43,15 @@ export default function Header() {
           <button className="text-secondary hover:text-primary hover:bg-surface-container-low p-2 rounded-full transition-colors active:scale-95">
             <span className="material-symbols-outlined">shopping_cart</span>
           </button>
-          <Link to="/login" className="text-secondary hover:text-primary hover:bg-surface-container-low p-2 rounded-full transition-colors active:scale-95">
-            <span className="material-symbols-outlined">person</span>
-          </Link>
+          {user ? (
+            <button onClick={handleLogout} className="text-secondary hover:text-primary hover:bg-surface-container-low p-2 rounded-full transition-colors active:scale-95" title="Đăng xuất" aria-label="Đăng xuất">
+              <span className="material-symbols-outlined">logout</span>
+            </button>
+          ) : (
+            <Link to="/login" className="text-secondary hover:text-primary hover:bg-surface-container-low p-2 rounded-full transition-colors active:scale-95">
+              <span className="material-symbols-outlined">person</span>
+            </Link>
+          )}
         </div>
       </div>
     </header>

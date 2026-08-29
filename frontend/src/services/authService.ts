@@ -1,10 +1,24 @@
 import { apiClient } from './apiClient';
 
+export type UserRole = 'Admin' | 'Customer'
+
+export interface LoginRequest {
+  email: string;
+  password: string;
+}
+
+export interface RegisterRequest {
+  fullName: string;
+  email: string;
+  phone?: string;
+  password: string;
+}
+
 export interface UserInfo {
   id: number;
   email: string;
   fullName: string;
-  role: string;
+  role: UserRole;
 }
 
 export interface AuthResponse {
@@ -13,44 +27,17 @@ export interface AuthResponse {
 }
 
 export const authService = {
-  login: async (data: any): Promise<AuthResponse> => {
-    const response = await apiClient<AuthResponse>('/auth/login', {
+  login: (data: LoginRequest): Promise<AuthResponse> => {
+    return apiClient<AuthResponse>('/auth/login', {
       method: 'POST',
       body: JSON.stringify(data),
     });
-    
-    if (response.token) {
-      localStorage.setItem('token', response.token);
-      localStorage.setItem('user', JSON.stringify(response.user));
-    }
-    return response;
   },
 
-  register: async (data: any): Promise<AuthResponse> => {
-    const response = await apiClient<AuthResponse>('/auth/register', {
+  register: (data: RegisterRequest): Promise<AuthResponse> => {
+    return apiClient<AuthResponse>('/auth/register', {
       method: 'POST',
       body: JSON.stringify(data),
     });
-    
-    if (response.token) {
-      localStorage.setItem('token', response.token);
-      localStorage.setItem('user', JSON.stringify(response.user));
-    }
-    return response;
   },
-
-  logout: () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-  },
-  
-  getCurrentUser: (): UserInfo | null => {
-    const userStr = localStorage.getItem('user');
-    if (!userStr) return null;
-    try {
-      return JSON.parse(userStr);
-    } catch {
-      return null;
-    }
-  }
 };
