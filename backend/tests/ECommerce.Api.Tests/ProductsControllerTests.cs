@@ -1,5 +1,6 @@
 using System.Net;
 using System.Net.Http.Json;
+using System.Text.Json;
 using ECommerce.Api.DTOs;
 using ECommerce.Api.DTOs.Products;
 using ECommerce.Api.Exceptions;
@@ -20,19 +21,27 @@ public sealed class ProductsControllerTests
         using var response = await client.GetAsync("/api/products/42");
 
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+        Assert.Equal("application/problem+json", response.Content.Headers.ContentType?.MediaType);
+        using var document = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
+        Assert.Equal("Resource was not found.", document.RootElement.GetProperty("title").GetString());
+        Assert.DoesNotContain("Product with ID", document.RootElement.GetRawText());
+        Assert.False(service.LastIncludeInactive);
     }
 
-    [Fact]
-    public async Task AdminDetailPassesIncludeInactiveToProductService()
+    [Theory]
+    [InlineData(null, false)]
+    [InlineData("Customer", false)]
+    [InlineData("Admin", true)]
+    public async Task ProductDetailPassesVisibilityByRole(string? role, bool expectedIncludeInactive)
     {
         var service = new RecordingProductService();
         using var factory = CreateProductFactory(service);
-        using var client = factory.CreateClientWithRole("Admin");
+        using var client = factory.CreateClientWithRole(role);
 
         using var response = await client.GetAsync("/api/products/42");
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-        Assert.True(service.LastIncludeInactive);
+        Assert.Equal(expectedIncludeInactive, service.LastIncludeInactive);
     }
 
     [Theory]
@@ -128,11 +137,19 @@ public sealed class ProductsControllerTests
 
     private sealed class ThrowingProductService(Exception exception) : IProductService
     {
+        public bool LastIncludeInactive { get; private set; }
+
         public Task<PagedResult<ProductDto>> SearchProductsAsync(ProductSearchRequestDto request, bool includeInactive, CancellationToken cancellationToken = default) =>
             Task.FromResult(new PagedResult<ProductDto>());
 
         public Task<ProductDto> GetProductByIdAsync(int id, bool includeInactive, CancellationToken cancellationToken = default) =>
-            Task.FromException<ProductDto>(exception);
+            ThrowDetail(includeInactive);
+
+        private Task<ProductDto> ThrowDetail(bool includeInactive)
+        {
+            LastIncludeInactive = includeInactive;
+            return Task.FromException<ProductDto>(exception);
+        }
 
         public Task<ProductDto> CreateProductAsync(ProductCreateDto dto, CancellationToken cancellationToken = default) =>
             Task.FromResult(RecordingProductService.ValidProduct);
