@@ -19,22 +19,17 @@ public class ProductsController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<PagedResult<ProductDto>>> GetProducts([FromQuery] ProductSearchRequestDto request, CancellationToken cancellationToken)
     {
-        var result = await _productService.SearchProductsAsync(request, cancellationToken);
+        var includeInactive = User.IsInRole("Admin");
+        var result = await _productService.SearchProductsAsync(request, includeInactive, cancellationToken);
         return Ok(result);
     }
 
     [HttpGet("{id}")]
     public async Task<ActionResult<ProductDto>> GetProductById(int id, CancellationToken cancellationToken)
     {
-        try
-        {
-            var result = await _productService.GetProductByIdAsync(id, cancellationToken);
-            return Ok(result);
-        }
-        catch (KeyNotFoundException ex)
-        {
-            return NotFound(new { Message = ex.Message });
-        }
+        var includeInactive = User.IsInRole("Admin");
+        var result = await _productService.GetProductByIdAsync(id, includeInactive, cancellationToken);
+        return Ok(result);
     }
 
     [HttpPost]
@@ -49,29 +44,15 @@ public class ProductsController : ControllerBase
     [Microsoft.AspNetCore.Authorization.Authorize(Roles = "Admin")]
     public async Task<ActionResult<ProductDto>> UpdateProduct(int id, ProductUpdateDto dto, CancellationToken cancellationToken)
     {
-        try
-        {
-            var result = await _productService.UpdateProductAsync(id, dto, cancellationToken);
-            return Ok(result);
-        }
-        catch (KeyNotFoundException ex)
-        {
-            return NotFound(new { Message = ex.Message });
-        }
+        var result = await _productService.UpdateProductAsync(id, dto, cancellationToken);
+        return Ok(result);
     }
 
     [HttpDelete("{id}")]
     [Microsoft.AspNetCore.Authorization.Authorize(Roles = "Admin")]
     public async Task<IActionResult> DeleteProduct(int id, CancellationToken cancellationToken)
     {
-        try
-        {
-            await _productService.DeleteProductAsync(id, cancellationToken);
-            return NoContent();
-        }
-        catch (KeyNotFoundException ex)
-        {
-            return NotFound(new { Message = ex.Message });
-        }
+        await _productService.DeleteProductAsync(id, cancellationToken);
+        return NoContent();
     }
 }

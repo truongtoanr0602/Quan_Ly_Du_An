@@ -1,6 +1,7 @@
 using ECommerce.Api.Data;
 using ECommerce.Api.DTOs;
 using ECommerce.Api.DTOs.Products;
+using ECommerce.Api.Exceptions;
 using Microsoft.EntityFrameworkCore;
 
 namespace ECommerce.Api.Services.Products;
@@ -14,14 +15,17 @@ public class ProductService : IProductService
         _context = context;
     }
 
-    public async Task<PagedResult<ProductDto>> SearchProductsAsync(ProductSearchRequestDto request, CancellationToken cancellationToken = default)
+    public async Task<PagedResult<ProductDto>> SearchProductsAsync(ProductSearchRequestDto request, bool includeInactive, CancellationToken cancellationToken = default)
     {
-        var query = _context.Products
+        IQueryable<ECommerce.Api.Entities.Product> query = _context.Products
+            .AsNoTracking()
             .Include(p => p.Category)
             .Include(p => p.Brand)
             .Include(p => p.Images)
-            .AsNoTracking()
             .AsQueryable();
+
+        if (!includeInactive)
+            query = query.Where(p => p.IsActive);
 
         // Filter by Keyword (ProductName or Description)
         if (!string.IsNullOrWhiteSpace(request.Keyword))
@@ -72,6 +76,7 @@ public class ProductService : IProductService
                 p.Brand.BrandName,
                 p.Images.Where(i => i.IsPrimary).Select(i => i.ImageURL).FirstOrDefault(),
                 p.StockQuantity,
+                p.IsActive,
                 p.CreatedAt,
                 p.UpdatedAt
             ))
@@ -86,17 +91,22 @@ public class ProductService : IProductService
         };
     }
 
-    public async Task<ProductDto> GetProductByIdAsync(int id, CancellationToken cancellationToken = default)
+    public async Task<ProductDto> GetProductByIdAsync(int id, bool includeInactive, CancellationToken cancellationToken = default)
     {
-        var product = await _context.Products
+        var query = _context.Products
             .Include(p => p.Category)
             .Include(p => p.Brand)
             .Include(p => p.Images)
             .AsNoTracking()
-            .FirstOrDefaultAsync(p => p.ProductID == id, cancellationToken);
+            .AsQueryable();
+
+        if (!includeInactive)
+            query = query.Where(p => p.IsActive);
+
+        var product = await query.FirstOrDefaultAsync(p => p.ProductID == id, cancellationToken);
 
         if (product == null)
-            throw new KeyNotFoundException($"Product with ID {id} not found.");
+            throw new ResourceNotFoundException();
 
         return new ProductDto(
             product.ProductID,
@@ -110,6 +120,7 @@ public class ProductService : IProductService
             product.Brand?.BrandName,
             product.Images?.Where(i => i.IsPrimary).Select(i => i.ImageURL).FirstOrDefault(),
             product.StockQuantity,
+            product.IsActive,
             product.CreatedAt,
             product.UpdatedAt
         );
@@ -117,6 +128,9 @@ public class ProductService : IProductService
 
     public async Task<ProductDto> CreateProductAsync(ProductCreateDto dto, CancellationToken cancellationToken = default)
     {
+        await ValidateReferencesAsync(dto.CategoryID, dto.BrandID, cancellationToken);
+        await EnsureSkuIsAvailableAsync(dto.SKU, productId: null, cancellationToken);
+
         var product = new ECommerce.Api.Entities.Product
         {
             CategoryID = dto.CategoryID,
@@ -141,7 +155,7 @@ public class ProductService : IProductService
         _context.Products.Add(product);
         await _context.SaveChangesAsync(cancellationToken);
 
-        return await GetProductByIdAsync(product.ProductID, cancellationToken);
+        return await GetProductByIdAsync(product.ProductID, includeInactive: true, cancellationToken: cancellationToken);
     }
 
     public async Task<ProductDto> UpdateProductAsync(int id, ProductUpdateDto dto, CancellationToken cancellationToken = default)
@@ -151,7 +165,10 @@ public class ProductService : IProductService
             .FirstOrDefaultAsync(p => p.ProductID == id, cancellationToken);
 
         if (product == null)
-            throw new KeyNotFoundException($"Product with ID {id} not found.");
+            throw new ResourceNotFoundException();
+
+        await ValidateReferencesAsync(dto.CategoryID, dto.BrandID, cancellationToken);
+        await EnsureSkuIsAvailableAsync(dto.SKU, id, cancellationToken);
 
         product.CategoryID = dto.CategoryID;
         product.ProductName = dto.ProductName;
@@ -182,17 +199,36 @@ public class ProductService : IProductService
 
         await _context.SaveChangesAsync(cancellationToken);
 
-        return await GetProductByIdAsync(product.ProductID, cancellationToken);
+        return await GetProductByIdAsync(product.ProductID, includeInactive: true, cancellationToken: cancellationToken);
     }
 
     public async Task DeleteProductAsync(int id, CancellationToken cancellationToken = default)
     {
         var product = await _context.Products.FindAsync(new object[] { id }, cancellationToken);
         if (product == null)
-            throw new KeyNotFoundException($"Product with ID {id} not found.");
+            throw new ResourceNotFoundException();
 
         // Soft delete bằng cách set IsActive = false (tùy nghiệp vụ)
         product.IsActive = false;
         await _context.SaveChangesAsync(cancellationToken);
+    }
+
+    private async Task ValidateReferencesAsync(int categoryId, int brandId, CancellationToken cancellationToken)
+    {
+        if (!await _context.Categories.AnyAsync(category => category.CategoryID == categoryId, cancellationToken))
+            throw new ResourceNotFoundException();
+
+        if (!await _context.Brands.AnyAsync(brand => brand.BrandID == brandId, cancellationToken))
+            throw new ResourceNotFoundException();
+    }
+
+    private async Task EnsureSkuIsAvailableAsync(string sku, int? productId, CancellationToken cancellationToken)
+    {
+        var exists = await _context.Products.AnyAsync(
+            product => product.SKU == sku && (!productId.HasValue || product.ProductID != productId.Value),
+            cancellationToken);
+
+        if (exists)
+            throw new DomainConflictException();
     }
 }
