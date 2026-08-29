@@ -12,6 +12,7 @@ export default function ProductListPage() {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [loadError, setLoadError] = useState<string | null>(null);
+  const [categoryError, setCategoryError] = useState<string | null>(null);
 
   // Filters state
   const [keyword, setKeyword] = useState('');
@@ -30,8 +31,18 @@ export default function ProductListPage() {
     return () => clearTimeout(handler);
   }, [keyword]);
 
+  const fetchCategories = async () => {
+    setCategoryError(null);
+    try {
+      const data = await categoryService.getAll();
+      setCategories(data);
+    } catch (err: unknown) {
+      setCategoryError(err instanceof ApiError || err instanceof Error ? err.message : 'Category request failed.');
+    }
+  };
+
   useEffect(() => {
-    categoryService.getAll().then(setCategories).catch(console.error);
+    fetchCategories();
   }, []);
 
   useEffect(() => {
@@ -79,6 +90,12 @@ export default function ProductListPage() {
           <span className="text-on-surface">Sản phẩm</span>
         </nav>
         <h1 className="text-3xl font-semibold text-on-surface">Khám phá Sản phẩm</h1>
+        {categoryError && (
+          <div role="alert" className="border border-error bg-error-container text-on-error-container rounded-lg p-4 mt-4 flex items-center justify-between gap-4">
+            <p>{categoryError}</p>
+            <button type="button" onClick={fetchCategories} className="underline font-medium">Thử lại</button>
+          </div>
+        )}
       </div>
 
       {/* Left Sidebar: Filters */}

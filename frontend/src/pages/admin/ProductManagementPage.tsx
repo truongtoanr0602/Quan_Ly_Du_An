@@ -11,6 +11,7 @@ export default function ProductManagementPage() {
   const [categories, setCategories] = useState<CategoryDto[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
+  const [categoryError, setCategoryError] = useState<string | null>(null);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
@@ -38,19 +39,21 @@ export default function ProductManagementPage() {
     fetchProducts();
   }, [page, keyword]);
 
-  useEffect(() => {
-    const fetchCats = async () => {
-      try {
-        const cats = await categoryService.getAll();
-        setCategories(cats);
-        if (cats.length > 0) {
-          setFormData(prev => ({ ...prev, categoryID: cats[0].categoryID }));
-        }
-      } catch (err: unknown) {
-        setLoadError(err instanceof ApiError || err instanceof Error ? err.message : 'Category request failed.');
+  const fetchCategories = async () => {
+    setCategoryError(null);
+    try {
+      const cats = await categoryService.getAll();
+      setCategories(cats);
+      if (cats.length > 0) {
+        setFormData(prev => ({ ...prev, categoryID: cats[0].categoryID }));
       }
-    };
-    fetchCats();
+    } catch (err: unknown) {
+      setCategoryError(err instanceof ApiError || err instanceof Error ? err.message : 'Category request failed.');
+    }
+  };
+
+  useEffect(() => {
+    fetchCategories();
   }, []);
 
   const fetchProducts = async () => {
@@ -169,6 +172,7 @@ export default function ProductManagementPage() {
               <span className="text-primary font-medium">Quản lý sản phẩm</span>
             </div>
             <h2 className="text-3xl font-semibold text-on-surface">Quản lý sản phẩm</h2>
+            {categoryError && <div role="alert" className="mt-4 border border-error bg-error-container text-on-error-container rounded-lg p-4 flex items-center justify-between gap-4"><span>{categoryError}</span><button type="button" onClick={fetchCategories} className="underline font-medium">Thử lại</button></div>}
             {loadError && <div role="alert" className="mt-4 border border-error bg-error-container text-on-error-container rounded-lg p-4 flex items-center justify-between gap-4"><span>{loadError}</span><button type="button" onClick={fetchProducts} className="underline font-medium">Thử lại</button></div>}
           </div>
           <button 

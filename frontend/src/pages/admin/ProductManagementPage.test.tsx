@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen } from '@testing-library/react'
+import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { ApiError } from '../../services/apiClient'
@@ -59,5 +59,18 @@ describe('ProductManagementPage', () => {
     expect(await screen.findByRole('alert')).toHaveTextContent('The request conflicts with existing state.')
     expect(screen.getByText('Sửa sản phẩm')).toBeInTheDocument()
     expect(screen.getByText('ThinkPad')).toBeInTheDocument()
+  })
+
+  it('shows a category-load alert and retries the category request', async () => {
+    vi.mocked(categoryService.getAll)
+      .mockRejectedValueOnce(new ApiError(503, 'Unable to load categories'))
+      .mockResolvedValueOnce([])
+    vi.mocked(productService.searchProducts).mockResolvedValue({ items: [], totalCount: 0, pageNumber: 1, pageSize: 10 })
+
+    render(<MemoryRouter><ProductManagementPage /></MemoryRouter>)
+
+    expect(await screen.findByRole('alert')).toHaveTextContent('Unable to load categories')
+    screen.getByRole('button', { name: /thử lại/i }).click()
+    await waitFor(() => expect(categoryService.getAll).toHaveBeenCalledTimes(2))
   })
 })

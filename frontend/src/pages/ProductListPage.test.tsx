@@ -36,4 +36,17 @@ describe('ProductListPage', () => {
     retry.click()
     await waitFor(() => expect(productService.searchProducts).toHaveBeenCalledTimes(2))
   })
+
+  it('shows a category-load alert and retries the category request', async () => {
+    vi.mocked(categoryService.getAll)
+      .mockRejectedValueOnce(new ApiError(503, 'Unable to load categories'))
+      .mockResolvedValueOnce([])
+    vi.mocked(productService.searchProducts).mockResolvedValue({ items: [], totalCount: 0, pageNumber: 1, pageSize: 12 })
+
+    render(<MemoryRouter><ProductListPage /></MemoryRouter>)
+
+    expect(await screen.findByRole('alert')).toHaveTextContent('Unable to load categories')
+    screen.getByRole('button', { name: /thử lại/i }).click()
+    await waitFor(() => expect(categoryService.getAll).toHaveBeenCalledTimes(2))
+  })
 })
