@@ -56,15 +56,19 @@ dotnet build backend/ECommerce.slnx --configuration Release --no-restore
 dotnet test backend/ECommerce.slnx --configuration Release --no-build --no-restore
 ```
 
-Initialize local secrets once per checkout:
+Configure the Development environment and initialize local secrets once per checkout. Replace only the angle-bracket placeholders with developer-provided local values; never commit those values:
 
 ```powershell
+$env:ASPNETCORE_ENVIRONMENT = 'Development'
 dotnet user-secrets init --project backend/src/ECommerce.Api
-dotnet user-secrets set "ConnectionStrings:ECommerce" "Server=localhost;Database=ECommerce;Trusted_Connection=True;TrustServerCertificate=True" --project backend/src/ECommerce.Api
-dotnet user-secrets set "Jwt:Key" "replace-with-a-local-key-of-at-least-32-characters" --project backend/src/ECommerce.Api
+dotnet user-secrets set "ConnectionStrings:ECommerce" "<local SQL Server connection string>" --project backend/src/ECommerce.Api
+dotnet user-secrets set "Jwt:Key" "<unique development key of at least 32 bytes>" --project backend/src/ECommerce.Api
+dotnet user-secrets set "BootstrapAdmin:Email" "admin@example.test" --project backend/src/ECommerce.Api
+dotnet user-secrets set "BootstrapAdmin:Password" "<local development password>" --project backend/src/ECommerce.Api
+dotnet user-secrets set "BootstrapAdmin:FullName" "Development Admin" --project backend/src/ECommerce.Api
 ```
 
-The shown values are local examples. Use a suitable SQL Server connection and a unique development-only signing key. Never commit real connection strings, JWT keys, or tokens.
+The `BootstrapAdmin` keys may be removed after the first local Admin exists. Never commit real connection strings, JWT keys, passwords, tokens, or User Secrets values.
 
 Run the API:
 
@@ -77,16 +81,13 @@ Verify:
 - Health: `http://localhost:5296/api/health`
 - OpenAPI document in Development: `http://localhost:5296/openapi/v1.json`
 
-The baseline does not query SQL Server yet. `User`, `Category`, and `Product` entities and the first migration belong to their approved Sprint 1 tasks.
-
-When a Sprint task introduces EF Core tooling and models, create and apply a reviewed migration from the repository root:
+Apply the reviewed Sprint 1 migration to a new, non-shared local test database from the repository root. Confirm that the connection string points only to that local database before running the update:
 
 ```powershell
-dotnet ef migrations add <MigrationName> --project backend/src/ECommerce.Api
-dotnet ef database update --project backend/src/ECommerce.Api
+dotnet ef database update --project backend/src/ECommerce.Api --startup-project backend/src/ECommerce.Api
 ```
 
-Replace `<MigrationName>` with a descriptive task-specific name such as `AddProductCatalog`; do not run these commands for the empty baseline.
+Do not apply migrations to a shared or production database. The generated migration is named `SeedRolesAndBrands` and must not be replaced by an unreviewed migration.
 
 ## Frontend Setup
 
@@ -98,16 +99,16 @@ npm --prefix frontend test
 npm --prefix frontend run build
 ```
 
-Copy the example environment file for local development:
+Copy the example environment file for local development, then ensure the untracked `.env.local` contains the supplied backend HTTP API URL:
 
 ```powershell
 Copy-Item frontend/.env.example frontend/.env.local
 ```
 
-`frontend/.env.example` points to `http://localhost:5000`. For the provided backend HTTP launch profile, set:
+Set `frontend/.env.local` to:
 
 ```dotenv
-VITE_API_BASE_URL=http://localhost:5296
+VITE_API_BASE_URL=http://localhost:5296/api
 ```
 
 Run the frontend:
