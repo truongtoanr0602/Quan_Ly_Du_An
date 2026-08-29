@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import { productService, type Product, type ProductCreateRequest, type ProductUpdateRequest } from '../../services/productService';
+import { ApiError } from '../../services/apiClient';
+import { useAuth } from '../../contexts/AuthContext';
 import { categoryService } from '../../services/categoryService';
 import type { CategoryDto } from '../../types/category';
 import { useNavigate } from 'react-router-dom';
@@ -8,6 +10,7 @@ export default function ProductManagementPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<CategoryDto[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
@@ -29,6 +32,7 @@ export default function ProductManagementPage() {
   });
 
   const navigate = useNavigate();
+  const { logout } = useAuth();
 
   useEffect(() => {
     fetchProducts();
@@ -42,8 +46,8 @@ export default function ProductManagementPage() {
         if (cats.length > 0) {
           setFormData(prev => ({ ...prev, categoryID: cats[0].categoryID }));
         }
-      } catch (err) {
-        console.error("Failed to fetch categories");
+      } catch (err: unknown) {
+        setLoadError(err instanceof ApiError || err instanceof Error ? err.message : 'Category request failed.');
       }
     };
     fetchCats();
@@ -51,6 +55,7 @@ export default function ProductManagementPage() {
 
   const fetchProducts = async () => {
     setIsLoading(true);
+    setLoadError(null);
     try {
       const res = await productService.searchProducts({
         pageNumber: page,
@@ -60,8 +65,8 @@ export default function ProductManagementPage() {
       setProducts(res.items);
       setTotalPages(Math.ceil(res.totalCount / res.pageSize) || 1);
       setTotalCount(res.totalCount);
-    } catch (err) {
-      console.error('Failed to fetch products:', err);
+    } catch (err: unknown) {
+      setLoadError(err instanceof ApiError || err instanceof Error ? err.message : 'Product request failed.');
     } finally {
       setIsLoading(false);
     }
@@ -71,9 +76,9 @@ export default function ProductManagementPage() {
     if (!window.confirm('Bạn có chắc chắn muốn xóa sản phẩm này?')) return;
     try {
       await productService.deleteProduct(id);
-      fetchProducts(); // Reload sau khi xóa
-    } catch (err) {
-      alert('Lỗi khi xóa sản phẩm.');
+      await fetchProducts(); // Reload sau khi xóa
+    } catch (err: unknown) {
+      setLoadError(err instanceof ApiError || err instanceof Error ? err.message : 'Product delete failed.');
     }
   };
 
@@ -89,7 +94,7 @@ export default function ProductManagementPage() {
         stockQuantity: product.stockQuantity,
         description: product.description || '',
         imageUrl: product.imageUrl || '',
-        isActive: true
+        isActive: product.isActive
       });
     } else {
       setEditingId(null);
@@ -124,17 +129,15 @@ export default function ProductManagementPage() {
       }
       handleCloseModal();
       fetchProducts();
-    } catch (err: any) {
-      alert("Lưu sản phẩm thất bại. Chi tiết lỗi: " + (err.message || JSON.stringify(err)));
-      console.error(err);
+    } catch (err: unknown) {
+      setLoadError(err instanceof ApiError || err instanceof Error ? err.message : 'Product save failed.');
     } finally {
       setIsSubmitting(false);
     }
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
+    logout();
     navigate('/login');
   };
 
@@ -150,7 +153,7 @@ export default function ProductManagementPage() {
           <div className="h-8 w-8 rounded-full overflow-hidden border border-outline-variant bg-primary text-white flex items-center justify-center font-bold">
             A
           </div>
-          <button onClick={handleLogout} className="p-2 text-secondary hover:bg-surface-container-low rounded-full transition-colors opacity-70 hover:opacity-100" title="Đăng xuất">
+          <button aria-label="Log out" onClick={handleLogout} className="p-2 text-secondary hover:bg-surface-container-low rounded-full transition-colors opacity-70 hover:opacity-100" title="Đăng xuất">
             <span className="material-symbols-outlined">logout</span>
           </button>
         </div>
@@ -166,6 +169,7 @@ export default function ProductManagementPage() {
               <span className="text-primary font-medium">Quản lý sản phẩm</span>
             </div>
             <h2 className="text-3xl font-semibold text-on-surface">Quản lý sản phẩm</h2>
+            {loadError && <div role="alert" className="mt-4 border border-error bg-error-container text-on-error-container rounded-lg p-4 flex items-center justify-between gap-4"><span>{loadError}</span><button type="button" onClick={fetchProducts} className="underline font-medium">Thử lại</button></div>}
           </div>
           <button 
             onClick={() => handleOpenModal()}
@@ -236,8 +240,8 @@ export default function ProductManagementPage() {
                       </span>
                     </td>
                     <td className="p-4 text-right">
-                      <button onClick={() => handleOpenModal(p)} className="text-secondary hover:text-primary transition-colors p-1"><span className="material-symbols-outlined text-sm">edit</span></button>
-                      <button onClick={() => handleDelete(p.productID)} className="text-secondary hover:text-error transition-colors p-1 ml-2"><span className="material-symbols-outlined text-sm">delete</span></button>
+                      <button aria-label="Edit product" onClick={() => handleOpenModal(p)} className="text-secondary hover:text-primary transition-colors p-1"><span className="material-symbols-outlined text-sm">edit</span></button>
+                      <button aria-label="Delete product" onClick={() => handleDelete(p.productID)} className="text-secondary hover:text-error transition-colors p-1 ml-2"><span className="material-symbols-outlined text-sm">delete</span></button>
                     </td>
                   </tr>
                 ))}
@@ -329,7 +333,7 @@ export default function ProductManagementPage() {
                       <label className="flex items-center gap-2 cursor-pointer">
                         <input type="checkbox" checked={formData.isActive} onChange={e => setFormData({...formData, isActive: e.target.checked})} className="w-4 h-4 text-primary" />
                         <span className="text-sm font-medium text-on-surface-variant">Đang mở bán (Kích hoạt)</span>
-                      </label>
+                      </label><span className="text-sm text-secondary">{formData.isActive ? 'Active' : 'Inactive'}</span>
                     </div>
                   )}
                 </form>

@@ -14,6 +14,7 @@ export interface Product {
   stockQuantity: number;
   createdAt: string;
   updatedAt?: string;
+  isActive: boolean;
 }
 
 export interface PagedResult<T> {
@@ -53,8 +54,8 @@ export const productService = {
     const searchParams = new URLSearchParams();
     if (params.keyword) searchParams.append('Keyword', params.keyword);
     if (params.categoryId) searchParams.append('CategoryId', params.categoryId.toString());
-    if (params.minPrice) searchParams.append('MinPrice', params.minPrice.toString());
-    if (params.maxPrice) searchParams.append('MaxPrice', params.maxPrice.toString());
+    if (params.minPrice !== undefined) searchParams.append('MinPrice', params.minPrice.toString());
+    if (params.maxPrice !== undefined) searchParams.append('MaxPrice', params.maxPrice.toString());
     if (params.brand) searchParams.append('Brand', params.brand);
     searchParams.append('PageNumber', params.pageNumber.toString());
     searchParams.append('PageSize', params.pageSize.toString());
