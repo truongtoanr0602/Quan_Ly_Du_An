@@ -31,6 +31,11 @@ public sealed class TestApiFactory(
         {
             builder.UseSetting("Jwt:Key", TestJwtKey);
         }
+        else
+        {
+            builder.UseSetting("Jwt:Key", string.Empty);
+        }
+
         builder.ConfigureAppConfiguration((_, configuration) =>
         {
             var values = new Dictionary<string, string?>
@@ -43,6 +48,10 @@ public sealed class TestApiFactory(
             if (withJwtKey)
             {
                 values["Jwt:Key"] = TestJwtKey;
+            }
+            else
+            {
+                values["Jwt:Key"] = string.Empty;
             }
 
             configuration.AddInMemoryCollection(values);

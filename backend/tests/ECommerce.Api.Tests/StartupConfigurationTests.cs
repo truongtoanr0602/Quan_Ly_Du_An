@@ -15,6 +15,26 @@ public sealed class StartupConfigurationTests
     }
 
     [Fact]
+    public void CreateClientWithoutJwtKeyFailsWhenEnvironmentProvidesJwtKey()
+    {
+        var originalJwtKey = Environment.GetEnvironmentVariable("Jwt__Key");
+
+        try
+        {
+            Environment.SetEnvironmentVariable("Jwt__Key", TestApiFactory.TestJwtKey);
+            using var factory = new TestApiFactory(withJwtKey: false);
+
+            var exception = Assert.ThrowsAny<Exception>(() => factory.CreateClient());
+
+            Assert.DoesNotContain("test-signing-key", exception.ToString(), StringComparison.OrdinalIgnoreCase);
+        }
+        finally
+        {
+            Environment.SetEnvironmentVariable("Jwt__Key", originalJwtKey);
+        }
+    }
+
+    [Fact]
     public async Task HealthEndpointStartsWhenTestConfigurationSuppliesJwtKey()
     {
         using var factory = new TestApiFactory();
