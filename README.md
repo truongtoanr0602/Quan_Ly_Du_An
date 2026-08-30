@@ -2,7 +2,7 @@
 
 Technical baseline for a six-week e-commerce MVP developed by a five-person Scrum Team. The current Sprint is **Sprint 1 — Product Catalog & Authentication**.
 
-This repository currently provides shared project rules, a runnable .NET 10 API baseline, a runnable React/Vite baseline, tests, engineering documentation, and GitHub CI. It intentionally does not implement Sprint 1 business User Stories yet.
+This repository provides shared project rules, the implemented Sprint 1 catalog and authentication increment, runnable .NET 10 and React/Vite applications, tests, engineering documentation, and GitHub CI. The live SQL/UX functional gate remains externally pending until a developer supplies a non-shared local test database and User Secrets.
 
 ## Team
 
@@ -70,6 +70,14 @@ dotnet user-secrets set "BootstrapAdmin:FullName" "Development Admin" --project 
 
 The `BootstrapAdmin` keys may be removed after the first local Admin exists. Never commit real connection strings, JWT keys, passwords, tokens, or User Secrets values.
 
+On a fresh local database, apply the reviewed Sprint 1 migration before starting the Development API. The Development BootstrapAdmin hosted service may query roles and users at startup, so the schema and seed data must exist first. Confirm that the connection string points only to the new, non-shared local test database before running the update:
+
+```powershell
+dotnet ef database update --project backend/src/ECommerce.Api --startup-project backend/src/ECommerce.Api
+```
+
+Do not apply migrations to a shared or production database. The generated migration is named `SeedRolesAndBrands` and must not be replaced by an unreviewed migration.
+
 Run the API:
 
 ```powershell
@@ -80,14 +88,6 @@ Verify:
 
 - Health: `http://localhost:5296/api/health`
 - OpenAPI document in Development: `http://localhost:5296/openapi/v1.json`
-
-Apply the reviewed Sprint 1 migration to a new, non-shared local test database from the repository root. Confirm that the connection string points only to that local database before running the update:
-
-```powershell
-dotnet ef database update --project backend/src/ECommerce.Api --startup-project backend/src/ECommerce.Api
-```
-
-Do not apply migrations to a shared or production database. The generated migration is named `SeedRolesAndBrands` and must not be replaced by an unreviewed migration.
 
 ## Frontend Setup
 
