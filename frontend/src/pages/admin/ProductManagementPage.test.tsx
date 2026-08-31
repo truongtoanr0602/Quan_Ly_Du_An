@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { ApiError } from '../../services/apiClient'
@@ -53,16 +53,49 @@ describe('ProductManagementPage', () => {
     render(<MemoryRouter><ProductManagementPage /></MemoryRouter>)
     expect(await screen.findByText('ThinkPad')).toBeInTheDocument()
     fireEvent.click(screen.getByRole('button', { name: 'Edit product' }))
+    const dialog = screen.getByRole('dialog', { name: 'Product editor' })
     expect(screen.getByText(/inactive/i)).toBeInTheDocument()
     fireEvent.submit(document.getElementById('productForm')!)
 
-    expect(await screen.findByRole('alert')).toHaveTextContent('The request conflicts with existing state.')
+    expect(await within(dialog).findByRole('alert')).toHaveTextContent('The request conflicts with existing state.')
     expect(screen.getByText('Sửa sản phẩm')).toBeInTheDocument()
     expect(screen.getByText('ThinkPad')).toBeInTheDocument()
   })
 
-  it('shows a category-load alert and retries the category request', async () => {
+  it('shows inactive status for an in-stock inactive product', async () => {
+    render(<MemoryRouter><ProductManagementPage /></MemoryRouter>)
+
+    expect(await screen.findByText('ThinkPad')).toBeInTheDocument()
+    expect(screen.getByRole('status', { name: 'Product inactive' })).toBeInTheDocument()
+  })
+
+  it('keeps the edited category when retrying category loading', async () => {
+    vi.mocked(categoryService.getAll).mockReset()
     vi.mocked(categoryService.getAll)
+      .mockRejectedValueOnce(new ApiError(503, 'Unable to load categories'))
+      .mockResolvedValueOnce([
+        { categoryID: 3, categoryName: 'Laptops', parentID: null, description: null, isActive: true, createdAt: '', updatedAt: null },
+        { categoryID: 4, categoryName: 'Desktops', parentID: null, description: null, isActive: true, createdAt: '', updatedAt: null },
+      ])
+    vi.mocked(productService.searchProducts).mockResolvedValue({
+      items: [{ ...product, categoryID: 4, categoryName: 'Desktops' }],
+      totalCount: 1,
+      pageNumber: 1,
+      pageSize: 10,
+    })
+
+    render(<MemoryRouter><ProductManagementPage /></MemoryRouter>)
+    expect(await screen.findByText('ThinkPad')).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'Edit product' }))
+    const dialog = screen.getByRole('dialog', { name: 'Product editor' })
+    screen.getByRole('button', { name: /th\u1eed l\u1ea1i/i }).click()
+
+    await waitFor(() => expect(categoryService.getAll).toHaveBeenCalledTimes(2))
+    expect(within(dialog).getByRole('combobox')).toHaveValue('4')
+  })
+
+  it('shows a category-load alert and retries the category request', async () => {
+    vi.mocked(categoryService.getAll).mockReset()
       .mockRejectedValueOnce(new ApiError(503, 'Unable to load categories'))
       .mockResolvedValueOnce([])
     vi.mocked(productService.searchProducts).mockResolvedValue({ items: [], totalCount: 0, pageNumber: 1, pageSize: 10 })

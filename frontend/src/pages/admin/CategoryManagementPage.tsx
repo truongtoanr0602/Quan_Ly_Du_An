@@ -9,6 +9,7 @@ export default function CategoryManagementPage() {
   const [categories, setCategories] = useState<CategoryDto[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
+  const [formError, setFormError] = useState<string | null>(null);
   
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -41,6 +42,7 @@ export default function CategoryManagementPage() {
   }, []);
 
   const handleOpenModal = (cat?: CategoryDto) => {
+    setFormError(null);
     if (cat) {
       setEditingId(cat.categoryID);
       setFormData({
@@ -61,12 +63,14 @@ export default function CategoryManagementPage() {
   };
 
   const handleCloseModal = () => {
+    setFormError(null);
     setIsModalOpen(false);
     setEditingId(null);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setFormError(null);
     setIsSubmitting(true);
     try {
       if (editingId) {
@@ -77,7 +81,7 @@ export default function CategoryManagementPage() {
       handleCloseModal();
       await fetchCategories();
     } catch (err: unknown) {
-      setLoadError(err instanceof ApiError || err instanceof Error ? err.message : 'Category save failed.');
+      setFormError(err instanceof ApiError || err instanceof Error ? err.message : 'Category save failed.');
     } finally {
       setIsSubmitting(false);
     }
@@ -181,7 +185,7 @@ export default function CategoryManagementPage() {
         {/* Modal Thêm/Sửa */}
         {isModalOpen && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center bg-on-surface/50 p-4">
-            <div className="bg-surface-container-lowest rounded-xl shadow-xl w-full max-w-lg flex flex-col">
+            <div role="dialog" aria-modal="true" aria-label="Category editor" className="bg-surface-container-lowest rounded-xl shadow-xl w-full max-w-lg flex flex-col">
               <div className="p-6 border-b border-outline-variant flex justify-between items-center">
                 <h3 className="text-xl font-bold text-on-surface">{editingId ? 'Sửa danh mục' : 'Thêm danh mục mới'}</h3>
                 <button onClick={handleCloseModal} className="text-secondary hover:text-error transition-colors">
@@ -189,6 +193,7 @@ export default function CategoryManagementPage() {
                 </button>
               </div>
               <div className="p-6 overflow-y-auto flex-1">
+                {formError && <div role="alert" className="mb-4 border border-error bg-error-container text-on-error-container rounded-lg p-4"><span>{formError}</span></div>}
                 <form id="categoryForm" onSubmit={handleSubmit} className="flex flex-col gap-6">
                   <div className="space-y-1">
                     <label className="text-sm font-medium text-on-surface-variant">Tên danh mục *</label>

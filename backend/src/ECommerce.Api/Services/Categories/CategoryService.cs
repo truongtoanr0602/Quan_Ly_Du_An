@@ -64,7 +64,7 @@ public class CategoryService : ICategoryService
         };
 
         _context.Categories.Add(category);
-        await _context.SaveChangesAsync(cancellationToken);
+        await PersistenceBoundary.SaveChangesAsync(_context, cancellationToken);
 
         return ToDto(category);
     }
@@ -91,7 +91,7 @@ public class CategoryService : ICategoryService
         category.IsActive = dto.IsActive;
         category.UpdatedAt = DateTime.UtcNow;
 
-        await _context.SaveChangesAsync(cancellationToken);
+        await PersistenceBoundary.SaveChangesAsync(_context, cancellationToken);
 
         return ToDto(category);
     }

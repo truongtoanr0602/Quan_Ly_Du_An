@@ -1,4 +1,4 @@
-import { cleanup, render, screen, waitFor } from '@testing-library/react'
+import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { ApiError } from '../../services/apiClient'
@@ -44,6 +44,21 @@ describe('CategoryManagementPage', () => {
     screen.getByRole('button', { name: 'Delete category' }).click()
 
     expect(await screen.findByRole('alert')).toHaveTextContent('The request conflicts with existing state.')
+    expect(screen.getByText('Laptops')).toBeInTheDocument()
+  })
+
+  it('renders a save conflict inside the open category dialog', async () => {
+    vi.mocked(categoryService.update).mockRejectedValueOnce(
+      new ApiError(409, 'The request conflicts with existing state.'),
+    )
+
+    render(<MemoryRouter><CategoryManagementPage /></MemoryRouter>)
+    expect(await screen.findByText('Laptops')).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'Edit category' }))
+    const dialog = screen.getByRole('dialog', { name: 'Category editor' })
+    fireEvent.submit(document.getElementById('categoryForm')!)
+
+    expect(await within(dialog).findByRole('alert')).toHaveTextContent('The request conflicts with existing state.')
     expect(screen.getByText('Laptops')).toBeInTheDocument()
   })
 

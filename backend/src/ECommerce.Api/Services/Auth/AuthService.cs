@@ -41,7 +41,7 @@ public class AuthService(AppDbContext context, IConfiguration configuration) : I
         };
 
         context.Users.Add(user);
-        await context.SaveChangesAsync(cancellationToken);
+        await PersistenceBoundary.SaveChangesAsync(context, cancellationToken);
 
         return CreateAuthResponse(user, customerRole.RoleName);
     }

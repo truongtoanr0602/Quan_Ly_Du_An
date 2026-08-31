@@ -153,7 +153,7 @@ public class ProductService : IProductService
         }
 
         _context.Products.Add(product);
-        await _context.SaveChangesAsync(cancellationToken);
+        await PersistenceBoundary.SaveChangesAsync(_context, cancellationToken);
 
         return await GetProductByIdAsync(product.ProductID, includeInactive: true, cancellationToken: cancellationToken);
     }
@@ -197,7 +197,7 @@ public class ProductService : IProductService
             }
         }
 
-        await _context.SaveChangesAsync(cancellationToken);
+        await PersistenceBoundary.SaveChangesAsync(_context, cancellationToken);
 
         return await GetProductByIdAsync(product.ProductID, includeInactive: true, cancellationToken: cancellationToken);
     }

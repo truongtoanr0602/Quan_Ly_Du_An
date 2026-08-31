@@ -1,6 +1,6 @@
-import { render, screen } from '@testing-library/react'
+import { cleanup, render, screen } from '@testing-library/react'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
-import { beforeEach, describe, expect, it } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import AuthProvider from '../contexts/AuthContext'
 import { saveSession } from '../services/authSession'
 import RequireAdmin from './RequireAdmin'
@@ -10,6 +10,13 @@ const customer = {
   email: 'customer@example.test',
   fullName: 'Customer',
   role: 'Customer' as const,
+}
+
+const admin = {
+  id: 2,
+  email: 'admin@example.test',
+  fullName: 'Admin',
+  role: 'Admin' as const,
 }
 
 function GuardRoutes() {
@@ -26,11 +33,20 @@ function GuardRoutes() {
 
 describe('RequireAdmin', () => {
   beforeEach(() => localStorage.clear())
+  afterEach(cleanup)
 
   it('redirects an anonymous visitor from an Admin route to login', () => {
     render(<MemoryRouter initialEntries={['/admin/products']}><AuthProvider><GuardRoutes /></AuthProvider></MemoryRouter>)
 
     expect(screen.getByText('Login')).toBeInTheDocument()
+  })
+
+  it('renders the protected outlet for an Admin', () => {
+    saveSession({ token: 'token', user: admin })
+
+    render(<MemoryRouter initialEntries={['/admin/products']}><AuthProvider><GuardRoutes /></AuthProvider></MemoryRouter>)
+
+    expect(screen.getByText('Admin products')).toBeInTheDocument()
   })
 
   it('redirects a Customer from an Admin route home', () => {
