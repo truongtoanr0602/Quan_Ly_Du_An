@@ -38,5 +38,13 @@ public class BrandConfiguration : IEntityTypeConfiguration<Brand>
         builder.HasIndex(b => b.BrandName)
             .IsUnique()
             .HasDatabaseName("UQ_Brands_Name");
+        var seedTimestamp = new DateTime(2026, 8, 29, 0, 0, 0, DateTimeKind.Utc);
+
+        builder.HasData(
+            new Brand { BrandID = 1, BrandName = "Apple", IsActive = true, CreatedAt = seedTimestamp },
+            new Brand { BrandID = 2, BrandName = "ASUS", IsActive = true, CreatedAt = seedTimestamp },
+            new Brand { BrandID = 3, BrandName = "Lenovo", IsActive = true, CreatedAt = seedTimestamp },
+            new Brand { BrandID = 4, BrandName = "Dell", IsActive = true, CreatedAt = seedTimestamp },
+            new Brand { BrandID = 5, BrandName = "Sony", IsActive = true, CreatedAt = seedTimestamp });
     }
 }

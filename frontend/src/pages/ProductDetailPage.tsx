@@ -1,27 +1,38 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { productService, type Product } from '../services/productService';
+import { ApiError } from '../services/apiClient';
 
 export default function ProductDetailPage() {
   const { id } = useParams();
   const [product, setProduct] = useState<Product | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [quantity, setQuantity] = useState(1);
   const [activeTab, setActiveTab] = useState<'desc' | 'specs'>('desc');
 
-  useEffect(() => {
-    const fetchProduct = async () => {
-      try {
-        if (id) {
-          const data = await productService.getProductById(Number(id));
-          setProduct(data);
-        }
-      } catch (error) {
-        console.error('Error fetching product:', error);
-      } finally {
-        setIsLoading(false);
+  const fetchProduct = async () => {
+    setIsLoading(true);
+    setLoadError(null);
+    try {
+      if (id) {
+        const data = await productService.getProductById(Number(id));
+        setProduct(data);
+      } else {
+        setProduct(null);
       }
-    };
+    } catch (error: unknown) {
+      if (error instanceof ApiError && error.status === 404) {
+        setProduct(null);
+      } else {
+        setLoadError(error instanceof ApiError || error instanceof Error ? error.message : 'Không thể tải sản phẩm.');
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchProduct();
   }, [id]);
 
@@ -33,6 +44,15 @@ export default function ProductDetailPage() {
     return (
       <div className="flex justify-center items-center min-h-[50vh]">
         <span className="material-symbols-outlined animate-spin text-4xl text-primary">progress_activity</span>
+      </div>
+    );
+  }
+
+  if (loadError) {
+    return (
+      <div role="alert" className="flex justify-center items-center min-h-[50vh] flex-col gap-4 text-center">
+        <p>{loadError}</p>
+        <button type="button" onClick={fetchProduct} className="text-primary hover:underline">Thử lại</button>
       </div>
     );
   }

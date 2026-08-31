@@ -4,6 +4,6 @@ namespace ECommerce.Api.Services.Auth;
 
 public interface IAuthService
 {
-    Task<AuthResponseDto> LoginAsync(LoginDto loginDto);
-    Task<AuthResponseDto> RegisterAsync(RegisterDto registerDto);
+    Task<AuthResponseDto> LoginAsync(LoginDto loginDto, CancellationToken cancellationToken = default);
+    Task<AuthResponseDto> RegisterAsync(RegisterDto registerDto, CancellationToken cancellationToken = default);
 }

@@ -1,11 +1,15 @@
 import { useState, useEffect } from 'react';
 import type { CategoryDto, CategoryCreateDto, CategoryUpdateDto } from '../../types/category';
 import { categoryService } from '../../services/categoryService';
+import { ApiError } from '../../services/apiClient';
+import { useAuth } from '../../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 
 export default function CategoryManagementPage() {
   const [categories, setCategories] = useState<CategoryDto[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [formError, setFormError] = useState<string | null>(null);
   
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -18,14 +22,16 @@ export default function CategoryManagementPage() {
   });
 
   const navigate = useNavigate();
+  const { logout } = useAuth();
 
   const fetchCategories = async () => {
     try {
       setIsLoading(true);
+      setLoadError(null);
       const data = await categoryService.getAll();
       setCategories(data);
-    } catch (err: any) {
-      alert('Failed to fetch categories: ' + (err.message || ''));
+    } catch (err: unknown) {
+      setLoadError(err instanceof ApiError || err instanceof Error ? err.message : 'Category request failed.');
     } finally {
       setIsLoading(false);
     }
@@ -36,11 +42,12 @@ export default function CategoryManagementPage() {
   }, []);
 
   const handleOpenModal = (cat?: CategoryDto) => {
+    setFormError(null);
     if (cat) {
       setEditingId(cat.categoryID);
       setFormData({
         categoryName: cat.categoryName,
-        description: cat.description || '',
+        description: cat.description ?? '',
         isActive: cat.isActive,
         parentID: cat.parentID,
       });
@@ -56,12 +63,14 @@ export default function CategoryManagementPage() {
   };
 
   const handleCloseModal = () => {
+    setFormError(null);
     setIsModalOpen(false);
     setEditingId(null);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setFormError(null);
     setIsSubmitting(true);
     try {
       if (editingId) {
@@ -70,9 +79,9 @@ export default function CategoryManagementPage() {
         await categoryService.create(formData);
       }
       handleCloseModal();
-      fetchCategories();
-    } catch (err: any) {
-      alert("Lưu danh mục thất bại. Chi tiết: " + (err.message || JSON.stringify(err)));
+      await fetchCategories();
+    } catch (err: unknown) {
+      setFormError(err instanceof ApiError || err instanceof Error ? err.message : 'Category save failed.');
     } finally {
       setIsSubmitting(false);
     }
@@ -82,15 +91,14 @@ export default function CategoryManagementPage() {
     if (!window.confirm('Bạn có chắc chắn muốn xóa danh mục này?')) return;
     try {
       await categoryService.delete(id);
-      fetchCategories();
-    } catch (err: any) {
-      alert('Lỗi khi xóa danh mục: ' + (err.message || ''));
+      await fetchCategories();
+    } catch (err: unknown) {
+      setLoadError(err instanceof ApiError || err instanceof Error ? err.message : 'Category request failed.');
     }
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
+    logout();
     navigate('/login');
   };
 
@@ -102,7 +110,7 @@ export default function CategoryManagementPage() {
           <div className="h-8 w-8 rounded-full overflow-hidden border border-outline-variant bg-primary text-white flex items-center justify-center font-bold">
             A
           </div>
-          <button onClick={handleLogout} className="p-2 text-secondary hover:bg-surface-container-low rounded-full transition-colors opacity-70 hover:opacity-100" title="Đăng xuất">
+          <button aria-label="Log out" onClick={handleLogout} className="p-2 text-secondary hover:bg-surface-container-low rounded-full transition-colors opacity-70 hover:opacity-100" title="Đăng xuất">
             <span className="material-symbols-outlined">logout</span>
           </button>
         </div>
@@ -118,6 +126,7 @@ export default function CategoryManagementPage() {
               <span className="text-primary font-medium">Quản lý danh mục</span>
             </div>
             <h2 className="text-3xl font-semibold text-on-surface">Quản lý danh mục</h2>
+            {loadError && <div role="alert" className="mt-4 border border-error bg-error-container text-on-error-container rounded-lg p-4 flex items-center justify-between gap-4"><span>{loadError}</span><button type="button" onClick={fetchCategories} className="underline font-medium">Thử lại</button></div>}
           </div>
           <button 
             onClick={() => handleOpenModal()}
@@ -163,8 +172,8 @@ export default function CategoryManagementPage() {
                       </span>
                     </td>
                     <td className="p-4 text-right">
-                      <button onClick={() => handleOpenModal(c)} className="text-secondary hover:text-primary transition-colors p-1"><span className="material-symbols-outlined text-sm">edit</span></button>
-                      <button onClick={() => handleDelete(c.categoryID)} className="text-secondary hover:text-error transition-colors p-1 ml-2"><span className="material-symbols-outlined text-sm">delete</span></button>
+                      <button aria-label="Edit category" onClick={() => handleOpenModal(c)} className="text-secondary hover:text-primary transition-colors p-1"><span className="material-symbols-outlined text-sm">edit</span></button>
+                      <button aria-label="Delete category" onClick={() => handleDelete(c.categoryID)} className="text-secondary hover:text-error transition-colors p-1 ml-2"><span className="material-symbols-outlined text-sm">delete</span></button>
                     </td>
                   </tr>
                 ))}
@@ -176,7 +185,7 @@ export default function CategoryManagementPage() {
         {/* Modal Thêm/Sửa */}
         {isModalOpen && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center bg-on-surface/50 p-4">
-            <div className="bg-surface-container-lowest rounded-xl shadow-xl w-full max-w-lg flex flex-col">
+            <div role="dialog" aria-modal="true" aria-label="Category editor" className="bg-surface-container-lowest rounded-xl shadow-xl w-full max-w-lg flex flex-col">
               <div className="p-6 border-b border-outline-variant flex justify-between items-center">
                 <h3 className="text-xl font-bold text-on-surface">{editingId ? 'Sửa danh mục' : 'Thêm danh mục mới'}</h3>
                 <button onClick={handleCloseModal} className="text-secondary hover:text-error transition-colors">
@@ -184,6 +193,7 @@ export default function CategoryManagementPage() {
                 </button>
               </div>
               <div className="p-6 overflow-y-auto flex-1">
+                {formError && <div role="alert" className="mb-4 border border-error bg-error-container text-on-error-container rounded-lg p-4"><span>{formError}</span></div>}
                 <form id="categoryForm" onSubmit={handleSubmit} className="flex flex-col gap-6">
                   <div className="space-y-1">
                     <label className="text-sm font-medium text-on-surface-variant">Tên danh mục *</label>
@@ -191,7 +201,7 @@ export default function CategoryManagementPage() {
                   </div>
                   <div className="space-y-1">
                     <label className="text-sm font-medium text-on-surface-variant">Mô tả</label>
-                    <textarea rows={3} value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})} className="w-full px-3 py-2 border border-outline-variant rounded focus:border-primary outline-none" />
+                    <textarea rows={3} value={formData.description ?? ''} onChange={e => setFormData({...formData, description: e.target.value})} className="w-full px-3 py-2 border border-outline-variant rounded focus:border-primary outline-none" />
                   </div>
                   <div className="space-y-1">
                     <label className="flex items-center gap-2 cursor-pointer">

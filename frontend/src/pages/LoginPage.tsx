@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { authService } from '../services/authService';
+import { useAuth } from '../contexts/AuthContext';
+import { ApiError } from '../services/apiClient';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -10,6 +11,7 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -17,14 +19,14 @@ export default function LoginPage() {
     setIsLoading(true);
     
     try {
-      const response = await authService.login({ email, password });
+      const response = await login({ email, password });
       if (response.user.role === 'Admin') {
         navigate('/admin/products');
       } else {
         navigate('/');
       }
-    } catch (err: any) {
-      setError(err.message || 'Đăng nhập thất bại.');
+    } catch (err: unknown) {
+      setError(err instanceof ApiError || err instanceof Error ? err.message : 'Đăng nhập thất bại.');
     } finally {
       setIsLoading(false);
     }

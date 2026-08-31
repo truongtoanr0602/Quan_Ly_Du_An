@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { authService } from '../services/authService';
+import { useAuth } from '../contexts/AuthContext';
+import { ApiError } from '../services/apiClient';
 
 export default function RegisterPage() {
   const [form, setForm] = useState({ fullName: '', email: '', phone: '', password: '', confirmPassword: '' });
@@ -9,6 +10,7 @@ export default function RegisterPage() {
   const [isLoading, setIsLoading] = useState(false);
   
   const navigate = useNavigate();
+  const { register } = useAuth();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
@@ -25,15 +27,15 @@ export default function RegisterPage() {
     
     setIsLoading(true);
     try {
-      await authService.register({
+      await register({
         fullName: form.fullName,
         email: form.email,
         phone: form.phone,
         password: form.password
       });
       navigate('/');
-    } catch (err: any) {
-      setError(err.message || 'Đăng ký thất bại.');
+    } catch (err: unknown) {
+      setError(err instanceof ApiError || err instanceof Error ? err.message : 'Đăng ký thất bại.');
     } finally {
       setIsLoading(false);
     }

@@ -12,6 +12,7 @@ public record ProductDto(
     string? BrandName,
     string? ImageUrl,
     int StockQuantity,
+    bool IsActive,
     DateTime CreatedAt,
     DateTime? UpdatedAt
 );

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { productService, type Product } from '../services/productService';
+import { ApiError } from '../services/apiClient';
 import { categoryService } from '../services/categoryService';
 import type { CategoryDto } from '../types/category';
 
@@ -10,6 +11,8 @@ export default function ProductListPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [categoryError, setCategoryError] = useState<string | null>(null);
 
   // Filters state
   const [keyword, setKeyword] = useState('');
@@ -28,8 +31,18 @@ export default function ProductListPage() {
     return () => clearTimeout(handler);
   }, [keyword]);
 
+  const fetchCategories = async () => {
+    setCategoryError(null);
+    try {
+      const data = await categoryService.getAll();
+      setCategories(data);
+    } catch (err: unknown) {
+      setCategoryError(err instanceof ApiError || err instanceof Error ? err.message : 'Category request failed.');
+    }
+  };
+
   useEffect(() => {
-    categoryService.getAll().then(setCategories).catch(console.error);
+    fetchCategories();
   }, []);
 
   useEffect(() => {
@@ -38,6 +51,7 @@ export default function ProductListPage() {
 
   const fetchProducts = async () => {
     setIsLoading(true);
+    setLoadError(null);
     try {
       const res = await productService.searchProducts({
         pageNumber: page,
@@ -55,8 +69,8 @@ export default function ProductListPage() {
       
       setProducts(items);
       setTotalPages(Math.ceil(res.totalCount / res.pageSize) || 1);
-    } catch (err) {
-      console.error('Failed to fetch products:', err);
+    } catch (err: unknown) {
+      setLoadError(err instanceof ApiError || err instanceof Error ? err.message : 'Không thể tải sản phẩm.');
     } finally {
       setIsLoading(false);
     }
@@ -76,6 +90,12 @@ export default function ProductListPage() {
           <span className="text-on-surface">Sản phẩm</span>
         </nav>
         <h1 className="text-3xl font-semibold text-on-surface">Khám phá Sản phẩm</h1>
+        {categoryError && (
+          <div role="alert" className="border border-error bg-error-container text-on-error-container rounded-lg p-4 mt-4 flex items-center justify-between gap-4">
+            <p>{categoryError}</p>
+            <button type="button" onClick={fetchCategories} className="underline font-medium">Thử lại</button>
+          </div>
+        )}
       </div>
 
       {/* Left Sidebar: Filters */}
@@ -124,7 +144,7 @@ export default function ProductListPage() {
         <section className="pb-6">
           <h3 className="text-xl font-semibold text-on-surface mb-4">Thương hiệu</h3>
           <div className="space-y-3">
-            {['Apple', 'Asus', 'Lenovo', 'Dell', 'Sony'].map((b) => (
+            {['Apple', 'ASUS', 'Lenovo', 'Dell', 'Sony'].map((b) => (
               <label key={b} className="flex items-center gap-3 cursor-pointer group">
                 <input 
                   type="radio" 
@@ -179,6 +199,11 @@ export default function ProductListPage() {
         {isLoading ? (
           <div className="flex justify-center items-center py-20">
             <span className="material-symbols-outlined animate-spin text-4xl text-primary">progress_activity</span>
+          </div>
+        ) : loadError ? (
+          <div role="alert" className="border border-error bg-error-container text-on-error-container rounded-lg p-6 flex items-center justify-between gap-4">
+            <p>{loadError}</p>
+            <button type="button" onClick={fetchProducts} className="underline font-medium">Thử lại</button>
           </div>
         ) : products.length === 0 ? (
           <div className="text-center py-20 text-secondary">
