@@ -10,6 +10,7 @@ export interface AuthContextValue {
   login: (request: LoginRequest) => Promise<AuthResponse>
   register: (request: RegisterRequest) => Promise<AuthResponse>
   logout: () => void
+  updateUser: (user: UserInfo) => void
 }
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined)
@@ -35,12 +36,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return response
   }
 
+  const updateUser = (updatedUser: UserInfo): void => {
+    const session = readSession()
+    if (session) {
+      saveSession({ ...session, user: updatedUser })
+    }
+    setUser(updatedUser)
+  }
+
   const logout = (): void => {
     clearSession()
     setUser(null)
   }
 
-  return <AuthContext.Provider value={{ user, isAuthenticated: user !== null, login, register, logout }}>{children}</AuthContext.Provider>
+  return <AuthContext.Provider value={{ user, isAuthenticated: user !== null, login, register, logout, updateUser }}>{children}</AuthContext.Provider>
 }
 
 export function useAuth(): AuthContextValue {

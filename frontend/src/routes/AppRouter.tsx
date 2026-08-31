@@ -7,8 +7,10 @@ import CategoryManagementPage from '../pages/admin/CategoryManagementPage';
 import ProductManagementPage from '../pages/admin/ProductManagementPage';
 import ProductListPage from '../pages/ProductListPage';
 import ProductDetailPage from '../pages/ProductDetailPage';
+import ProfilePage from '../pages/ProfilePage';
 import AuthProvider from '../contexts/AuthContext';
 import RequireAdmin from './RequireAdmin';
+import RequireCustomer from './RequireCustomer';
 
 export default function AppRouter() {
   return (
@@ -20,6 +22,9 @@ export default function AppRouter() {
           <Route path="/" element={<HomePage />} />
           <Route path="/products" element={<ProductListPage />} />
           <Route path="/products/:id" element={<ProductDetailPage />} />
+          <Route element={<RequireCustomer />}>
+            <Route path="/profile" element={<ProfilePage />} />
+          </Route>
         </Route>
 
         {/* Auth pages (no header/footer) */}
