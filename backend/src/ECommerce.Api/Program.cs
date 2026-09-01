@@ -46,15 +46,15 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IProfileService, ProfileService>();
+builder.Services.AddScoped<IOrderService, OrderService>();
+builder.Services.AddScoped<ICartService, CartService>();
+builder.Services.AddScoped<IAddressService, AddressService>();
 builder.Services.AddSingleton(serviceProvider =>
 {
     var section = serviceProvider
         .GetRequiredService<IConfiguration>()
         .GetSection("BootstrapAdmin");
-builder.Services.AddScoped<IProfileService, ProfileService>();
-builder.Services.AddScoped<IOrderService, OrderService>();
-builder.Services.AddScoped<ICartService, CartService>();
-builder.Services.AddScoped<IAddressService, AddressService>();
 
     return new BootstrapAdminOptions(
         section["Email"],
