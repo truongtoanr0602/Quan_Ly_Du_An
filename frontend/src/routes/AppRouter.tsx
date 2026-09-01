@@ -9,6 +9,7 @@ import ProductListPage from '../pages/ProductListPage';
 import ProductDetailPage from '../pages/ProductDetailPage';
 import ProfilePage from '../pages/ProfilePage';
 import CartPage from '../pages/CartPage';
+import AddressesPage from '../pages/AddressesPage';
 import AuthProvider from '../contexts/AuthContext';
 import { CartProvider } from '../contexts/CartContext';
 import RequireAdmin from './RequireAdmin';
@@ -28,6 +29,7 @@ export default function AppRouter() {
           <Route element={<RequireCustomer />}>
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/cart" element={<CartPage />} />
+            <Route path="/addresses" element={<AddressesPage />} />
           </Route>
         </Route>
 
