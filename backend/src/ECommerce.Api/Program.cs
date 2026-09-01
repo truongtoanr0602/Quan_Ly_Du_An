@@ -4,6 +4,7 @@ using ECommerce.Api.Middleware;
 using ECommerce.Api.Services.Products;
 using ECommerce.Api.Services.Categories;
 using ECommerce.Api.Services.Profile;
+using ECommerce.Api.Services.Cart;
 using ECommerce.Api.Services.Auth;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -49,6 +50,7 @@ builder.Services.AddSingleton(serviceProvider =>
         .GetRequiredService<IConfiguration>()
         .GetSection("BootstrapAdmin");
 builder.Services.AddScoped<IProfileService, ProfileService>();
+builder.Services.AddScoped<ICartService, CartService>();
 
     return new BootstrapAdminOptions(
         section["Email"],

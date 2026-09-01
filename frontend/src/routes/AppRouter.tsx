@@ -8,7 +8,9 @@ import ProductManagementPage from '../pages/admin/ProductManagementPage';
 import ProductListPage from '../pages/ProductListPage';
 import ProductDetailPage from '../pages/ProductDetailPage';
 import ProfilePage from '../pages/ProfilePage';
+import CartPage from '../pages/CartPage';
 import AuthProvider from '../contexts/AuthContext';
+import { CartProvider } from '../contexts/CartContext';
 import RequireAdmin from './RequireAdmin';
 import RequireCustomer from './RequireCustomer';
 
@@ -16,6 +18,7 @@ export default function AppRouter() {
   return (
     <BrowserRouter>
       <AuthProvider>
+        <CartProvider>
         <Routes>
         {/* Public layout with Header/Footer */}
         <Route element={<MainLayout />}>
@@ -24,6 +27,7 @@ export default function AppRouter() {
           <Route path="/products/:id" element={<ProductDetailPage />} />
           <Route element={<RequireCustomer />}>
             <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/cart" element={<CartPage />} />
           </Route>
         </Route>
 
@@ -45,6 +49,7 @@ export default function AppRouter() {
 
         <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
+        </CartProvider>
       </AuthProvider>
     </BrowserRouter>
   );

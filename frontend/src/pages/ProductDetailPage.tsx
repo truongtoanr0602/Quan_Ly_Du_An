@@ -1,16 +1,23 @@
 import { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { productService, type Product } from '../services/productService';
 import { ApiError } from '../services/apiClient';
+import { useCart } from '../contexts/CartContext';
+import { useAuth } from '../contexts/AuthContext';
 
 export default function ProductDetailPage() {
   const { id } = useParams();
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const { add } = useCart();
   const [product, setProduct] = useState<Product | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [quantity, setQuantity] = useState(1);
   const [activeTab, setActiveTab] = useState<'desc' | 'specs'>('desc');
 
+  const [cartError, setCartError] = useState<string | null>(null);
+  const [cartMessage, setCartMessage] = useState<string | null>(null);
   const fetchProduct = async () => {
     setIsLoading(true);
     setLoadError(null);
@@ -29,6 +36,22 @@ export default function ProductDetailPage() {
       }
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleAddToCart = async () => {
+    if (!product) return;
+    if (!user) {
+      navigate('/login');
+      return;
+    }
+    setCartError(null);
+    setCartMessage(null);
+    try {
+      await add(product.productID, quantity);
+      setCartMessage('Da them san pham vao gio hang.');
+    } catch (error: unknown) {
+      setCartError(error instanceof Error ? error.message : 'Khong the them vao gio hang.');
     }
   };
 
@@ -141,11 +164,14 @@ export default function ProductDetailPage() {
             <button 
               disabled={product.stockQuantity <= 0}
               className="flex-1 bg-accent hover:bg-accent-hover text-white py-3.5 px-6 rounded-lg font-medium text-base transition-colors shadow-sm flex justify-center items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              onClick={() => void handleAddToCart()}
             >
               <span className="material-symbols-outlined">shopping_cart</span>
               Thêm vào giỏ hàng
             </button>
           </div>
+          {cartError && <p role="alert" className="mt-3 text-red-600">{cartError}</p>}
+          {cartMessage && <p className="mt-3 text-green-700">{cartMessage}</p>}
           
           <div className="mt-8 pt-6 border-t border-outline-variant grid grid-cols-2 gap-4 text-sm">
             <div className="flex items-center gap-3 text-on-surface-variant">
