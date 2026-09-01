@@ -7,6 +7,8 @@ SQL Server is the primary database and Entity Framework Core is the only applica
 The implementation baseline is .NET 10 with EF Core 10 and SQL Server.
 
 Sprint 1 delivered `User`, `Category`, and `Product`. Active Sprint 2 owns `Address`, `Cart`, `CartItem`, `Order`, and `OrderItem` for the COD customer journey. Inventory administration, order cancellation, and administrative order status behavior remain Sprint 3.
+EF Core model audit for Sprint 2 reports no pending model changes; existing reviewed migrations already contain these tables and constraints.
+
 
 ## 2. Logical ERD
 
