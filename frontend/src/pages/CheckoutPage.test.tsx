@@ -42,6 +42,17 @@ describe('CheckoutPage', () => {
     expect(await screen.findByText('Order destination')).toBeInTheDocument()
   })
 
+  it('navigates to the created order even when cart refresh fails', async () => {
+    refresh.mockRejectedValue(new Error('Refresh failed'))
+    renderPage()
+    await screen.findByRole('radio')
+
+    fireEvent.click(screen.getByRole('button', { name: 'Dat hang' }))
+
+    expect(await screen.findByText('Order destination')).toBeInTheDocument()
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument()
+  })
+
   it('retains checkout and displays API errors', async () => {
     vi.mocked(orderService.checkout).mockRejectedValue(new Error('Het hang'))
     renderPage()

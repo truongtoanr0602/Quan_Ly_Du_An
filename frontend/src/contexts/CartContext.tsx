@@ -23,6 +23,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const [cart, setCart] = useState<Cart>(emptyCart)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [loadedForAuth, setLoadedForAuth] = useState<boolean | null>(null)
 
   const run = async (operation: () => Promise<Cart | void>) => {
     setError(null)
@@ -38,6 +39,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const refresh = async () => {
     if (!isAuthenticated) {
       setCart(emptyCart)
+      setLoadedForAuth(false)
       return
     }
     setIsLoading(true)
@@ -45,6 +47,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
       await run(() => cartService.get())
     } finally {
       setIsLoading(false)
+      setLoadedForAuth(true)
     }
   }
 
@@ -54,7 +57,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const value = useMemo<CartContextValue>(() => ({
     cart,
-    isLoading,
+    isLoading: isLoading || loadedForAuth !== isAuthenticated,
     error,
     refresh,
     add: (productID, quantity) => run(() => cartService.add(productID, quantity)),
@@ -67,7 +70,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
       await run(() => cartService.clear())
       setCart(emptyCart)
     },
-  }), [cart, isLoading, error, isAuthenticated])
+  }), [cart, isLoading, error, isAuthenticated, loadedForAuth])
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>
 }

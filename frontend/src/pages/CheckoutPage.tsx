@@ -40,8 +40,8 @@ export default function CheckoutPage() {
         paymentMethod: 'COD',
         note: note.trim() || undefined,
       })
-      await refresh()
       navigate('/orders/' + order.orderID)
+      void refresh().catch(() => undefined)
     } catch (reason: unknown) {
       setError(reason instanceof Error ? reason.message : 'Khong the dat hang.')
     } finally {

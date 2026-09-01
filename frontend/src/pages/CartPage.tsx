@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { useState } from 'react'
 import { useCart } from '../contexts/CartContext'
 
 const formatPrice = (value: number) =>
@@ -6,6 +7,20 @@ const formatPrice = (value: number) =>
 
 export default function CartPage() {
   const { cart, isLoading, error, update, remove, clear } = useCart()
+  const [pendingProductID, setPendingProductID] = useState<number | null>(null)
+  const [isClearing, setIsClearing] = useState(false)
+
+  const mutateItem = async (productID: number, operation: () => Promise<void>) => {
+    if (pendingProductID !== null) return
+    setPendingProductID(productID)
+    try {
+      await operation()
+    } catch {
+      // CartContext exposes the recoverable error inline.
+    } finally {
+      setPendingProductID(null)
+    }
+  }
 
   if (isLoading) return <p className="p-8">Dang tai gio hang...</p>
 
@@ -13,7 +28,10 @@ export default function CartPage() {
     <section className="mx-auto w-full max-w-5xl px-4 py-8">
       <div className="mb-6 flex items-center justify-between">
         <h1 className="text-2xl font-bold">Gio hang</h1>
-        {cart.items.length > 0 && <button onClick={() => void clear()} className="text-red-600">Xoa gio hang</button>}
+        {cart.items.length > 0 && <button disabled={isClearing} onClick={() => {
+          setIsClearing(true)
+          void clear().catch(() => undefined).finally(() => setIsClearing(false))
+        }} className="text-red-600 disabled:opacity-50">Xoa gio hang</button>}
       </div>
       {error && <p role="alert" className="mb-4 text-red-600">{error}</p>}
       {cart.items.length === 0 ? (
@@ -33,11 +51,12 @@ export default function CartPage() {
                   type="number"
                   min={1}
                   max={item.stockQuantity}
-                  value={item.quantity}
-                  onChange={(event) => void update(item.productID, Number(event.target.value))}
+                  defaultValue={item.quantity}
+                  disabled={pendingProductID !== null}
+                  onBlur={(event) => void mutateItem(item.productID, () => update(item.productID, Number(event.target.value)))}
                   className="h-10 w-20 rounded border p-2"
                 />
-                <button onClick={() => void remove(item.productID)} className="text-red-600">Xoa</button>
+                <button disabled={pendingProductID !== null} onClick={() => void mutateItem(item.productID, () => remove(item.productID))} className="text-red-600 disabled:opacity-50">Xoa</button>
               </li>
             ))}
           </ul>

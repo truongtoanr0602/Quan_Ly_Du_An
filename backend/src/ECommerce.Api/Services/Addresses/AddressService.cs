@@ -1,4 +1,5 @@
 using ECommerce.Api.Data;
+using System.Data;
 using ECommerce.Api.DTOs.Addresses;
 using ECommerce.Api.Entities;
 using ECommerce.Api.Exceptions;
@@ -21,7 +22,7 @@ public sealed class AddressService(AppDbContext context) : IAddressService
 
     public async Task<AddressDto> CreateAsync(int userId, AddressWriteDto dto, CancellationToken ct = default)
     {
-        await using var transaction = await context.Database.BeginTransactionAsync(ct);
+        await using var transaction = await context.Database.BeginTransactionAsync(IsolationLevel.Serializable, ct);
         var hasAddress = await context.Addresses.AnyAsync(address => address.UserID == userId, ct);
         var makeDefault = dto.IsDefault || !hasAddress;
         if (makeDefault) await ClearDefaultsAsync(userId, null, ct);
@@ -50,7 +51,7 @@ public sealed class AddressService(AppDbContext context) : IAddressService
         AddressWriteDto dto,
         CancellationToken ct = default)
     {
-        await using var transaction = await context.Database.BeginTransactionAsync(ct);
+        await using var transaction = await context.Database.BeginTransactionAsync(IsolationLevel.Serializable, ct);
         var address = await context.Addresses
             .SingleOrDefaultAsync(candidate => candidate.AddressID == addressId && candidate.UserID == userId, ct)
             ?? throw new ResourceNotFoundException();
