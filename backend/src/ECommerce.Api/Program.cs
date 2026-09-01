@@ -5,6 +5,7 @@ using ECommerce.Api.Services.Products;
 using ECommerce.Api.Services.Categories;
 using ECommerce.Api.Services.Profile;
 using ECommerce.Api.Services.Cart;
+using ECommerce.Api.Services.Orders;
 using ECommerce.Api.Services.Addresses;
 using ECommerce.Api.Services.Auth;
 using Microsoft.EntityFrameworkCore;
@@ -51,6 +52,7 @@ builder.Services.AddSingleton(serviceProvider =>
         .GetRequiredService<IConfiguration>()
         .GetSection("BootstrapAdmin");
 builder.Services.AddScoped<IProfileService, ProfileService>();
+builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<ICartService, CartService>();
 builder.Services.AddScoped<IAddressService, AddressService>();
 
