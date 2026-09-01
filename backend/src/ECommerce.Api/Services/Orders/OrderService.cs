@@ -78,12 +78,44 @@ public sealed class OrderService(AppDbContext context) : IOrderService
         return MapDetail(order);
     }
 
-    public Task<PagedResult<OrderSummaryDto>> ListAsync(int userId, int pageNumber, int pageSize, CancellationToken ct = default) =>
-        throw new NotSupportedException("Order history is implemented in US-15.");
+    public async Task<PagedResult<OrderSummaryDto>> ListAsync(
+        int userId, int pageNumber, int pageSize, CancellationToken ct = default)
+    {
+        if (pageNumber < 1 || pageSize is < 1 or > 100)
+        {
+            throw new DomainValidationException();
+        }
+
+        var query = context.Orders.AsNoTracking().Where(x => x.UserID == userId);
+        var totalCount = await query.CountAsync(ct);
+        var items = await query
+            .OrderByDescending(x => x.CreatedAt)
+            .ThenByDescending(x => x.OrderID)
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .Select(x => new OrderSummaryDto(
+                x.OrderID,
+                x.TotalAmount,
+                x.PaymentMethod,
+                x.PaymentStatus,
+                x.OrderStatus,
+                x.CreatedAt,
+                x.OrderDetails.Sum(item => item.Quantity)))
+            .ToListAsync(ct);
+
+        return new PagedResult<OrderSummaryDto>
+        {
+            Items = items,
+            TotalCount = totalCount,
+            PageNumber = pageNumber,
+            PageSize = pageSize
+        };
+    }
 
     public async Task<OrderDetailDto> GetAsync(int userId, long orderId, CancellationToken ct = default)
     {
-        var order = await context.Orders.Include(x => x.OrderDetails)
+        var order = await context.Orders.AsNoTracking()
+            .Include(x => x.OrderDetails)
             .SingleOrDefaultAsync(x => x.OrderID == orderId && x.UserID == userId, ct)
             ?? throw new ResourceNotFoundException();
         return MapDetail(order);

@@ -32,3 +32,20 @@ export interface CheckoutRequest {
   paymentMethod: 'COD'
   note?: string
 }
+export interface OrderSummary {
+  orderID: number
+  totalAmount: number
+  paymentMethod: 'COD'
+  paymentStatus: string
+  orderStatus: string
+  createdAt: string
+  totalItems: number
+}
+
+export interface PagedOrders {
+  items: OrderSummary[]
+  totalCount: number
+  pageNumber: number
+  pageSize: number
+  totalPages: number
+}

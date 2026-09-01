@@ -48,6 +48,9 @@ export default function Header() {
               <span className="absolute -right-1 -top-1 rounded-full bg-primary px-1.5 text-xs text-white">{cart.totalItems}</span>
             )}
           </Link>
+          {user && <Link to="/orders" aria-label="Don hang" className="text-secondary hover:text-primary p-2 rounded-full">
+            <span className="material-symbols-outlined">receipt_long</span>
+          </Link>}
           {user ? (
             <button onClick={handleLogout} className="text-secondary hover:text-primary hover:bg-surface-container-low p-2 rounded-full transition-colors active:scale-95" title="Đăng xuất" aria-label="Đăng xuất">
               <span className="material-symbols-outlined">logout</span>
