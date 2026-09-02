@@ -4,6 +4,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { ApiError } from '../services/apiClient'
 import { productService } from '../services/productService'
 import ProductDetailPage from './ProductDetailPage'
+import AuthProvider from '../contexts/AuthContext'
+import { CartProvider } from '../contexts/CartContext'
 
 vi.mock('../services/productService', async () => {
   const actual = await vi.importActual<typeof import('../services/productService')>('../services/productService')
@@ -16,7 +18,11 @@ describe('ProductDetailPage', () => {
 
   const renderDetail = () => render(
     <MemoryRouter initialEntries={['/products/42']}>
-      <Routes><Route path="/products/:id" element={<ProductDetailPage />} /></Routes>
+      <AuthProvider>
+        <CartProvider>
+          <Routes><Route path="/products/:id" element={<ProductDetailPage />} /></Routes>
+        </CartProvider>
+      </AuthProvider>
     </MemoryRouter>,
   )
 

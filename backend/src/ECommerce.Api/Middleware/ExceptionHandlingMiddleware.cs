@@ -46,6 +46,11 @@ public sealed class ExceptionHandlingMiddleware(
                 Status = StatusCodes.Status409Conflict,
                 Title = "The request conflicts with existing state."
             },
+            InvalidUserIdentityException => new ProblemDetails
+            {
+                Status = StatusCodes.Status401Unauthorized,
+                Title = "Authentication is required."
+            },
             InvalidCredentialsException => new ProblemDetails
             {
                 Status = StatusCodes.Status401Unauthorized,

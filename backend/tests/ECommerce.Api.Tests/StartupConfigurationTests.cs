@@ -1,4 +1,6 @@
 using System.Net;
+using ECommerce.Api.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace ECommerce.Api.Tests;
 
@@ -37,11 +39,22 @@ public sealed class StartupConfigurationTests
     [Fact]
     public async Task HealthEndpointStartsWhenTestConfigurationSuppliesJwtKey()
     {
+
         using var factory = new TestApiFactory();
         using var client = factory.CreateClient();
 
         using var response = await client.GetAsync("/api/health");
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+    }
+
+    [Fact]
+    public void BootstrapOptionsCanBeResolvedAfterHostBuild()
+    {
+        using var factory = new TestApiFactory();
+
+        var options = factory.Services.GetRequiredService<BootstrapAdminOptions>();
+
+        Assert.NotNull(options);
     }
 }

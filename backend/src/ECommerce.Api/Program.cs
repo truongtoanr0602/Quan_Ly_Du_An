@@ -3,6 +3,10 @@ using ECommerce.Api.Data;
 using ECommerce.Api.Middleware;
 using ECommerce.Api.Services.Products;
 using ECommerce.Api.Services.Categories;
+using ECommerce.Api.Services.Profile;
+using ECommerce.Api.Services.Cart;
+using ECommerce.Api.Services.Orders;
+using ECommerce.Api.Services.Addresses;
 using ECommerce.Api.Services.Auth;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -42,6 +46,10 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IProfileService, ProfileService>();
+builder.Services.AddScoped<IOrderService, OrderService>();
+builder.Services.AddScoped<ICartService, CartService>();
+builder.Services.AddScoped<IAddressService, AddressService>();
 builder.Services.AddSingleton(serviceProvider =>
 {
     var section = serviceProvider

@@ -6,7 +6,9 @@ SQL Server is the primary database and Entity Framework Core is the only applica
 
 The implementation baseline is .NET 10 with EF Core 10 and SQL Server.
 
-Sprint 1 prioritizes `User`, `Category`, and `Product`. `Address`, `Cart`, `CartItem`, `Order`, and `OrderItem` describe the planned Sprint 2/3 model and must not be implemented by the technical baseline.
+Sprint 1 delivered `User`, `Category`, and `Product`. Active Sprint 2 owns `Address`, `Cart`, `CartItem`, `Order`, and `OrderItem` for the COD customer journey. Inventory administration, order cancellation, and administrative order status behavior remain Sprint 3.
+EF Core model audit for Sprint 2 reports no pending model changes; existing reviewed migrations already contain these tables and constraints.
+
 
 ## 2. Logical ERD
 
@@ -33,7 +35,7 @@ erDiagram
 | `Address` | `Id`, `UserId`, `ReceiverName`, `Phone`, `AddressLine`, `IsDefault` | Required User FK; default-address invariant belongs to service rules | 2 |
 | `Cart` | `Id`, `UserId`, `CreatedAt` | One cart per User | 2 |
 | `CartItem` | `Id`, `CartId`, `ProductId`, `Quantity` | Unique Cart/Product pair; quantity positive | 2 |
-| `Order` | `Id`, `UserId`, `AddressId`, `Status`, `PaymentMethod`, `TotalAmount`, `CreatedAt`, `UpdatedAt` | COD is initial payment scope; money uses `decimal(18,2)` | 2/3 |
+| `Order` | `Id`, `UserId`, shipping snapshot, `Status`, `PaymentMethod`, `TotalAmount`, `CreatedAt`, `UpdatedAt` | COD ordering/history is Sprint 2; admin status changes are Sprint 3; money uses `decimal(18,2)` | 2 |
 | `OrderItem` | `Id`, `OrderId`, `ProductId`, `Quantity`, `UnitPrice` | Snapshot price uses `decimal(18,2)`; quantity positive | 2 |
 
 ## 4. Relationship Rules

@@ -1,8 +1,10 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { useCart } from '../contexts/CartContext';
 
 export default function Header() {
   const { user, logout } = useAuth();
+  const { cart } = useCart();
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -40,9 +42,15 @@ export default function Header() {
 
         {/* Trailing Icons */}
         <div className="flex items-center gap-4">
-          <button className="text-secondary hover:text-primary hover:bg-surface-container-low p-2 rounded-full transition-colors active:scale-95">
+          <Link to={user ? '/cart' : '/login'} aria-label="Gio hang" className="relative text-secondary hover:text-primary hover:bg-surface-container-low p-2 rounded-full transition-colors active:scale-95">
             <span className="material-symbols-outlined">shopping_cart</span>
-          </button>
+            {cart.totalItems > 0 && (
+              <span className="absolute -right-1 -top-1 rounded-full bg-primary px-1.5 text-xs text-white">{cart.totalItems}</span>
+            )}
+          </Link>
+          {user && <Link to="/orders" aria-label="Don hang" className="text-secondary hover:text-primary p-2 rounded-full">
+            <span className="material-symbols-outlined">receipt_long</span>
+          </Link>}
           {user ? (
             <button onClick={handleLogout} className="text-secondary hover:text-primary hover:bg-surface-container-low p-2 rounded-full transition-colors active:scale-95" title="Đăng xuất" aria-label="Đăng xuất">
               <span className="material-symbols-outlined">logout</span>

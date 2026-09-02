@@ -60,7 +60,7 @@ public sealed class TestApiFactory(
         builder.ConfigureTestServices(services => configureTestServices?.Invoke(services));
     }
 
-    public HttpClient CreateClientWithRole(string? role)
+    public HttpClient CreateClientWithRole(string? role, int? userId = null)
     {
         var client = CreateClient();
 
@@ -72,10 +72,15 @@ public sealed class TestApiFactory(
         var credentials = new SigningCredentials(
             new SymmetricSecurityKey(Encoding.UTF8.GetBytes(TestJwtKey)),
             SecurityAlgorithms.HmacSha256);
+        var claims = new List<Claim> { new(ClaimTypes.Role, role) };
+        if (userId.HasValue)
+        {
+            claims.Add(new Claim(JwtRegisteredClaimNames.Sub, userId.Value.ToString()));
+        }
         var token = new JwtSecurityToken(
             issuer: TestIssuer,
             audience: TestAudience,
-            claims: [new Claim(ClaimTypes.Role, role)],
+            claims: claims,
             expires: DateTime.UtcNow.AddMinutes(5),
             signingCredentials: credentials);
 

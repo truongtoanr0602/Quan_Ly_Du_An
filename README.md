@@ -1,5 +1,9 @@
 # ECommerce MVP
 
+> Current delivery: **Sprint 2 - Shopping & Ordering**. Sprint 1 is the completed catalog/authentication foundation. See [Sprint 2 evidence and demo](docs/Sprint2.md).
+
+
+
 Technical baseline for a six-week e-commerce MVP developed by a five-person Scrum Team. The current Sprint is **Sprint 1 — Product Catalog & Authentication**.
 
 This repository provides shared project rules, the implemented Sprint 1 catalog and authentication increment, runnable .NET 10 and React/Vite applications, tests, engineering documentation, and GitHub CI. The live SQL/UX functional gate remains externally pending until a developer supplies a non-shared local test database and User Secrets.

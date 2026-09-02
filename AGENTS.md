@@ -24,20 +24,19 @@ This repository contains a six-week e-commerce MVP delivered in three two-week S
 
 The Product Goal is to deliver a basic shopping journey from product discovery through ordering, together with administration for products, categories, inventory, and orders.
 
-The current Sprint is **Sprint 1 — Product Catalog & Authentication**. Its Sprint Goal is to establish the website foundation so customers can register, sign in, and discover products while administrators can manage categories and products.
+Sprint 1 — Product Catalog & Authentication is the completed foundation.
 
-Sprint 1 contains:
+The current Sprint is **Sprint 2 — Shopping & Ordering**. Its Sprint Goal is to complete the authenticated customer journey from cart through COD ordering and owned order history.
 
-- US-2: Category management.
-- US-3: Product management.
-- US-7: Account registration.
-- US-8: Login and logout.
-- US-17: Filter products by category.
-- US-18: Search products.
-- US-19: Filter products by price and brand.
-- US-20: View product details.
+Sprint 2 contains:
 
-Do not implement Cart, Checkout, Order, Payment, Inventory administration, reporting, or account-recovery behavior as part of Sprint 1 unless the Product Backlog and Sprint Backlog are explicitly updated.
+- US-9: Manage personal information.
+- US-12: Shopping cart.
+- US-13: Place an order containing multiple products.
+- US-14: Shipping address and supported payment method.
+- US-15: View owned order history and details.
+
+Sprint 2 supports COD only. Online payment, order cancellation, admin order management, inventory administration, reporting, password recovery, and password changes remain Sprint 3 or later scope unless the Product Backlog and Sprint Backlog are explicitly updated.
 
 ## Approved Architecture
 
