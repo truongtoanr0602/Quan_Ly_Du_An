@@ -24,8 +24,10 @@ appsettings.Local.json
 .vscode/
 .idea/
 
+# Isolated implementation worktrees
+.worktrees/
+
 # Logs and operating-system files
 *.log
 .DS_Store
 Thumbs.db
-
