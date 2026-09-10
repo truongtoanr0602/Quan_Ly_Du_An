@@ -191,7 +191,7 @@ export default function CategoryManagementPage() {
                   </div>
                   <div className="space-y-1">
                     <label className="text-sm font-medium text-on-surface-variant">Mô tả</label>
-                    <textarea rows={3} value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})} className="w-full px-3 py-2 border border-outline-variant rounded focus:border-primary outline-none" />
+                    <textarea rows={3} value={formData.description || ''} onChange={e => setFormData({...formData, description: e.target.value})} className="w-full px-3 py-2 border border-outline-variant rounded focus:border-primary outline-none" />
                   </div>
                   <div className="space-y-1">
                     <label className="flex items-center gap-2 cursor-pointer">

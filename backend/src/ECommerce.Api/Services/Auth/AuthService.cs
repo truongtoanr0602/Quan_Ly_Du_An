@@ -127,4 +127,56 @@ public class AuthService : IAuthService
 
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
+
+    public async Task ChangePasswordAsync(int userId, ChangePasswordDto dto)
+    {
+        var user = await _context.Users.FindAsync(userId)
+            ?? throw new Exception("User not found.");
+
+        if (!BCrypt.Net.BCrypt.Verify(dto.CurrentPassword, user.PasswordHash))
+            throw new Exception("Current password is incorrect.");
+
+        user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.NewPassword);
+        user.UpdatedAt = DateTime.UtcNow;
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task<string> RequestPasswordResetAsync(ForgotPasswordDto dto)
+    {
+        var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == dto.Email);
+        if (user == null)
+        {
+            // Không tiết lộ email có tồn tại hay không
+            return "If this email exists, a reset link has been sent.";
+        }
+
+        // Tạo token
+        var token = Guid.NewGuid().ToString("N");
+        _context.PasswordResetTokens.Add(new PasswordResetToken
+        {
+            UserID = user.UserID,
+            Token = token,
+            ExpiresAt = DateTime.UtcNow.AddHours(1),
+            CreatedAt = DateTime.UtcNow
+        });
+        await _context.SaveChangesAsync();
+
+        // MVP: trả token qua API (không gửi email)
+        return token;
+    }
+
+    public async Task ResetPasswordAsync(ResetPasswordDto dto)
+    {
+        var resetToken = await _context.PasswordResetTokens
+            .Include(t => t.User)
+            .FirstOrDefaultAsync(t => t.Token == dto.Token && t.UsedAt == null && t.ExpiresAt > DateTime.UtcNow)
+            ?? throw new Exception("Invalid or expired reset token.");
+
+        resetToken.User.PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.NewPassword);
+        resetToken.User.UpdatedAt = DateTime.UtcNow;
+        resetToken.UsedAt = DateTime.UtcNow;
+
+        await _context.SaveChangesAsync();
+    }
 }
+

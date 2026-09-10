@@ -3,6 +3,13 @@ using ECommerce.Api.Middleware;
 using ECommerce.Api.Services.Products;
 using ECommerce.Api.Services.Categories;
 using ECommerce.Api.Services.Auth;
+using ECommerce.Api.Services.Carts;
+using ECommerce.Api.Services.Addresses;
+using ECommerce.Api.Services.Orders;
+using ECommerce.Api.Services.Profile;
+using ECommerce.Api.Services.Admin;
+using ECommerce.Api.Services.Inventory;
+using ECommerce.Api.Services.Reports;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
@@ -17,9 +24,21 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("ECommerce"));
 });
 
+// Sprint 1 services
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+
+// Sprint 2 services
+builder.Services.AddScoped<ICartService, CartService>();
+builder.Services.AddScoped<IAddressService, AddressService>();
+builder.Services.AddScoped<IOrderService, OrderService>();
+builder.Services.AddScoped<IProfileService, ProfileService>();
+
+// Sprint 3 services
+builder.Services.AddScoped<IAdminService, AdminService>();
+builder.Services.AddScoped<IInventoryService, InventoryService>();
+builder.Services.AddScoped<IReportService, ReportService>();
 
 var jwtSettings = builder.Configuration.GetSection("Jwt");
 var secretKey = jwtSettings["Key"] ?? throw new InvalidOperationException("JWT Key is missing");

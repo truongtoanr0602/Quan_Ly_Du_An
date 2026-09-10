@@ -1,12 +1,16 @@
 import { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { productService, type Product } from '../services/productService';
+import { cartService } from '../services/cartService';
 
 export default function ProductDetailPage() {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [product, setProduct] = useState<Product | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
+  const [isAddingToCart, setIsAddingToCart] = useState(false);
+  const [cartSuccess, setCartSuccess] = useState(false);
   const [activeTab, setActiveTab] = useState<'desc' | 'specs'>('desc');
 
   useEffect(() => {
@@ -46,6 +50,31 @@ export default function ProductDetailPage() {
       </div>
     );
   }
+
+  const handleAddToCart = async () => {
+    if (!product) return;
+    const token = localStorage.getItem('token');
+    if (!token) {
+      if (confirm('Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng. Bạn có muốn chuyển đến trang Đăng nhập?')) {
+        navigate('/login');
+      }
+      return;
+    }
+
+    try {
+      setIsAddingToCart(true);
+      await cartService.addItem({
+        productId: product.productID,
+        quantity,
+      });
+      setCartSuccess(true);
+      setTimeout(() => setCartSuccess(false), 3000);
+    } catch (err: any) {
+      alert('Không thể thêm vào giỏ hàng: ' + (err.message || 'Lỗi không xác định'));
+    } finally {
+      setIsAddingToCart(false);
+    }
+  };
 
   return (
     <div className="max-w-7xl mx-auto space-y-12">
@@ -117,14 +146,28 @@ export default function ProductDetailPage() {
             </div>
           </div>
 
-          <div className="flex gap-4">
-            <button 
-              disabled={product.stockQuantity <= 0}
-              className="flex-1 bg-accent hover:bg-accent-hover text-white py-3.5 px-6 rounded-lg font-medium text-base transition-colors shadow-sm flex justify-center items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <span className="material-symbols-outlined">shopping_cart</span>
-              Thêm vào giỏ hàng
-            </button>
+          <div className="flex flex-col gap-3">
+            <div className="flex gap-4">
+              <button 
+                disabled={product.stockQuantity <= 0 || isAddingToCart}
+                onClick={handleAddToCart}
+                className="flex-1 bg-accent hover:bg-accent-hover text-white py-3.5 px-6 rounded-lg font-medium text-base transition-colors shadow-sm flex justify-center items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <span className="material-symbols-outlined">shopping_cart</span>
+                {isAddingToCart ? 'Đang thêm...' : 'Thêm vào giỏ hàng'}
+              </button>
+            </div>
+            {cartSuccess && (
+              <div className="p-3 bg-green-50 text-green-700 border border-green-200 rounded-lg text-sm flex items-center justify-between">
+                <span className="flex items-center gap-1.5 font-medium">
+                  <span className="material-symbols-outlined text-green-600 text-lg">check_circle</span>
+                  Đã thêm sản phẩm vào giỏ hàng!
+                </span>
+                <Link to="/cart" className="text-primary font-semibold hover:underline text-xs">
+                  Xem giỏ hàng &rarr;
+                </Link>
+              </div>
+            )}
           </div>
           
           <div className="mt-8 pt-6 border-t border-outline-variant grid grid-cols-2 gap-4 text-sm">

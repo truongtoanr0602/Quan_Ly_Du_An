@@ -3,11 +3,10 @@ import { describe, expect, it } from 'vitest'
 import App from './App'
 
 describe('App', () => {
-  it('shows the technical baseline shell', () => {
+  it('renders ElectroTech branding and store navigation', () => {
     render(<App />)
 
-    expect(screen.getByRole('heading', { name: 'ECommerce' })).toBeInTheDocument()
-    expect(screen.getByText('Technical baseline ready')).toBeInTheDocument()
+    expect(screen.getAllByText('ElectroTech').length).toBeGreaterThan(0)
+    expect(screen.getByPlaceholderText('Tìm kiếm sản phẩm...')).toBeInTheDocument()
   })
 })
-
