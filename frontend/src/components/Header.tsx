@@ -43,81 +43,76 @@ export default function Header() {
 
   return (
     <header className="bg-surface-container-lowest border-b border-outline-variant sticky top-0 z-50 w-full shadow-xs">
-      <div className="flex justify-between items-center px-4 sm:px-6 lg:px-8 py-3.5 w-full max-w-7xl mx-auto">
-        {/* Brand & Search */}
-        <div className="flex items-center gap-8">
-          <Link to="/" className="text-xl font-bold text-primary tracking-tight flex items-center gap-1.5">
-            <span className="material-symbols-outlined text-2xl text-primary">devices</span>
-            ElectroTech
-          </Link>
-          <form onSubmit={handleSearch} className="relative hidden md:block w-80">
-            <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[20px]">
-              search
-            </span>
-            <input
-              type="text"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 bg-surface-container-low border border-outline-variant rounded-full text-sm text-on-surface focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
-              placeholder="Tìm kiếm sản phẩm..."
-            />
-          </form>
-        </div>
+      <div className="flex justify-between items-center px-4 sm:px-6 lg:px-8 h-16 w-full max-w-7xl mx-auto gap-4">
+        {/* Brand */}
+        <Link to="/" className="text-xl font-bold text-primary tracking-tight flex items-center gap-1.5 flex-shrink-0">
+          <span className="material-symbols-outlined text-2xl text-primary">devices</span>
+          ElectroTech
+        </Link>
 
-        {/* Nav Links - Phụ kiện & Thiết bị */}
-        <nav className="hidden lg:flex items-center gap-1 xl:gap-2">
+        {/* Search Bar */}
+        <form onSubmit={handleSearch} className="relative hidden md:block w-64 lg:w-72 flex-shrink-0">
+          <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]">
+            search
+          </span>
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full pl-9 pr-3 py-1.5 bg-surface-container-low border border-outline-variant rounded-full text-xs sm:text-sm text-on-surface focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
+            placeholder="Tìm phụ kiện, sản phẩm..."
+          />
+        </form>
+
+        {/* Nav Links - Phụ kiện gọn gàng 1 dòng duy nhất */}
+        <nav className="hidden lg:flex items-center gap-0.5 xl:gap-1 text-sm font-medium">
           <Link
             to="/products"
-            className="text-sm font-medium text-secondary hover:text-primary hover:bg-surface-container-low transition-colors px-2.5 py-1 rounded-lg"
+            className="text-secondary hover:text-primary hover:bg-surface-container-low transition-colors px-2.5 py-1.5 rounded-lg whitespace-nowrap text-xs xl:text-sm"
           >
             Tất cả
           </Link>
           <Link
             to="/products?category=4"
-            className="text-sm font-medium text-secondary hover:text-primary hover:bg-surface-container-low transition-colors px-2.5 py-1 rounded-lg flex items-center gap-1"
+            className="text-secondary hover:text-primary hover:bg-surface-container-low transition-colors px-2.5 py-1.5 rounded-lg whitespace-nowrap text-xs xl:text-sm"
           >
-            <span className="material-symbols-outlined text-base">mouse</span>
-            Chuột & Bàn phím
+            Chuột & Phím
           </Link>
           <Link
             to="/products?category=5"
-            className="text-sm font-medium text-secondary hover:text-primary hover:bg-surface-container-low transition-colors px-2.5 py-1 rounded-lg flex items-center gap-1"
+            className="text-secondary hover:text-primary hover:bg-surface-container-low transition-colors px-2.5 py-1.5 rounded-lg whitespace-nowrap text-xs xl:text-sm"
           >
-            <span className="material-symbols-outlined text-base">headphones</span>
-            Tai nghe & Âm thanh
+            Tai nghe
           </Link>
           <Link
             to="/products?category=6"
-            className="text-sm font-medium text-secondary hover:text-primary hover:bg-surface-container-low transition-colors px-2.5 py-1 rounded-lg flex items-center gap-1"
+            className="text-secondary hover:text-primary hover:bg-surface-container-low transition-colors px-2.5 py-1.5 rounded-lg whitespace-nowrap text-xs xl:text-sm"
           >
-            <span className="material-symbols-outlined text-base">desktop_windows</span>
             Màn hình
           </Link>
           <Link
             to="/products?category=7"
-            className="text-sm font-medium text-secondary hover:text-primary hover:bg-surface-container-low transition-colors px-2.5 py-1 rounded-lg flex items-center gap-1"
+            className="text-secondary hover:text-primary hover:bg-surface-container-low transition-colors px-2.5 py-1.5 rounded-lg whitespace-nowrap text-xs xl:text-sm"
           >
-            <span className="material-symbols-outlined text-base">memory</span>
             Linh kiện PC
           </Link>
           <Link
             to="/products?category=8"
-            className="text-sm font-medium text-secondary hover:text-primary hover:bg-surface-container-low transition-colors px-2.5 py-1 rounded-lg flex items-center gap-1"
+            className="text-secondary hover:text-primary hover:bg-surface-container-low transition-colors px-2.5 py-1.5 rounded-lg whitespace-nowrap text-xs xl:text-sm"
           >
-            <span className="material-symbols-outlined text-base">cable</span>
-            Cáp sạc & Hub
+            Cáp sạc
           </Link>
         </nav>
 
         {/* Trailing Icons */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 flex-shrink-0">
           {/* Cart Link */}
           <Link
             to="/cart"
             className="text-secondary hover:text-primary hover:bg-surface-container-low p-2 rounded-full transition-colors active:scale-95 relative"
             title="Giỏ hàng"
           >
-            <span className="material-symbols-outlined">shopping_cart</span>
+            <span className="material-symbols-outlined text-[22px]">shopping_cart</span>
           </Link>
 
           {/* User Account / Profile */}
@@ -125,12 +120,12 @@ export default function Header() {
             <div className="relative" ref={dropdownRef}>
               <button
                 onClick={() => setDropdownOpen(!dropdownOpen)}
-                className="flex items-center gap-2 text-secondary hover:text-primary hover:bg-surface-container-low py-1.5 px-3 rounded-full transition-colors active:scale-95"
+                className="flex items-center gap-2 text-secondary hover:text-primary hover:bg-surface-container-low py-1.5 px-2.5 rounded-full transition-colors active:scale-95"
               >
                 <div className="w-7 h-7 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-xs">
                   {user.fullName ? user.fullName.charAt(0).toUpperCase() : 'U'}
                 </div>
-                <span className="text-sm font-medium hidden sm:inline text-on-surface max-w-[120px] truncate">
+                <span className="text-xs sm:text-sm font-medium hidden sm:inline text-on-surface max-w-[110px] truncate">
                   {user.fullName || user.email}
                 </span>
                 <span className="material-symbols-outlined text-sm">expand_more</span>
@@ -139,13 +134,11 @@ export default function Header() {
               {dropdownOpen && (
                 <div className="absolute right-0 mt-2 w-56 bg-surface-container-lowest border border-outline-variant rounded-xl shadow-xl py-2 z-50 text-sm">
                   <div className="px-4 py-2 border-b border-outline-variant">
-                    <p className="font-semibold text-on-surface truncate">{user.fullName}</p>
+                    <p className="font-semibold text-on-surface truncate">{user.fullName || 'Khách hàng'}</p>
                     <p className="text-xs text-secondary truncate">{user.email}</p>
-                    {user.role === 'Admin' && (
-                      <span className="inline-block mt-1 px-2 py-0.5 text-[10px] font-bold bg-purple-100 text-purple-800 rounded">
-                        ADMIN
-                      </span>
-                    )}
+                    <span className="inline-block mt-1 px-2 py-0.5 text-[10px] font-semibold bg-primary/10 text-primary rounded-full uppercase">
+                      {user.role}
+                    </span>
                   </div>
 
                   <Link
@@ -154,7 +147,7 @@ export default function Header() {
                     className="flex items-center gap-2.5 px-4 py-2 text-on-surface hover:bg-surface-container-low transition-colors"
                   >
                     <span className="material-symbols-outlined text-lg text-secondary">person</span>
-                    Tài khoản của tôi
+                    Thông tin tài khoản
                   </Link>
 
                   <Link
@@ -192,40 +185,12 @@ export default function Header() {
           ) : (
             <Link
               to="/login"
-              className="flex items-center gap-1.5 text-sm font-medium bg-primary/10 text-primary hover:bg-primary hover:text-white px-3.5 py-1.5 rounded-full transition-colors"
+              className="flex items-center gap-1.5 text-xs sm:text-sm font-medium bg-primary/10 text-primary hover:bg-primary hover:text-white px-3.5 py-1.5 rounded-full transition-colors"
             >
-              <span className="material-symbols-outlined text-lg">login</span>
+              <span className="material-symbols-outlined text-base">login</span>
               <span>Đăng nhập</span>
             </Link>
           )}
-        </div>
-      </div>
-
-      {/* Accessories Fast Navigation Sub-bar */}
-      <div className="bg-surface-container-low/80 border-t border-outline-variant/60 px-4 sm:px-6 lg:px-8 py-1.5 overflow-x-auto">
-        <div className="max-w-7xl mx-auto flex items-center gap-2 sm:gap-3 text-xs font-medium whitespace-nowrap">
-          <span className="text-secondary flex items-center gap-1 font-semibold pr-2 border-r border-outline-variant text-[11px] uppercase tracking-wider">
-            <span className="material-symbols-outlined text-sm text-primary">tune</span>
-            Phụ kiện:
-          </span>
-          <Link to="/products?category=4" className="px-2.5 py-1 rounded-full bg-surface-container hover:bg-primary/10 hover:text-primary transition-colors flex items-center gap-1">
-            <span className="material-symbols-outlined text-sm">mouse</span> Chuột Gaming & Văn phòng
-          </Link>
-          <Link to="/products?category=5" className="px-2.5 py-1 rounded-full bg-surface-container hover:bg-primary/10 hover:text-primary transition-colors flex items-center gap-1">
-            <span className="material-symbols-outlined text-sm">headphones</span> Tai nghe Bluetooth & Chống ồn
-          </Link>
-          <Link to="/products?category=6" className="px-2.5 py-1 rounded-full bg-surface-container hover:bg-primary/10 hover:text-primary transition-colors flex items-center gap-1">
-            <span className="material-symbols-outlined text-sm">monitor</span> Màn hình 4K IPS
-          </Link>
-          <Link to="/products?category=7" className="px-2.5 py-1 rounded-full bg-surface-container hover:bg-primary/10 hover:text-primary transition-colors flex items-center gap-1">
-            <span className="material-symbols-outlined text-sm">memory</span> Linh kiện RAM & SSD
-          </Link>
-          <Link to="/products?category=8" className="px-2.5 py-1 rounded-full bg-surface-container hover:bg-primary/10 hover:text-primary transition-colors flex items-center gap-1">
-            <span className="material-symbols-outlined text-sm">power</span> Cáp sạc & Hub USB-C
-          </Link>
-          <Link to="/products" className="ml-auto text-primary hover:underline flex items-center gap-0.5 text-xs font-semibold pl-2">
-            Tất cả phụ kiện <span className="material-symbols-outlined text-xs">arrow_forward</span>
-          </Link>
         </div>
       </div>
     </header>
