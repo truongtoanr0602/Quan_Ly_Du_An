@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+
+<html lang="vi"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Giỏ Hàng &amp; Thanh Toán | ElectroTech</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        "colors": {
+                "on-error": "#ffffff",
+                "secondary-fixed-dim": "#b7c8e1",
+                "on-primary": "#ffffff",
+                "surface-container-low": "#f2f4f6",
+                "surface-tint": "#0053db",
+                "on-tertiary-fixed": "#341100",
+                "primary": "#004ac6",
+                "surface-container-high": "#e6e8ea",
+                "background": "#f7f9fb",
+                "on-tertiary-container": "#ffece5",
+                "surface-container": "#eceef0",
+                "tertiary-fixed": "#ffdbca",
+                "surface-bright": "#f7f9fb",
+                "on-background": "#191c1e",
+                "error-container": "#ffdad6",
+                "surface": "#f7f9fb",
+                "surface-dim": "#d8dadc",
+                "error": "#ba1a1a",
+                "primary-fixed-dim": "#b4c5ff",
+                "tertiary-container": "#b54e00",
+                "on-tertiary-fixed-variant": "#783200",
+                "on-secondary-fixed": "#0b1c30",
+                "secondary-container": "#d0e1fb",
+                "on-surface-variant": "#434655",
+                "on-secondary-container": "#54647a",
+                "outline": "#737686",
+                "on-surface": "#191c1e",
+                "on-error-container": "#93000a",
+                "on-secondary": "#ffffff",
+                "secondary": "#505f76",
+                "outline-variant": "#c3c6d7",
+                "tertiary": "#8e3c00",
+                "secondary-fixed": "#d3e4fe",
+                "on-tertiary": "#ffffff",
+                "primary-container": "#2563eb",
+                "on-primary-fixed-variant": "#003ea8",
+                "on-secondary-fixed-variant": "#38485d",
+                "surface-container-lowest": "#ffffff",
+                "inverse-surface": "#2d3133",
+                "surface-container-highest": "#e0e3e5",
+                "inverse-on-surface": "#eff1f3",
+                "surface-variant": "#e0e3e5",
+                "on-primary-container": "#eeefff",
+                "primary-fixed": "#dbe1ff",
+                "tertiary-fixed-dim": "#ffb690",
+                "inverse-primary": "#b4c5ff",
+                "on-primary-fixed": "#00174b"
+        },
+        "borderRadius": {
+                "DEFAULT": "0.125rem",
+                "lg": "0.25rem",
+                "xl": "0.5rem",
+                "full": "0.75rem"
+        },
+        "spacing": {
+                "unit": "4px",
+                "margin-mobile": "16px",
+                "gutter": "24px",
+                "margin-desktop": "64px",
+                "max-width": "1280px"
+        },
+        "fontFamily": {
+                "headline-lg": [
+                        "Inter"
+                ],
+                "display-lg": [
+                        "Inter"
+                ],
+                "body-md": [
+                        "Inter"
+                ],
+                "headline-md": [
+                        "Inter"
+                ],
+                "body-lg": [
+                        "Inter"
+                ],
+                "headline-lg-mobile": [
+                        "Inter"
+                ],
+                "label-md": [
+                        "Inter"
+                ],
+                "spec-code": [
+                        "Inter"
+                ]
+        },
+        "fontSize": {
+                "headline-lg": [
+                        "32px",
+                        {
+                                "lineHeight": "40px",
+                                "letterSpacing": "-0.01em",
+                                "fontWeight": "600"
+                        }
+                ],
+                "display-lg": [
+                        "48px",
+                        {
+                                "lineHeight": "56px",
+                                "letterSpacing": "-0.02em",
+                                "fontWeight": "700"
+                        }
+                ],
+                "body-md": [
+                        "16px",
+                        {
+                                "lineHeight": "24px",
+                                "fontWeight": "400"
+                        }
+                ],
+                "headline-md": [
+                        "20px",
+                        {
+                                "lineHeight": "28px",
+                                "fontWeight": "600"
+                        }
+                ],
+                "body-lg": [
+                        "18px",
+                        {
+                                "lineHeight": "28px",
+                                "fontWeight": "400"
+                        }
+                ],
+                "headline-lg-mobile": [
+                        "24px",
+                        {
+                                "lineHeight": "32px",
+                                "fontWeight": "600"
+                        }
+                ],
+                "label-md": [
+                        "14px",
+                        {
+                                "lineHeight": "20px",
+                                "fontWeight": "500"
+                        }
+                ],
+                "spec-code": [
+                        "13px",
+                        {
+                                "lineHeight": "18px",
+                                "fontWeight": "600"
+                        }
+                ]
+        }
+},
+    },
+  }
+</script>
+</head>
+<body class="bg-background text-on-background font-body-md antialiased flex flex-col min-h-screen">
+<!-- TopNavBar -->
+<header class="bg-surface-container-lowest dark:bg-inverse-surface border-b border-outline-variant dark:border-outline docked full-width top-0 z-50">
+<div class="flex justify-between items-center px-gutter py-4 w-full max-w-max-width mx-auto">
+<div class="flex items-center gap-8">
+<a class="font-display-lg text-headline-md font-bold text-primary dark:text-primary-fixed-dim" href="#">ElectroTech</a>
+<!-- Search Bar -->
+<div class="hidden lg:flex items-center bg-surface-container-low rounded-full px-4 py-2 border border-outline-variant">
+<span class="material-symbols-outlined text-secondary mr-2" data-icon="search">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-body-md text-on-surface w-64 p-0" placeholder="Tìm kiếm sản phẩm..." type="text"/>
+</div>
+</div>
+<nav class="hidden md:flex items-center gap-6">
+<a class="font-label-md text-label-md text-secondary dark:text-secondary-fixed-dim hover:text-primary dark:hover:text-primary-fixed-dim transition-colors duration-200" href="#">Deals</a>
+<a class="font-label-md text-label-md text-secondary dark:text-secondary-fixed-dim hover:text-primary dark:hover:text-primary-fixed-dim transition-colors duration-200" href="#">New Arrivals</a>
+<a class="font-label-md text-label-md text-secondary dark:text-secondary-fixed-dim hover:text-primary dark:hover:text-primary-fixed-dim transition-colors duration-200" href="#">Laptops</a>
+<a class="font-label-md text-label-md text-secondary dark:text-secondary-fixed-dim hover:text-primary dark:hover:text-primary-fixed-dim transition-colors duration-200" href="#">Components</a>
+<a class="font-label-md text-label-md text-secondary dark:text-secondary-fixed-dim hover:text-primary dark:hover:text-primary-fixed-dim transition-colors duration-200" href="#">Mobile</a>
+<a class="font-label-md text-label-md text-secondary dark:text-secondary-fixed-dim hover:text-primary dark:hover:text-primary-fixed-dim transition-colors duration-200" href="#">Peripherals</a>
+</nav>
+<div class="flex items-center gap-4 text-primary dark:text-primary-fixed-dim">
+<button aria-label="Cart" class="hover:bg-surface-container-low dark:hover:bg-secondary-container transition-colors duration-200 p-2 rounded-full relative">
+<span class="material-symbols-outlined" data-icon="shopping_cart">shopping_cart</span>
+<span class="absolute top-0 right-0 bg-error text-on-error font-spec-code text-[10px] rounded-full h-4 w-4 flex items-center justify-center">2</span>
+</button>
+<button aria-label="Profile" class="hover:bg-surface-container-low dark:hover:bg-secondary-container transition-colors duration-200 p-2 rounded-full">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+</button>
+</div>
+</div>
+</header>
+<!-- Main Content -->
+<main class="flex-grow w-full max-w-max-width mx-auto px-margin-mobile md:px-gutter py-8 md:py-margin-desktop">
+<h1 class="font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-surface mb-8">Thanh Toán</h1>
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter">
+<!-- Left Column: Cart & Forms -->
+<div class="lg:col-span-8 flex flex-col gap-8">
+<!-- Shopping Cart Section -->
+<section class="bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden shadow-sm">
+<div class="px-6 py-4 border-b border-outline-variant bg-surface-bright">
+<h2 class="font-headline-md text-headline-md text-on-surface">Giỏ Hàng Của Bạn</h2>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="border-b border-outline-variant bg-surface-container-low text-secondary font-spec-code text-spec-code uppercase tracking-wider">
+<th class="px-6 py-4 font-semibold">Sản phẩm</th>
+<th class="px-6 py-4 font-semibold text-right">Giá</th>
+<th class="px-6 py-4 font-semibold text-center">Số lượng</th>
+<th class="px-6 py-4 font-semibold text-right">Tổng</th>
+<th class="px-6 py-4 font-semibold text-center">Thao tác</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant">
+<!-- Item 1 -->
+<tr class="hover:bg-surface-bright transition-colors group">
+<td class="px-6 py-6">
+<div class="flex items-center gap-4">
+<div class="w-20 h-20 rounded-xl bg-surface-container flex-shrink-0 overflow-hidden border border-outline-variant/50">
+<img class="w-full h-full object-cover" data-alt="A high-performance professional laptop designed for precision engineering and tech enthusiasts, positioned on a sleek white minimalist desk. The scene is illuminated by soft, high-key lighting characteristic of a modern light-mode corporate aesthetic, emphasizing clean lines and premium materials. The color palette features neutral grays and pure whites with a subtle hint of digital blue reflection on the screen. The mood is sophisticated, reliable, and technologically advanced." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDppjW2020UbI_a6iiQnd0q0pHQce5wC6RTgxkYO_Jv2ajR5O8qkXOdSweLdcYRotW_XVbJrl8-LUEoHXOn7BtNApN4EuNDWlFdLN1Rpq5BYPyTEehnDEfQ81wWCsO7A-Lgk8Vh6qkw4d1kfOFuGpY1giARitsc5mfBbLm1yoyzhgfcM8XxMykaIOljYPwBcQHp3uo_JJxFg_XyqrA3IcUrOf4iV6J86Nlgzh0G3hn-FttaxsWluabD"/>
+</div>
+<div>
+<h3 class="font-label-md text-label-md text-on-surface font-semibold mb-1">ElectroTech ProBook 15"</h3>
+<p class="font-body-md text-[13px] text-secondary">Intel i9, 32GB RAM, 1TB SSD</p>
+</div>
+</div>
+</td>
+<td class="px-6 py-6 font-spec-code text-spec-code text-right text-on-surface-variant">
+                                        32,500,000 ₫
+                                    </td>
+<td class="px-6 py-6">
+<div class="flex items-center justify-center">
+<div class="flex items-center border border-outline-variant rounded-lg bg-surface-container-lowest">
+<button class="px-3 py-1 text-secondary hover:text-primary hover:bg-surface-container-low transition-colors"><span class="material-symbols-outlined text-[16px]" data-icon="remove">remove</span></button>
+<input class="w-10 text-center font-spec-code text-spec-code border-none bg-transparent focus:ring-0 p-0 text-on-surface" readonly="" type="text" value="1"/>
+<button class="px-3 py-1 text-secondary hover:text-primary hover:bg-surface-container-low transition-colors"><span class="material-symbols-outlined text-[16px]" data-icon="add">add</span></button>
+</div>
+</div>
+</td>
+<td class="px-6 py-6 font-spec-code text-spec-code text-right font-semibold text-primary">
+                                        32,500,000 ₫
+                                    </td>
+<td class="px-6 py-6 text-center">
+<button class="text-outline hover:text-error transition-colors p-2 rounded-full hover:bg-error-container/20">
+<span class="material-symbols-outlined" data-icon="delete">delete</span>
+</button>
+</td>
+</tr>
+<!-- Item 2 -->
+<tr class="hover:bg-surface-bright transition-colors group">
+<td class="px-6 py-6">
+<div class="flex items-center gap-4">
+<div class="w-20 h-20 rounded-xl bg-surface-container flex-shrink-0 overflow-hidden border border-outline-variant/50">
+<img class="w-full h-full object-cover" data-alt="Premium wireless over-ear headphones resting on a pristine, light gray surface within a minimalist studio environment. The lighting is soft and diffused, casting gentle tonal shadows that highlight the sleek, modern design and high-quality matte finish of the device. The visual style aligns with a high-end e-commerce platform, using a stark white and slate gray color palette to reduce cognitive load. The atmosphere conveys precision, clarity, and top-tier technological craftsmanship." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAu8fRHqdbrkWS3GGptATncBzH8Al6fx3cuBBJKt1Cr9NKux7bMaz2TFHb3ijQZm7K8r7SZRxXXiMil_6krZ_4hrlW6aYO11SkrpvnOKNUxrnieFEhL1Ui0BYfTI5bUEnQjv3zy5Q9vMbcFsyRRyfAToX3vVmF6MeLuteO7aH4J7gZsOWczFZ7EisgZE0wAUsUW1fR_3fcDcP8Ca-xBcpvmx9HRpWJ5MphQuKULpMW99feSgojmneWc"/>
+</div>
+<div>
+<h3 class="font-label-md text-label-md text-on-surface font-semibold mb-1">SonicPro Noise Cancelling</h3>
+<p class="font-body-md text-[13px] text-secondary">Đen nhám, Không dây</p>
+</div>
+</div>
+</td>
+<td class="px-6 py-6 font-spec-code text-spec-code text-right text-on-surface-variant">
+                                        4,200,000 ₫
+                                    </td>
+<td class="px-6 py-6">
+<div class="flex items-center justify-center">
+<div class="flex items-center border border-outline-variant rounded-lg bg-surface-container-lowest">
+<button class="px-3 py-1 text-secondary hover:text-primary hover:bg-surface-container-low transition-colors"><span class="material-symbols-outlined text-[16px]" data-icon="remove">remove</span></button>
+<input class="w-10 text-center font-spec-code text-spec-code border-none bg-transparent focus:ring-0 p-0 text-on-surface" readonly="" type="text" value="1"/>
+<button class="px-3 py-1 text-secondary hover:text-primary hover:bg-surface-container-low transition-colors"><span class="material-symbols-outlined text-[16px]" data-icon="add">add</span></button>
+</div>
+</div>
+</td>
+<td class="px-6 py-6 font-spec-code text-spec-code text-right font-semibold text-primary">
+                                        4,200,000 ₫
+                                    </td>
+<td class="px-6 py-6 text-center">
+<button class="text-outline hover:text-error transition-colors p-2 rounded-full hover:bg-error-container/20">
+<span class="material-symbols-outlined" data-icon="delete">delete</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<!-- Shipping Form Section -->
+<section class="bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden shadow-sm">
+<div class="px-6 py-4 border-b border-outline-variant bg-surface-bright flex items-center gap-3">
+<span class="material-symbols-outlined text-primary" data-icon="local_shipping">local_shipping</span>
+<h2 class="font-headline-md text-headline-md text-on-surface">Thông tin giao hàng</h2>
+</div>
+<div class="p-6">
+<form class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<div class="md:col-span-2">
+<label class="font-label-md text-label-md text-on-surface mb-2 block" for="fullname">Họ và tên *</label>
+<input class="w-full bg-surface-container-lowest border border-outline-variant rounded-lg px-4 py-3 text-body-md focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all shadow-sm" id="fullname" placeholder="Nhập họ và tên người nhận" type="text"/>
+</div>
+<div>
+<label class="font-label-md text-label-md text-on-surface mb-2 block" for="phone">Số điện thoại *</label>
+<input class="w-full bg-surface-container-lowest border border-outline-variant rounded-lg px-4 py-3 text-body-md focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all shadow-sm" id="phone" placeholder="Ví dụ: 0912345678" type="tel"/>
+</div>
+<div>
+<label class="font-label-md text-label-md text-on-surface mb-2 block" for="email">Email (Không bắt buộc)</label>
+<input class="w-full bg-surface-container-lowest border border-outline-variant rounded-lg px-4 py-3 text-body-md focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all shadow-sm" id="email" placeholder="Để nhận thông báo đơn hàng" type="email"/>
+</div>
+<div class="md:col-span-2">
+<label class="font-label-md text-label-md text-on-surface mb-2 block" for="address">Địa chỉ chi tiết *</label>
+<input class="w-full bg-surface-container-lowest border border-outline-variant rounded-lg px-4 py-3 text-body-md focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all shadow-sm" id="address" placeholder="Số nhà, tên đường, phường/xã, quận/huyện, thành phố" type="text"/>
+</div>
+<div class="md:col-span-2">
+<label class="font-label-md text-label-md text-on-surface mb-2 block" for="note">Ghi chú đơn hàng</label>
+<textarea class="w-full bg-surface-container-lowest border border-outline-variant rounded-lg px-4 py-3 text-body-md focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all shadow-sm" id="note" placeholder="Ghi chú thêm về thời gian giao hàng, chỉ dẫn địa chỉ..." rows="3"></textarea>
+</div>
+</form>
+</div>
+</section>
+<!-- Payment Method Section -->
+<section class="bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden shadow-sm mb-8 lg:mb-0">
+<div class="px-6 py-4 border-b border-outline-variant bg-surface-bright flex items-center gap-3">
+<span class="material-symbols-outlined text-primary" data-icon="payments">payments</span>
+<h2 class="font-headline-md text-headline-md text-on-surface">Phương thức thanh toán</h2>
+</div>
+<div class="p-6">
+<div class="border border-primary bg-primary/5 rounded-xl p-4 flex items-start gap-4 cursor-pointer relative overflow-hidden transition-all">
+<div class="mt-1">
+<input checked="" class="w-5 h-5 text-primary border-outline-variant focus:ring-primary bg-surface-container-lowest" id="cod" name="payment" type="radio"/>
+</div>
+<div class="flex-grow">
+<label class="font-label-md text-label-md text-on-surface font-semibold cursor-pointer block" for="cod">Thanh toán khi nhận hàng (COD)</label>
+<p class="font-body-md text-[14px] text-secondary mt-1">Khách hàng thanh toán bằng tiền mặt cho nhân viên giao hàng khi nhận được sản phẩm.</p>
+</div>
+<span class="material-symbols-outlined text-primary absolute right-4 top-1/2 -translate-y-1/2 opacity-20 text-[48px]" data-icon="local_atm">local_atm</span>
+</div>
+<div class="border border-outline-variant rounded-xl p-4 flex items-start gap-4 cursor-pointer mt-4 opacity-60 hover:bg-surface-bright transition-colors">
+<div class="mt-1">
+<input class="w-5 h-5 text-primary border-outline-variant focus:ring-primary bg-surface-container-lowest" id="transfer" name="payment" type="radio"/>
+</div>
+<div class="flex-grow">
+<label class="font-label-md text-label-md text-on-surface font-semibold cursor-pointer block" for="transfer">Chuyển khoản ngân hàng</label>
+<p class="font-body-md text-[14px] text-secondary mt-1">Chuyển khoản trực tiếp vào tài khoản công ty. Hàng sẽ được giao sau khi xác nhận.</p>
+</div>
+</div>
+</div>
+</section>
+</div>
+<!-- Right Column: Order Summary (Sticky) -->
+<div class="lg:col-span-4">
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm sticky top-24">
+<div class="px-6 py-4 border-b border-outline-variant bg-surface-bright">
+<h2 class="font-headline-md text-headline-md text-on-surface">Tóm Tắt Đơn Hàng</h2>
+</div>
+<div class="p-6 flex flex-col gap-4">
+<div class="flex justify-between items-center font-body-md text-body-md text-on-surface-variant">
+<span>Tạm tính (2 sản phẩm):</span>
+<span class="font-spec-code text-spec-code text-on-surface">36,700,000 ₫</span>
+</div>
+<div class="flex justify-between items-center font-body-md text-body-md text-on-surface-variant">
+<span>Phí vận chuyển:</span>
+<span class="font-spec-code text-spec-code text-primary font-medium">Miễn phí</span>
+</div>
+<div class="border-t border-outline-variant my-2 pt-4 flex justify-between items-end">
+<span class="font-label-md text-label-md text-on-surface font-semibold">Tổng cộng:</span>
+<div class="text-right">
+<span class="font-headline-lg text-headline-lg-mobile md:text-headline-lg text-primary block">36,700,000 ₫</span>
+<span class="font-body-md text-[12px] text-secondary">(Đã bao gồm VAT)</span>
+</div>
+</div>
+<button class="w-full mt-6 bg-primary hover:bg-on-primary-fixed-variant text-on-primary font-label-md text-label-md py-4 rounded-xl flex items-center justify-center gap-2 transition-all shadow-sm hover:shadow-md active:scale-[0.98]">
+<span class="material-symbols-outlined text-[20px]" data-icon="check_circle">check_circle</span>
+                            Xác nhận đặt hàng
+                        </button>
+<div class="mt-4 flex items-center justify-center gap-2 text-secondary">
+<span class="material-symbols-outlined text-[16px]" data-icon="verified_user">verified_user</span>
+<span class="font-body-md text-[12px]">Thanh toán an toàn &amp; Bảo mật 100%</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer -->
+<footer class="bg-surface-dim dark:bg-inverse-surface border-t border-outline-variant full-width mt-auto">
+<div class="grid grid-cols-1 md:grid-cols-4 gap-gutter px-gutter py-margin-desktop w-full max-w-max-width mx-auto">
+<div class="col-span-1 md:col-span-4 mb-8">
+<span class="font-display-lg text-headline-md font-bold text-primary dark:text-primary-fixed-dim">ElectroTech</span>
+<p class="font-body-md text-body-md text-secondary dark:text-secondary-fixed-dim mt-2">© 2024 ElectroTech Inc. Precision Engineering for Tech Enthusiasts.</p>
+</div>
+<div class="col-span-1 md:col-span-4 flex flex-wrap gap-6 border-t border-outline-variant/50 pt-8">
+<a class="font-body-md text-body-md text-secondary dark:text-secondary-fixed-dim hover:text-primary dark:hover:text-primary-fixed-dim underline transition-all" href="#">About Us</a>
+<a class="font-body-md text-body-md text-secondary dark:text-secondary-fixed-dim hover:text-primary dark:hover:text-primary-fixed-dim underline transition-all" href="#">Privacy Policy</a>
+<a class="font-body-md text-body-md text-secondary dark:text-secondary-fixed-dim hover:text-primary dark:hover:text-primary-fixed-dim underline transition-all" href="#">Terms of Service</a>
+<a class="font-body-md text-body-md text-secondary dark:text-secondary-fixed-dim hover:text-primary dark:hover:text-primary-fixed-dim underline transition-all" href="#">Shipping Info</a>
+<a class="font-body-md text-body-md text-secondary dark:text-secondary-fixed-dim hover:text-primary dark:hover:text-primary-fixed-dim underline transition-all" href="#">Contact Support</a>
+</div>
+</div>
+</footer>
+</body></html>

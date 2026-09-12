@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+
+<html class="light" lang="vi"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ElectroTech - Laptop</title>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Google Fonts & Material Symbols -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind Config Injection -->
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "primary-fixed-dim": "#b4c5ff",
+                    "primary": "#004ac6",
+                    "on-primary-fixed-variant": "#003ea8",
+                    "surface-tint": "#0053db",
+                    "surface-container": "#eceef0",
+                    "surface-bright": "#f7f9fb",
+                    "secondary": "#505f76",
+                    "inverse-primary": "#b4c5ff",
+                    "error": "#ba1a1a",
+                    "surface-container-high": "#e6e8ea",
+                    "on-surface": "#191c1e",
+                    "tertiary-fixed": "#ffdbca",
+                    "surface-variant": "#e0e3e5",
+                    "on-primary-container": "#eeefff",
+                    "surface-dim": "#d8dadc",
+                    "surface-container-low": "#f2f4f6",
+                    "on-error-container": "#93000a",
+                    "outline-variant": "#c3c6d7",
+                    "on-tertiary": "#ffffff",
+                    "on-tertiary-fixed-variant": "#783200",
+                    "secondary-fixed": "#d3e4fe",
+                    "secondary-fixed-dim": "#b7c8e1",
+                    "background": "#f7f9fb",
+                    "on-secondary-fixed-variant": "#38485d",
+                    "inverse-surface": "#2d3133",
+                    "tertiary-container": "#b54e00",
+                    "tertiary-fixed-dim": "#ffb690",
+                    "surface": "#f7f9fb",
+                    "on-tertiary-container": "#ffece5",
+                    "on-secondary-fixed": "#0b1c30",
+                    "outline": "#737686",
+                    "on-primary-fixed": "#00174b",
+                    "on-background": "#191c1e",
+                    "inverse-on-surface": "#eff1f3",
+                    "secondary-container": "#d0e1fb",
+                    "surface-container-lowest": "#ffffff",
+                    "surface-container-highest": "#e0e3e5",
+                    "primary-container": "#2563eb",
+                    "on-surface-variant": "#434655",
+                    "on-secondary": "#ffffff",
+                    "on-tertiary-fixed": "#341100",
+                    "on-secondary-container": "#54647a",
+                    "tertiary": "#8e3c00",
+                    "primary-fixed": "#dbe1ff",
+                    "on-error": "#ffffff",
+                    "on-primary": "#ffffff",
+                    "error-container": "#ffdad6"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "gutter": "24px",
+                    "max-width": "1280px",
+                    "margin-desktop": "64px",
+                    "unit": "4px",
+                    "margin-mobile": "16px"
+            },
+            "fontFamily": {
+                    "body-lg": ["Inter"],
+                    "body-md": ["Inter"],
+                    "headline-md": ["Inter"],
+                    "headline-lg-mobile": ["Inter"],
+                    "display-lg": ["Inter"],
+                    "headline-lg": ["Inter"],
+                    "label-md": ["Inter"],
+                    "spec-code": ["Inter"]
+            },
+            "fontSize": {
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "label-md": ["14px", {"lineHeight": "20px", "fontWeight": "500"}],
+                    "spec-code": ["13px", {"lineHeight": "18px", "fontWeight": "600"}]
+            }
+          }
+        }
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-family: 'Material Symbols Outlined';
+            font-weight: normal;
+            font-style: normal;
+            font-size: 24px;
+            display: inline-block;
+            line-height: 1;
+            text-transform: none;
+            letter-spacing: normal;
+            word-wrap: normal;
+            white-space: nowrap;
+            direction: ltr;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md text-body-md min-h-screen flex flex-col">
+<!-- TopNavBar Shared Component -->
+<header class="bg-surface-container-lowest border-b border-outline-variant docked full-width top-0 z-50 sticky">
+<div class="flex justify-between items-center px-gutter py-4 w-full max-w-max-width mx-auto">
+<div class="flex items-center gap-8">
+<!-- Brand Logo -->
+<a class="font-display-lg text-headline-md font-bold text-primary tracking-tight" href="#">
+                    ElectroTech
+                </a>
+<!-- Navigation Links (Desktop) -->
+<nav class="hidden md:flex gap-6">
+<a class="font-label-md text-label-md text-secondary hover:text-primary transition-colors duration-200" href="#">Deals</a>
+<a class="font-label-md text-label-md text-secondary hover:text-primary transition-colors duration-200" href="#">New Arrivals</a>
+<!-- ACTIVE NAVIGATION ITEM (User is on Laptops PLP) -->
+<a class="font-label-md text-label-md text-primary border-b-2 border-primary pb-1 scale-95 transition-transform" href="#">Laptops</a>
+<a class="font-label-md text-label-md text-secondary hover:text-primary transition-colors duration-200" href="#">Components</a>
+<a class="font-label-md text-label-md text-secondary hover:text-primary transition-colors duration-200" href="#">Mobile</a>
+<a class="font-label-md text-label-md text-secondary hover:text-primary transition-colors duration-200" href="#">Peripherals</a>
+</nav>
+</div>
+<!-- Trailing Actions & Search -->
+<div class="flex items-center gap-4">
+<div class="hidden lg:flex items-center bg-surface-container-low rounded-full px-4 py-2 border border-outline-variant">
+<span class="material-symbols-outlined text-outline mr-2 text-sm">search</span>
+<input class="bg-transparent border-none outline-none text-body-md font-body-md placeholder:text-outline w-48 focus:ring-0" placeholder="Tìm kiếm sản phẩm..." type="text"/>
+</div>
+<button aria-label="shopping_cart" class="p-2 text-secondary hover:bg-surface-container-low transition-colors duration-200 rounded-full">
+<span class="material-symbols-outlined">shopping_cart</span>
+</button>
+<button aria-label="person" class="p-2 text-secondary hover:bg-surface-container-low transition-colors duration-200 rounded-full">
+<span class="material-symbols-outlined">person</span>
+</button>
+</div>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-grow w-full max-w-max-width mx-auto px-gutter py-8 md:py-margin-desktop grid grid-cols-1 lg:grid-cols-12 gap-gutter">
+<!-- Breadcrumb & Page Title (Spans full width above columns) -->
+<div class="lg:col-span-12 mb-4">
+<nav class="flex items-center gap-2 text-secondary font-label-md text-label-md mb-2">
+<a class="hover:text-primary" href="#">Trang chủ</a>
+<span class="material-symbols-outlined text-sm">chevron_right</span>
+<span class="text-on-surface">Laptop</span>
+</nav>
+<h1 class="font-headline-lg text-headline-lg text-on-surface">Khám phá Laptop</h1>
+</div>
+<!-- Left Sidebar: Filters (4 Columns) -->
+<aside class="hidden lg:block lg:col-span-3 space-y-8 pr-6">
+<!-- Danh mục -->
+<section class="border-b border-outline-variant pb-6">
+<h3 class="font-headline-md text-headline-md text-on-surface mb-4">Danh mục</h3>
+<div class="space-y-3">
+<label class="flex items-center gap-3 cursor-pointer group">
+<input class="form-checkbox text-primary rounded border-outline-variant focus:ring-primary focus:ring-opacity-20 w-5 h-5 transition-all" type="checkbox"/>
+<span class="font-body-md text-body-md text-on-surface-variant group-hover:text-on-surface">Laptop Gaming</span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer group">
+<input class="form-checkbox text-primary rounded border-outline-variant focus:ring-primary focus:ring-opacity-20 w-5 h-5 transition-all" type="checkbox"/>
+<span class="font-body-md text-body-md text-on-surface-variant group-hover:text-on-surface">Laptop Văn phòng</span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer group">
+<input class="form-checkbox text-primary rounded border-outline-variant focus:ring-primary focus:ring-opacity-20 w-5 h-5 transition-all" type="checkbox"/>
+<span class="font-body-md text-body-md text-on-surface-variant group-hover:text-on-surface">Laptop Đồ họa</span>
+</label>
+</div>
+</section>
+<!-- Khoảng giá -->
+<section class="border-b border-outline-variant pb-6">
+<h3 class="font-headline-md text-headline-md text-on-surface mb-4">Khoảng giá</h3>
+<div class="space-y-3">
+<label class="flex items-center gap-3 cursor-pointer group">
+<input class="form-radio text-primary border-outline-variant focus:ring-primary w-5 h-5" name="price" type="radio"/>
+<span class="font-body-md text-body-md text-on-surface-variant group-hover:text-on-surface">Dưới 10.000.000₫</span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer group">
+<input class="form-radio text-primary border-outline-variant focus:ring-primary w-5 h-5" name="price" type="radio"/>
+<span class="font-body-md text-body-md text-on-surface-variant group-hover:text-on-surface">10 - 20.000.000₫</span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer group">
+<input class="form-radio text-primary border-outline-variant focus:ring-primary w-5 h-5" name="price" type="radio"/>
+<span class="font-body-md text-body-md text-on-surface-variant group-hover:text-on-surface">Trên 20.000.000₫</span>
+</label>
+</div>
+</section>
+<!-- Thương hiệu -->
+<section class="pb-6">
+<h3 class="font-headline-md text-headline-md text-on-surface mb-4">Thương hiệu</h3>
+<div class="space-y-3">
+<label class="flex items-center gap-3 cursor-pointer group">
+<input class="form-checkbox text-primary rounded border-outline-variant focus:ring-primary w-5 h-5" type="checkbox"/>
+<span class="font-body-md text-body-md text-on-surface-variant group-hover:text-on-surface">Apple</span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer group">
+<input class="form-checkbox text-primary rounded border-outline-variant focus:ring-primary w-5 h-5" type="checkbox"/>
+<span class="font-body-md text-body-md text-on-surface-variant group-hover:text-on-surface">Asus</span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer group">
+<input class="form-checkbox text-primary rounded border-outline-variant focus:ring-primary w-5 h-5" type="checkbox"/>
+<span class="font-body-md text-body-md text-on-surface-variant group-hover:text-on-surface">Lenovo</span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer group">
+<input class="form-checkbox text-primary rounded border-outline-variant focus:ring-primary w-5 h-5" type="checkbox"/>
+<span class="font-body-md text-body-md text-on-surface-variant group-hover:text-on-surface">Xiaomi</span>
+</label>
+</div>
+</section>
+</aside>
+<!-- Main Area: Sort & Product Grid (8 Columns) -->
+<section class="col-span-1 lg:col-span-9 flex flex-col gap-6">
+<!-- Sort Bar -->
+<div class="flex justify-between items-center bg-surface-container-lowest p-4 rounded-lg border border-outline-variant">
+<span class="font-body-md text-body-md text-secondary">Hiển thị 24 sản phẩm</span>
+<div class="flex items-center gap-3">
+<label class="font-label-md text-label-md text-on-surface-variant">Sắp xếp theo:</label>
+<select class="font-body-md text-body-md bg-surface border border-outline-variant text-on-surface rounded focus:ring-primary focus:border-primary px-3 py-1.5 cursor-pointer">
+<option value="newest">Mới nhất</option>
+<option value="price_asc">Giá: Thấp đến Cao</option>
+<option value="price_desc">Giá: Cao đến Thấp</option>
+</select>
+</div>
+</div>
+<!-- Product Grid -->
+<div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-gutter">
+<!-- Product Card 1: Apple -->
+<article class="bg-surface-container-lowest border border-outline-variant rounded-lg overflow-hidden group hover:shadow-[0_4px_12px_rgba(0,0,0,0.05)] hover:border-outline transition-all duration-300 flex flex-col">
+<div class="w-full aspect-square bg-surface-container-low relative p-4 flex items-center justify-center">
+<img class="object-contain w-full h-full mix-blend-multiply" data-alt="A high-end, sleek silver laptop positioned on a pristine white minimalist desk. The studio lighting is bright and high-key, highlighting the premium brushed aluminum finish of the device. The composition is clean, modern, and corporate, emphasizing precision engineering." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBsTtoEQXhpnJR5tIn4Bbvtu9XKacT1H78MOnfe-AxxzBOJaj2Ajvu4FXuDUEra4dG3sqn1QGhSd29ictDtRiumFRUYAo9E8FwRL3wIXDmlgcL5UrQwXIKQgKiwhh1g5nJbzDqzjNaQ6_r3U5ktSaMH6eK6RQAHCpPNdTFjm8P837lJ_-Rb5Ap67N_Ac12ezS96cvvF5CD16UjCXUu3hFsirKZ2Ja-afZ-qZPzQUvUMHIrBgiBARG6H"/>
+<div class="absolute top-3 left-3 bg-secondary-container text-on-secondary-container font-label-md text-label-md px-2 py-0.5 rounded-full text-xs">
+                            Mới
+                        </div>
+</div>
+<div class="p-5 flex flex-col flex-grow gap-2">
+<span class="font-label-md text-label-md text-secondary uppercase tracking-wider text-xs">Apple</span>
+<h2 class="font-headline-md text-headline-md text-on-surface line-clamp-2 hover:text-primary cursor-pointer transition-colors">MacBook Pro 14 M3 Pro 2023</h2>
+<div class="font-spec-code text-spec-code text-on-surface-variant flex flex-col gap-1 mt-1 text-[12px]">
+<span>CPU: Apple M3 Pro</span>
+<span>RAM: 18GB | 512GB SSD</span>
+</div>
+<div class="mt-auto pt-4 flex items-end justify-between">
+<span class="font-headline-md text-headline-md text-primary">49.990.000₫</span>
+</div>
+<button class="mt-4 w-full border border-primary text-primary hover:bg-primary hover:text-on-primary font-label-md text-label-md py-2.5 rounded transition-colors flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-sm">shopping_cart</span>
+                            Thêm vào giỏ
+                        </button>
+</div>
+</article>
+<!-- Product Card 2: Asus -->
+<article class="bg-surface-container-lowest border border-outline-variant rounded-lg overflow-hidden group hover:shadow-[0_4px_12px_rgba(0,0,0,0.05)] hover:border-outline transition-all duration-300 flex flex-col">
+<div class="w-full aspect-square bg-surface-container-low relative p-4 flex items-center justify-center">
+<img class="object-contain w-full h-full mix-blend-multiply" data-alt="A powerful, angular gaming laptop in a dark, stealthy chassis resting on a minimalist surface. Subtle RGB accents glow softly against a bright, modern corporate background. The lighting is crisp, emphasizing the robust build quality and high-performance nature of the device without being overly aggressive." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCq83fiCIFPvOnol0MYCP5gwC31CjwNzZfCLcXRm-udFa_UOP451Fo970BjtSa_znpN9D8K6PTkaO396xSvLAPWbKOgkYEzaGdoLnrqqrAJG31Coq80S76WXdogF4u4XLUmB4mHynPb6h5x1nhFO_MMPAeh30H1IVSzkSQBKOIOR5VSpIO_LzdLHFi3ihheygEmKUi3FmAsUrkAOTSD28R8gnMz5uFDeii6oTtU-UrlFiQxMrdBxLYL"/>
+</div>
+<div class="p-5 flex flex-col flex-grow gap-2">
+<span class="font-label-md text-label-md text-secondary uppercase tracking-wider text-xs">Asus</span>
+<h2 class="font-headline-md text-headline-md text-on-surface line-clamp-2 hover:text-primary cursor-pointer transition-colors">Asus ROG Zephyrus G14</h2>
+<div class="font-spec-code text-spec-code text-on-surface-variant flex flex-col gap-1 mt-1 text-[12px]">
+<span>CPU: Ryzen 9 7940HS</span>
+<span>RAM: 16GB | RTX 4060</span>
+</div>
+<div class="mt-auto pt-4 flex items-end justify-between">
+<span class="font-headline-md text-headline-md text-primary">42.590.000₫</span>
+</div>
+<button class="mt-4 w-full border border-primary text-primary hover:bg-primary hover:text-on-primary font-label-md text-label-md py-2.5 rounded transition-colors flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-sm">shopping_cart</span>
+                            Thêm vào giỏ
+                        </button>
+</div>
+</article>
+<!-- Product Card 3: Lenovo -->
+<article class="bg-surface-container-lowest border border-outline-variant rounded-lg overflow-hidden group hover:shadow-[0_4px_12px_rgba(0,0,0,0.05)] hover:border-outline transition-all duration-300 flex flex-col">
+<div class="w-full aspect-square bg-surface-container-low relative p-4 flex items-center justify-center">
+<img class="object-contain w-full h-full mix-blend-multiply" data-alt="A professional matte black business laptop opened slightly, displayed in a sterile, ultra-modern office setting. The lighting is bright and diffuse, casting soft shadows that highlight the utilitarian, minimalist design and premium carbon fiber texture. The aesthetic is purely corporate and sophisticated." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD5UVMz79TfVlZtU4NDT82PFpSXE4zkB-JDJyKNqkT9bQrWC2SumhoL2zYCsrzcv-FgP35vbOCB5M5tMUCJVp7dnY7R6aC4x4G2KOdKx7GEHe0pq3g3NtBsq9d9sFrfY9Q-4sjkLHiXPTM72W2nbjfA2wFuu4akwMqw7gPLJAoSgCKRKbkulRf6XbFuXRUQ7YosZdzzHJeLfYi8fjTFqH-HTRUE1EV4mRe9A3ccQ6bI8moNrx79a5Js"/>
+</div>
+<div class="p-5 flex flex-col flex-grow gap-2">
+<span class="font-label-md text-label-md text-secondary uppercase tracking-wider text-xs">Lenovo</span>
+<h2 class="font-headline-md text-headline-md text-on-surface line-clamp-2 hover:text-primary cursor-pointer transition-colors">Lenovo ThinkPad X1 Carbon Gen 11</h2>
+<div class="font-spec-code text-spec-code text-on-surface-variant flex flex-col gap-1 mt-1 text-[12px]">
+<span>CPU: Core i7-1355U</span>
+<span>RAM: 16GB | 1TB SSD</span>
+</div>
+<div class="mt-auto pt-4 flex items-end justify-between">
+<span class="font-headline-md text-headline-md text-primary">38.990.000₫</span>
+</div>
+<button class="mt-4 w-full border border-primary text-primary hover:bg-primary hover:text-on-primary font-label-md text-label-md py-2.5 rounded transition-colors flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-sm">shopping_cart</span>
+                            Thêm vào giỏ
+                        </button>
+</div>
+</article>
+<!-- Product Card 4: Xiaomi -->
+<article class="bg-surface-container-lowest border border-outline-variant rounded-lg overflow-hidden group hover:shadow-[0_4px_12px_rgba(0,0,0,0.05)] hover:border-outline transition-all duration-300 flex flex-col">
+<div class="w-full aspect-square bg-surface-container-low relative p-4 flex items-center justify-center">
+<img class="object-contain w-full h-full mix-blend-multiply" data-alt="An ultra-thin, minimalist laptop in a pale grey finish, captured from an elevated isometric angle. It sits on a pure white background bathed in bright, natural-looking studio light. The focus is on the device's extreme thinness and clean, unadorned surfaces, evoking a sense of modern technological elegance." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBOolgNTeS7u5HFwEBCq9By3VYTpyH8HsjbrVCBOKSQD_O09Ptsvplhj4rue_H4LrfiPu3MmeejcaxTCIKJiZcyae1dFvmJD4K0_IyYgOpoc1jZpW30UqS7CRkdA7s3yLJ-CvdOPlE8j_BdQ6GTvG-Qf5nwp_tkyES6j5Vo941dTkrD8aZDJyy4lPd_ToJX8SWvZsLYqFWKYJt-4Gzv9S4M488DaFCD2DtoHrNKmLUnT9rNw7MoiTyu"/>
+</div>
+<div class="p-5 flex flex-col flex-grow gap-2">
+<span class="font-label-md text-label-md text-secondary uppercase tracking-wider text-xs">Xiaomi</span>
+<h2 class="font-headline-md text-headline-md text-on-surface line-clamp-2 hover:text-primary cursor-pointer transition-colors">Xiaomi Book Pro 14 2022</h2>
+<div class="font-spec-code text-spec-code text-on-surface-variant flex flex-col gap-1 mt-1 text-[12px]">
+<span>CPU: Core i5-1240P</span>
+<span>RAM: 16GB | OLED 90Hz</span>
+</div>
+<div class="mt-auto pt-4 flex items-end justify-between">
+<span class="font-headline-md text-headline-md text-primary">21.490.000₫</span>
+</div>
+<button class="mt-4 w-full border border-primary text-primary hover:bg-primary hover:text-on-primary font-label-md text-label-md py-2.5 rounded transition-colors flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-sm">shopping_cart</span>
+                            Thêm vào giỏ
+                        </button>
+</div>
+</article>
+</div>
+<!-- Pagination Placeholder -->
+<div class="flex justify-center mt-8">
+<div class="flex items-center gap-2">
+<button class="w-10 h-10 rounded border border-outline-variant flex items-center justify-center text-secondary hover:bg-surface-container-low disabled:opacity-50" disabled="">
+<span class="material-symbols-outlined text-sm">chevron_left</span>
+</button>
+<button class="w-10 h-10 rounded bg-primary text-on-primary font-label-md text-label-md flex items-center justify-center">1</button>
+<button class="w-10 h-10 rounded border border-outline-variant flex items-center justify-center text-secondary hover:bg-surface-container-low font-label-md text-label-md">2</button>
+<button class="w-10 h-10 rounded border border-outline-variant flex items-center justify-center text-secondary hover:bg-surface-container-low font-label-md text-label-md">3</button>
+<span class="text-secondary px-2">...</span>
+<button class="w-10 h-10 rounded border border-outline-variant flex items-center justify-center text-secondary hover:bg-surface-container-low">
+<span class="material-symbols-outlined text-sm">chevron_right</span>
+</button>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer Shared Component -->
+<footer class="bg-surface-dim mt-auto border-t border-outline-variant full-width">
+<div class="grid grid-cols-1 md:grid-cols-4 gap-gutter px-gutter py-margin-desktop w-full max-w-max-width mx-auto">
+<div class="col-span-1 md:col-span-1 flex flex-col gap-4">
+<span class="font-display-lg text-headline-md font-bold text-primary">ElectroTech</span>
+<p class="font-body-md text-body-md text-secondary mt-2">
+                    © 2024 ElectroTech Inc. Precision Engineering for Tech Enthusiasts.
+                </p>
+</div>
+<div class="col-span-1 md:col-span-3 flex flex-wrap gap-8 justify-end">
+<a class="font-body-md text-body-md text-secondary hover:text-primary underline transition-all" href="#">About Us</a>
+<a class="font-body-md text-body-md text-secondary hover:text-primary underline transition-all" href="#">Privacy Policy</a>
+<a class="font-body-md text-body-md text-secondary hover:text-primary underline transition-all" href="#">Terms of Service</a>
+<a class="font-body-md text-body-md text-secondary hover:text-primary underline transition-all" href="#">Shipping Info</a>
+<a class="font-body-md text-body-md text-secondary hover:text-primary underline transition-all" href="#">Contact Support</a>
+</div>
+</div>
+</footer>
+</body></html>

@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+
+<html lang="vi"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ElectroTech - Trang Chủ</title>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-family: 'Material Symbols Outlined';
+            font-weight: normal;
+            font-style: normal;
+            font-size: 24px;
+            line-height: 1;
+            letter-spacing: normal;
+            text-transform: none;
+            display: inline-block;
+            white-space: nowrap;
+            word-wrap: normal;
+            direction: ltr;
+            -webkit-font-feature-settings: 'liga';
+            -webkit-font-smoothing: antialiased;
+        }
+    </style>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        "colors": {
+                "on-error-container": "#93000a",
+                "inverse-on-surface": "#eff1f3",
+                "on-tertiary": "#ffffff",
+                "primary-fixed-dim": "#b3c5ff",
+                "on-tertiary-fixed-variant": "#004f54",
+                "inverse-surface": "#2d3133",
+                "cyber-cyan": "#00F0FF",
+                "surface": "#f7f9fb",
+                "electric-blue": "#0066FF",
+                "surface-variant": "#e0e3e5",
+                "primary-container": "#0066ff",
+                "tertiary-container": "#007e86",
+                "secondary": "#515f78",
+                "tertiary": "#00636a",
+                "on-secondary-fixed": "#0d1c32",
+                "on-surface": "#191c1e",
+                "on-primary": "#ffffff",
+                "on-primary-fixed-variant": "#003fa4",
+                "surface-container-low": "#f2f4f6",
+                "primary": "#0050cb",
+                "secondary-container": "#d2e0fe",
+                "error": "#ba1a1a",
+                "surface-container": "#eceef0",
+                "on-error": "#ffffff",
+                "inverse-primary": "#b3c5ff",
+                "error-container": "#ffdad6",
+                "on-surface-variant": "#424656",
+                "outline-variant": "#c2c6d8",
+                "outline": "#727687",
+                "on-tertiary-container": "#e3fdff",
+                "on-secondary-fixed-variant": "#39475f",
+                "on-secondary-container": "#55637d",
+                "background": "#f7f9fb",
+                "deep-navy": "#0A192F",
+                "on-primary-fixed": "#001849",
+                "primary-fixed": "#dae1ff",
+                "surface-tint": "#0054d6",
+                "surface-border": "rgba(10, 25, 47, 0.08)",
+                "tertiary-fixed": "#7df4ff",
+                "secondary-fixed-dim": "#b9c7e4",
+                "surface-container-highest": "#e0e3e5",
+                "surface-dim": "#d8dadc",
+                "tertiary-fixed-dim": "#00dbe9",
+                "surface-container-high": "#e6e8ea",
+                "glass-bg": "rgba(255, 255, 255, 0.7)",
+                "surface-container-lowest": "#ffffff",
+                "on-background": "#191c1e",
+                "surface-bright": "#f7f9fb",
+                "on-secondary": "#ffffff",
+                "on-tertiary-fixed": "#002022",
+                "secondary-fixed": "#d6e3ff",
+                "on-primary-container": "#f8f7ff"
+        },
+        "borderRadius": {
+                "DEFAULT": "0.25rem",
+                "lg": "0.5rem",
+                "xl": "0.75rem",
+                "full": "9999px"
+        },
+        "spacing": {
+                "container-padding-desktop": "80px",
+                "base": "8px",
+                "section-gap": "120px",
+                "gutter": "32px",
+                "container-padding-mobile": "20px"
+        },
+        "fontFamily": {
+                "display-lg-mobile": [
+                        "Inter"
+                ],
+                "headline-md": [
+                        "Inter"
+                ],
+                "spec-data": [
+                        "Inter"
+                ],
+                "headline-lg": [
+                        "Inter"
+                ],
+                "display-lg": [
+                        "Inter"
+                ],
+                "headline-lg-mobile": [
+                        "Inter"
+                ],
+                "label-lg": [
+                        "Inter"
+                ],
+                "body-lg": [
+                        "Inter"
+                ],
+                "label-md": [
+                        "Inter"
+                ],
+                "body-md": [
+                        "Inter"
+                ]
+        },
+        "fontSize": {
+                "display-lg-mobile": [
+                        "40px",
+                        {
+                                "lineHeight": "48px",
+                                "letterSpacing": "-0.02em",
+                                "fontWeight": "700"
+                        }
+                ],
+                "headline-md": [
+                        "24px",
+                        {
+                                "lineHeight": "32px",
+                                "letterSpacing": "-0.01em",
+                                "fontWeight": "600"
+                        }
+                ],
+                "spec-data": [
+                        "13px",
+                        {
+                                "lineHeight": "18px",
+                                "letterSpacing": "0.01em",
+                                "fontWeight": "600"
+                        }
+                ],
+                "headline-lg": [
+                        "36px",
+                        {
+                                "lineHeight": "44px",
+                                "letterSpacing": "-0.02em",
+                                "fontWeight": "600"
+                        }
+                ],
+                "display-lg": [
+                        "56px",
+                        {
+                                "lineHeight": "64px",
+                                "letterSpacing": "-0.03em",
+                                "fontWeight": "700"
+                        }
+                ],
+                "headline-lg-mobile": [
+                        "28px",
+                        {
+                                "lineHeight": "36px",
+                                "letterSpacing": "-0.01em",
+                                "fontWeight": "600"
+                        }
+                ],
+                "label-lg": [
+                        "14px",
+                        {
+                                "lineHeight": "20px",
+                                "letterSpacing": "0.02em",
+                                "fontWeight": "600"
+                        }
+                ],
+                "body-lg": [
+                        "18px",
+                        {
+                                "lineHeight": "30px",
+                                "letterSpacing": "0em",
+                                "fontWeight": "400"
+                        }
+                ],
+                "label-md": [
+                        "12px",
+                        {
+                                "lineHeight": "16px",
+                                "letterSpacing": "0.05em",
+                                "fontWeight": "500"
+                        }
+                ],
+                "body-md": [
+                        "16px",
+                        {
+                                "lineHeight": "26px",
+                                "letterSpacing": "0em",
+                                "fontWeight": "400"
+                        }
+                ]
+        }
+},
+    },
+  }
+</script>
+</head>
+<body class="bg-background text-on-background font-body-md antialiased flex flex-col min-h-screen">
+<!-- TopNavBar (Shared Component) -->
+<header class="bg-surface-container-lowest/80 backdrop-blur-md border-b border-surface-border sticky top-0 z-50 w-full transition-all duration-300">
+<div class="flex justify-between items-center px-gutter py-6 w-full max-w-[1440px] mx-auto">
+<!-- Brand & Search Container -->
+<div class="flex items-center gap-8 lg:gap-12 w-full lg:w-auto">
+<a class="font-display-lg text-headline-md font-bold text-electric-blue tracking-tight shrink-0" href="#">
+                    ElectroTech
+                </a>
+<div class="relative hidden md:block flex-1 min-w-[320px] lg:w-[480px]">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant/60 text-[20px]">search</span>
+<input class="w-full pl-12 pr-4 py-3 bg-surface border border-surface-border rounded-full font-body-md text-on-surface focus:outline-none focus:border-electric-blue focus:ring-1 focus:ring-electric-blue transition-all" placeholder="Tìm kiếm sản phẩm..." type="text"/>
+</div>
+</div>
+<!-- Navigation Links -->
+<nav class="hidden lg:flex items-center gap-8 ml-auto mr-12">
+<a class="font-label-lg text-electric-blue relative after:absolute after:-bottom-2 after:left-0 after:w-full after:h-0.5 after:bg-electric-blue after:rounded-t-full transition-colors" href="#">Deals</a>
+<a class="font-label-lg text-secondary hover:text-deep-navy transition-colors duration-200" href="#">New Arrivals</a>
+<a class="font-label-lg text-secondary hover:text-deep-navy transition-colors duration-200" href="#">Laptops</a>
+<a class="font-label-lg text-secondary hover:text-deep-navy transition-colors duration-200" href="#">Components</a>
+<a class="font-label-lg text-secondary hover:text-deep-navy transition-colors duration-200" href="#">Mobile</a>
+<a class="font-label-lg text-secondary hover:text-deep-navy transition-colors duration-200" href="#">Peripherals</a>
+</nav>
+<!-- Trailing Icons -->
+<div class="flex items-center gap-2">
+<button class="text-secondary hover:text-electric-blue hover:bg-surface-container-low w-12 h-12 flex items-center justify-center rounded-full transition-all duration-200 active:scale-95 group">
+<span class="material-symbols-outlined text-[24px] group-hover:scale-110 transition-transform">shopping_cart</span>
+</button>
+<button class="text-secondary hover:text-electric-blue hover:bg-surface-container-low w-12 h-12 flex items-center justify-center rounded-full transition-all duration-200 active:scale-95 group">
+<span class="material-symbols-outlined text-[24px] group-hover:scale-110 transition-transform">person</span>
+</button>
+</div>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-grow w-full max-w-[1440px] mx-auto px-gutter lg:px-container-padding-desktop py-12 lg:py-16 space-y-section-gap">
+<!-- Hero Section (Bento Grid Style) -->
+<section class="grid grid-cols-1 lg:grid-cols-12 gap-gutter h-auto lg:h-[640px]">
+<!-- Main Hero Banner -->
+<div class="lg:col-span-8 relative rounded-[24px] overflow-hidden bg-deep-navy group cursor-pointer shadow-lg hover:shadow-xl transition-shadow duration-300 isolate">
+<img class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000 ease-out opacity-80" data-alt="A cinematic, high-end product shot of the latest flagship smartphone, resting on a sleek metallic surface. The scene is illuminated by dramatic, modern studio lighting with subtle blue and orange neon reflections, emphasizing the phone's premium titanium finish and advanced camera lenses. The aesthetic is clean, technological, and aspirational, fitting a top-tier e-commerce platform." src="https://lh3.googleusercontent.com/aida-public/AB6AXuACu1lgviid4VH1YYBHFRY02bFykTSMuJcB9tJSUj88W1I26LOz_sXwoiV9ei0ZMwg1HR9iBOLuviGMk3fUkedCYrAMnnMC8pLgZJLbn6tUyuJw0_kGfH8MNYMeSuLij9zoqPb4JSkOudgnS5qUozitZojgv2BOU0QnHfMioInbPezPr9gQkr7Dbv45Yv6hvQYCa6d0Mbzd9bLmASfXhMKgFxh7ZIwEkQSPVAiB8TCUBbqpRQcRyztr"/>
+<div class="absolute inset-0 bg-gradient-to-t from-deep-navy/95 via-deep-navy/40 to-transparent mix-blend-multiply"></div>
+<div class="absolute inset-0 bg-gradient-to-r from-deep-navy/80 via-deep-navy/20 to-transparent"></div>
+<div class="absolute bottom-0 left-0 p-8 lg:p-12 w-full lg:w-3/4 z-10">
+<span class="inline-block px-4 py-1.5 mb-6 bg-electric-blue text-white font-label-lg rounded-full uppercase tracking-widest text-[11px] shadow-sm">Ưu Đãi Đặc Biệt</span>
+<h1 class="font-display-lg text-display-lg-mobile lg:text-display-lg mb-4 text-white drop-shadow-md">iPhone 15 Pro Max</h1>
+<p class="font-body-lg text-surface-container-low mb-8 max-w-lg opacity-90 leading-relaxed">Trải nghiệm sức mạnh titan vô song cùng hệ thống camera tiên tiến nhất. Giảm ngay 2.000.000đ khi thanh toán qua thẻ.</p>
+<button class="bg-white text-deep-navy font-label-lg px-8 py-4 rounded-full hover:bg-surface-container-low hover:scale-105 transition-all duration-300 shadow-md flex items-center gap-2 group/btn">
+                    Khám Phá Ngay
+                    <span class="material-symbols-outlined text-[20px] group-hover/btn:translate-x-1 transition-transform">arrow_forward</span>
+</button>
+</div>
+</div>
+<!-- Side Banners -->
+<div class="lg:col-span-4 flex flex-col gap-gutter">
+<div class="flex-1 relative rounded-[20px] overflow-hidden bg-deep-navy group cursor-pointer shadow-md hover:shadow-lg transition-shadow duration-300 isolate">
+<img class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out opacity-70" data-alt="A sleek, high-performance gaming laptop shown partially open on a minimalist white desk. Bright RGB lighting subtly glows from the keyboard, contrasting with the clean, bright environment. The composition highlights the laptop's thin profile and powerful cooling vents, appealing to both gamers and tech professionals seeking premium hardware." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDamfnkJC9NHF8R_rr-trdmmuj4HmLlv6h5_dyjfD42Apy-dTdYHhSourp-mCLjzJpkLz-v24mrpIZO0KdNBosSnoRvo9D6iFyOelvMxF1dQaGAvIT4cyo1qTEIHKdvcYnu6rT7o_Dh3bLlyYAqjoZfdzwbAUk7jdCGM6SQaAecXI-p2LngBHA4MsideyKAkp18-pSZ-39He3tmeKhu1ZIHuDJHRSqrvP6GJNtbBAwfnvC4x37XZFvN"/>
+<div class="absolute inset-0 bg-gradient-to-t from-deep-navy/90 via-deep-navy/30 to-transparent"></div>
+<div class="absolute inset-0 p-8 flex flex-col justify-end z-10">
+<h3 class="font-headline-lg text-headline-md lg:text-headline-lg text-white mb-3">Gaming Laptops Mới</h3>
+<p class="font-body-md text-surface-container-low mb-6 opacity-80">Sức mạnh vượt trội cho mọi tựa game.</p>
+<span class="text-cyber-cyan font-label-lg flex items-center gap-2 group-hover:translate-x-2 transition-transform duration-300">Xem thêm <span class="material-symbols-outlined text-[18px]">arrow_right_alt</span></span>
+</div>
+</div>
+<div class="flex-1 relative rounded-[20px] overflow-hidden bg-deep-navy group cursor-pointer shadow-md hover:shadow-lg transition-shadow duration-300 isolate">
+<img class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out opacity-70" data-alt="Close-up macro photography of a high-end computer graphic card (GPU) or motherboard component. The intricate circuitry, metallic heat sinks, and gold connectors are sharply in focus against a dark, moody background. A soft, cool blue light sweeps across the metallic surfaces, conveying precision engineering, speed, and advanced electronic technology." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAGq_jxZ2ATPeqpGef8poRPd3rldcohkWY4K8Ho_oa-RrKE4-RDOOX8A2neP_mbSQBvbZzfYvBmCleP7_ctqhEAIFZTDk74J0CafWlJmYSk-KkhNlxnILlkAwxC1vzwOC8Bs6jaLUMeoGP2apVMUrbx13_ycq__rAsrR9DvV4aJerGPAmj6bMEr2u9bcT81qJJDz4lc9ttKsywNekyX-Cq4MYG3YDR2EZb-Bo0vsXmgT9wjLn5TXdXv"/>
+<div class="absolute inset-0 bg-gradient-to-t from-deep-navy/90 via-deep-navy/30 to-transparent"></div>
+<div class="absolute inset-0 p-8 flex flex-col justify-end z-10">
+<h3 class="font-headline-lg text-headline-md lg:text-headline-lg text-white mb-3">Linh Kiện PC Cao Cấp</h3>
+<p class="font-body-md text-surface-container-low mb-6 opacity-80">Nâng cấp hệ thống của bạn ngay hôm nay.</p>
+<span class="text-cyber-cyan font-label-lg flex items-center gap-2 group-hover:translate-x-2 transition-transform duration-300">Xem thêm <span class="material-symbols-outlined text-[18px]">arrow_right_alt</span></span>
+</div>
+</div>
+</div>
+</section>
+<!-- Categories Section -->
+<section>
+<div class="flex items-end justify-between mb-12">
+<div>
+<h2 class="font-display-lg text-headline-lg-mobile lg:text-display-lg text-deep-navy mb-2">Danh Mục Nổi Bật</h2>
+<p class="font-body-lg text-secondary">Khám phá các sản phẩm công nghệ hàng đầu</p>
+</div>
+</div>
+<div class="grid grid-cols-2 md:grid-cols-4 gap-4 lg:gap-8">
+<!-- Category Item -->
+<a class="group flex flex-col items-center justify-center p-8 lg:p-10 bg-surface-container-lowest border border-surface-border rounded-[20px] hover:border-electric-blue/30 hover:shadow-lg transition-all duration-300" href="#">
+<div class="w-20 h-20 rounded-full bg-surface flex items-center justify-center mb-6 group-hover:bg-electric-blue/10 group-hover:scale-110 transition-all duration-300">
+<span class="material-symbols-outlined text-[40px] text-secondary group-hover:text-electric-blue transition-colors" style="font-variation-settings: 'FILL' 0;">laptop_mac</span>
+</div>
+<span class="font-headline-md text-[18px] text-deep-navy text-center group-hover:text-electric-blue transition-colors">Laptops</span>
+</a>
+<a class="group flex flex-col items-center justify-center p-8 lg:p-10 bg-surface-container-lowest border border-surface-border rounded-[20px] hover:border-electric-blue/30 hover:shadow-lg transition-all duration-300" href="#">
+<div class="w-20 h-20 rounded-full bg-surface flex items-center justify-center mb-6 group-hover:bg-electric-blue/10 group-hover:scale-110 transition-all duration-300">
+<span class="material-symbols-outlined text-[40px] text-secondary group-hover:text-electric-blue transition-colors" style="font-variation-settings: 'FILL' 0;">smartphone</span>
+</div>
+<span class="font-headline-md text-[18px] text-deep-navy text-center group-hover:text-electric-blue transition-colors">Điện Thoại</span>
+</a>
+<a class="group flex flex-col items-center justify-center p-8 lg:p-10 bg-surface-container-lowest border border-surface-border rounded-[20px] hover:border-electric-blue/30 hover:shadow-lg transition-all duration-300" href="#">
+<div class="w-20 h-20 rounded-full bg-surface flex items-center justify-center mb-6 group-hover:bg-electric-blue/10 group-hover:scale-110 transition-all duration-300">
+<span class="material-symbols-outlined text-[40px] text-secondary group-hover:text-electric-blue transition-colors" style="font-variation-settings: 'FILL' 0;">memory</span>
+</div>
+<span class="font-headline-md text-[18px] text-deep-navy text-center group-hover:text-electric-blue transition-colors">Linh Kiện</span>
+</a>
+<a class="group flex flex-col items-center justify-center p-8 lg:p-10 bg-surface-container-lowest border border-surface-border rounded-[20px] hover:border-electric-blue/30 hover:shadow-lg transition-all duration-300" href="#">
+<div class="w-20 h-20 rounded-full bg-surface flex items-center justify-center mb-6 group-hover:bg-electric-blue/10 group-hover:scale-110 transition-all duration-300">
+<span class="material-symbols-outlined text-[40px] text-secondary group-hover:text-electric-blue transition-colors" style="font-variation-settings: 'FILL' 0;">headphones</span>
+</div>
+<span class="font-headline-md text-[18px] text-deep-navy text-center group-hover:text-electric-blue transition-colors">Phụ Kiện</span>
+</a>
+</div>
+</section>
+<!-- Best Sellers Section -->
+<section>
+<div class="flex items-end justify-between mb-12">
+<div>
+<h2 class="font-display-lg text-headline-lg-mobile lg:text-display-lg text-deep-navy mb-2">Sản Phẩm Bán Chạy</h2>
+<p class="font-body-lg text-secondary">Những lựa chọn hàng đầu từ khách hàng</p>
+</div>
+<a class="font-label-lg text-electric-blue hover:text-deep-navy flex items-center gap-2 transition-colors pb-1 border-b-2 border-transparent hover:border-deep-navy" href="#">Xem tất cả <span class="material-symbols-outlined text-[20px]">arrow_forward</span></a>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
+<!-- Product Card 1 -->
+<div class="bg-surface-container-lowest border border-surface-border rounded-[24px] overflow-hidden hover:shadow-xl hover:border-electric-blue/20 transition-all duration-300 group flex flex-col relative p-2">
+<div class="absolute top-6 left-6 z-10">
+<span class="bg-surface-container-high text-on-surface font-label-md px-3 py-1.5 rounded-full uppercase tracking-wider text-[11px] shadow-sm">Còn hàng</span>
+</div>
+<div class="h-64 sm:h-72 bg-surface rounded-[16px] flex items-center justify-center p-8 relative overflow-hidden mb-4">
+<img class="object-contain w-full h-full mix-blend-multiply group-hover:scale-110 transition-transform duration-500 ease-out" data-alt="A pristine, minimalist product photography shot of a high-end ultra-thin laptop, positioned slightly angled on a pure white background. Soft, diffused lighting eliminates harsh shadows, highlighting the smooth matte silver finish and the slim bezels of the screen. The image exudes a clean, modern, and professional aesthetic suitable for a premium tech catalog." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCmwHrLZC0DaLrnRFKQ0oL5CPmeZHXc-iYvVvKn4_GWzkvYioZL4j_rl6R-1jxEDsLFR3msa15cvh7ODPq61ghUMR1InYiaMLUd3-4Maa1_XPMkrerRn7eEO34lpDC-Xq_fJws-LdwQutle-Wqi1mhtiCHtoHLAuT8CsO9SZUXU-1smoRJwS8OJsS9ZRO0t297rp5yULcGujzadyG3YQaBpwW0q_QYJi6sPh_JFdRVTwq5Mq4ryNKY1"/>
+</div>
+<div class="p-4 flex flex-col flex-grow">
+<h3 class="font-headline-md text-[18px] text-deep-navy line-clamp-2 mb-3 leading-snug group-hover:text-electric-blue transition-colors">MacBook Pro 14" M3 Pro</h3>
+<ul class="mb-6 space-y-2">
+<li class="font-spec-data text-secondary flex items-center gap-3"><span class="w-1.5 h-1.5 rounded-full bg-electric-blue/50"></span>Chip M3 Pro 11-core CPU</li>
+<li class="font-spec-data text-secondary flex items-center gap-3"><span class="w-1.5 h-1.5 rounded-full bg-electric-blue/50"></span>18GB Unified Memory</li>
+<li class="font-spec-data text-secondary flex items-center gap-3"><span class="w-1.5 h-1.5 rounded-full bg-electric-blue/50"></span>512GB SSD</li>
+</ul>
+<div class="mt-auto pt-4 border-t border-surface-border">
+<div class="flex items-center justify-between mb-4">
+<span class="font-headline-lg text-[22px] text-deep-navy">49.990.000₫</span>
+</div>
+<button class="w-full bg-white border-2 border-electric-blue text-electric-blue hover:bg-electric-blue hover:text-white font-label-lg py-3.5 rounded-full transition-all duration-300 flex items-center justify-center gap-2 group-hover:shadow-md">
+<span class="material-symbols-outlined text-[20px]">shopping_cart</span> Thêm vào giỏ
+                        </button>
+</div>
+</div>
+</div>
+<!-- Product Card 2 -->
+<div class="bg-surface-container-lowest border border-surface-border rounded-[24px] overflow-hidden hover:shadow-xl hover:border-electric-blue/20 transition-all duration-300 group flex flex-col relative p-2">
+<div class="absolute top-6 left-6 z-10">
+<span class="bg-[#ba1a1a] text-white font-label-md px-3 py-1.5 rounded-full uppercase tracking-wider text-[11px] shadow-sm">Giảm 15%</span>
+</div>
+<div class="h-64 sm:h-72 bg-surface rounded-[16px] flex items-center justify-center p-8 relative overflow-hidden mb-4">
+<img class="object-contain w-full h-full mix-blend-multiply group-hover:scale-110 transition-transform duration-500 ease-out" data-alt="A clean, highly detailed rendering of a modern, ergonomic wireless mouse with subtle customizable RGB lighting zones. The mouse sits perfectly centered on a light gray, almost white background. The lighting emphasizes the textured grips on the sides and the smooth curvature designed for comfortable extended use. The aesthetic is focused, functional, and modern." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCZbfTmrP8ACkft0Sfg7TxlzAWaiJa5mqPTBipOb0BXeOv_l-zcPKEmUFakcZW8YJlB-3hURl6cMrxTkKN_11QRYw9mpTk-dXx5bQ8214Y29pcQP0mHu9BqmQCPS0_vOksBbp0AAiItTZexo1xOWcMOU3nObOZf8wBt0oao0SFhFDZZQlACDPFDwn-_ofQV4IR8zbopPMt5CHMPrjSTgRbvcHjSyRoNLpyv3i6GDk-n4T05bAXJWXGt"/>
+</div>
+<div class="p-4 flex flex-col flex-grow">
+<h3 class="font-headline-md text-[18px] text-deep-navy line-clamp-2 mb-3 leading-snug group-hover:text-electric-blue transition-colors">Chuột Gaming Logitech G Pro X Superlight</h3>
+<ul class="mb-6 space-y-2">
+<li class="font-spec-data text-secondary flex items-center gap-3"><span class="w-1.5 h-1.5 rounded-full bg-electric-blue/50"></span>Trọng lượng siêu nhẹ &lt;63g</li>
+<li class="font-spec-data text-secondary flex items-center gap-3"><span class="w-1.5 h-1.5 rounded-full bg-electric-blue/50"></span>Cảm biến HERO 25K</li>
+</ul>
+<div class="mt-auto pt-4 border-t border-surface-border">
+<div class="flex flex-col mb-4">
+<span class="font-body-md text-secondary line-through text-[14px]">3.490.000₫</span>
+<span class="font-headline-lg text-[22px] text-[#ba1a1a]">2.990.000₫</span>
+</div>
+<button class="w-full bg-white border-2 border-electric-blue text-electric-blue hover:bg-electric-blue hover:text-white font-label-lg py-3.5 rounded-full transition-all duration-300 flex items-center justify-center gap-2 group-hover:shadow-md">
+<span class="material-symbols-outlined text-[20px]">shopping_cart</span> Thêm vào giỏ
+                        </button>
+</div>
+</div>
+</div>
+<!-- Product Card 3 -->
+<div class="bg-surface-container-lowest border border-surface-border rounded-[24px] overflow-hidden hover:shadow-xl hover:border-electric-blue/20 transition-all duration-300 group flex flex-col relative p-2">
+<div class="absolute top-6 left-6 z-10">
+<span class="bg-surface-container-high text-on-surface font-label-md px-3 py-1.5 rounded-full uppercase tracking-wider text-[11px] shadow-sm">Còn hàng</span>
+</div>
+<div class="h-64 sm:h-72 bg-surface rounded-[16px] flex items-center justify-center p-8 relative overflow-hidden mb-4">
+<img class="object-contain w-full h-full mix-blend-multiply group-hover:scale-110 transition-transform duration-500 ease-out" data-alt="A front-facing, hyper-realistic product image of a large, flat-screen premium curved gaming monitor on a sturdy metallic stand. The screen displays an abstract, colorful graphic to demonstrate vibrant color reproduction. The background is a stark, clean white to isolate the product completely. The overall mood is precise, technological, and high-fidelity." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBNpk-eTqvy2lTXH6LCE9WJaKLuwicDPwwt3PSlSnSb2WvRZOQGH8r_rIXBxeHrSxI9gXA7Jp7CppamFaa0govonshP67J0ph8MzvYqjDuZbWrngIUX3YunFbgwSYj2yXpzUexnzz9Wq_-PDfbCSG7g354VWM7ClR97uaGk2enAXPkNFcO_5oEkV0IhVcc55MwcfgHxd4ceaGdgyI1c5-4Dpf0W5BHl4FncjzqlIro7B_dyoGSLXqbG"/>
+</div>
+<div class="p-4 flex flex-col flex-grow">
+<h3 class="font-headline-md text-[18px] text-deep-navy line-clamp-2 mb-3 leading-snug group-hover:text-electric-blue transition-colors">Màn hình Dell UltraSharp 27" 4K</h3>
+<ul class="mb-6 space-y-2">
+<li class="font-spec-data text-secondary flex items-center gap-3"><span class="w-1.5 h-1.5 rounded-full bg-electric-blue/50"></span>Độ phân giải 4K UHD</li>
+<li class="font-spec-data text-secondary flex items-center gap-3"><span class="w-1.5 h-1.5 rounded-full bg-electric-blue/50"></span>Tấm nền IPS Black</li>
+<li class="font-spec-data text-secondary flex items-center gap-3"><span class="w-1.5 h-1.5 rounded-full bg-electric-blue/50"></span>Hub USB-C 90W</li>
+</ul>
+<div class="mt-auto pt-4 border-t border-surface-border">
+<div class="flex items-center justify-between mb-4">
+<span class="font-headline-lg text-[22px] text-deep-navy">14.500.000₫</span>
+</div>
+<button class="w-full bg-white border-2 border-electric-blue text-electric-blue hover:bg-electric-blue hover:text-white font-label-lg py-3.5 rounded-full transition-all duration-300 flex items-center justify-center gap-2 group-hover:shadow-md">
+<span class="material-symbols-outlined text-[20px]">shopping_cart</span> Thêm vào giỏ
+                        </button>
+</div>
+</div>
+</div>
+<!-- Product Card 4 -->
+<div class="bg-surface-container-lowest border border-surface-border rounded-[24px] overflow-hidden hover:shadow-xl hover:border-electric-blue/20 transition-all duration-300 group flex flex-col relative p-2 opacity-90">
+<div class="absolute top-6 left-6 z-10">
+<span class="bg-surface-variant text-secondary font-label-md px-3 py-1.5 rounded-full uppercase tracking-wider text-[11px] shadow-sm">Sắp về</span>
+</div>
+<div class="h-64 sm:h-72 bg-surface rounded-[16px] flex items-center justify-center p-8 relative overflow-hidden mb-4 grayscale-[30%]">
+<img class="object-contain w-full h-full mix-blend-multiply group-hover:scale-110 transition-transform duration-500 ease-out" data-alt="A sophisticated, studio-lit photo of a pair of premium over-ear noise-canceling headphones resting gracefully on a sleek surface. The headphones feature brushed aluminum accents and plush leather earcups. The lighting creates soft gradients across the curved surfaces against a minimalist, bright white background, emphasizing luxury, acoustic precision, and modern design." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDQ8ZHFUTuWewzL3H1Lv-akvwJLYaEkFSV7IT5xqGvIYz3iG5C6OJ6exbfh654P2V4-a8PlCDcVlXCaSxdWFZ_7COxawatTO1kVmexV-jfZa6FLCslXHkG3T743FUpJK95BmldjrGs-EYDhEXcv1ui6jDah7RjwhdNx4SljrIomEhb0mBRh3-4jhHIVLRaYyIE79RGtBbcnFbelHXNjvfTD4H6fqUldVYHhtvcGe2iz0YTQoz2RQXgd"/>
+</div>
+<div class="p-4 flex flex-col flex-grow">
+<h3 class="font-headline-md text-[18px] text-deep-navy line-clamp-2 mb-3 leading-snug group-hover:text-electric-blue transition-colors">Tai nghe Sony WH-1000XM5</h3>
+<ul class="mb-6 space-y-2">
+<li class="font-spec-data text-secondary flex items-center gap-3"><span class="w-1.5 h-1.5 rounded-full bg-electric-blue/50"></span>Chống ồn chủ động ANC</li>
+<li class="font-spec-data text-secondary flex items-center gap-3"><span class="w-1.5 h-1.5 rounded-full bg-electric-blue/50"></span>Pin 30 giờ</li>
+</ul>
+<div class="mt-auto pt-4 border-t border-surface-border">
+<div class="flex items-center justify-between mb-4">
+<span class="font-headline-lg text-[22px] text-deep-navy">7.990.000₫</span>
+</div>
+<button class="w-full bg-surface-container-high text-secondary font-label-lg py-3.5 rounded-full cursor-not-allowed flex items-center justify-center gap-2 transition-colors hover:bg-surface-variant" disabled="">
+<span class="material-symbols-outlined text-[20px]">notifications</span> Nhận thông báo
+                        </button>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer (Shared Component) -->
+<footer class="bg-surface-container-low border-t border-surface-border w-full mt-auto py-16">
+<div class="grid grid-cols-1 md:grid-cols-4 gap-12 px-gutter lg:px-container-padding-desktop w-full max-w-[1440px] mx-auto">
+<!-- Brand Column -->
+<div class="col-span-1 md:col-span-1">
+<div class="font-display-lg text-headline-md font-bold text-electric-blue mb-6 tracking-tight">ElectroTech</div>
+<p class="font-body-md text-secondary leading-relaxed max-w-xs">
+                    © 2024 ElectroTech Inc. Precision Engineering for Tech Enthusiasts.
+                </p>
+</div>
+<!-- Links Column (Mapped from JSON) -->
+<div class="col-span-1 md:col-span-3 flex flex-wrap gap-x-12 gap-y-6 md:justify-end items-start pt-2">
+<a class="font-label-lg text-secondary hover:text-electric-blue transition-colors" href="#">About Us</a>
+<a class="font-label-lg text-secondary hover:text-electric-blue transition-colors" href="#">Privacy Policy</a>
+<a class="font-label-lg text-secondary hover:text-electric-blue transition-colors" href="#">Terms of Service</a>
+<a class="font-label-lg text-secondary hover:text-electric-blue transition-colors" href="#">Shipping Info</a>
+<a class="font-label-lg text-secondary hover:text-electric-blue transition-colors" href="#">Contact Support</a>
+</div>
+</div>
+</footer>
+</body></html>

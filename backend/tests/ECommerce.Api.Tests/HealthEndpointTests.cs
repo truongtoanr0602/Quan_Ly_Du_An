@@ -1,16 +1,27 @@
 using System.Net;
 using System.Net.Http.Json;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.Extensions.Logging;
 
 namespace ECommerce.Api.Tests;
 
-public sealed class HealthEndpointTests
+public sealed class HealthEndpointTests : IClassFixture<WebApplicationFactory<Program>>
 {
+    private readonly HttpClient client;
+
+    public HealthEndpointTests(WebApplicationFactory<Program> factory)
+    {
+        client = factory.WithWebHostBuilder(builder =>
+        {
+            builder.UseEnvironment("Testing");
+            builder.ConfigureLogging(logging => logging.ClearProviders());
+        }).CreateClient();
+    }
+
     [Fact]
     public async Task GetHealthReturnsHealthyStatus()
     {
-        using var factory = new ApiWebApplicationFactory();
-        using var client = factory.CreateAnonymousClient();
-
         using var response = await client.GetAsync("/api/health");
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);

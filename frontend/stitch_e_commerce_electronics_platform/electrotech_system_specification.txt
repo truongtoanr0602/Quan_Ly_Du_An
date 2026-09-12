@@ -1,0 +1,22 @@
+# Product Backlog & Specification: ElectroTech Electronics System
+
+## 1. Storefront Module (Customer Facing)
+### Key Screens:
+- **Homepage & Search:** Global header with auto-complete search and multi-level category menu.
+- **Product Listing Page (PLP):** Advanced sidebar filtering (Category, Price range slider, Brand) and sortable grid.
+- **Product Detail Page (PDP):** Image gallery, stock status, specs summary table, and detailed content tabs.
+- **Cart & Checkout:** Step-by-step flow from cart summary to secure checkout (shipping info, COD payment).
+- **User Dashboard:** Profile management, order history with status tracking (Processing, Shipping, Completed, Canceled).
+
+## 2. Admin Portal Module (Management)
+### Key Screens:
+- **Admin Dashboard:** High-level metrics (Revenue, Orders, Users) with Line and Bar charts.
+- **Category & Product Management:** CRUD interfaces for categories and products with dynamic specs and rich text descriptions.
+- **Order & User Management:** Order status workflows (Dropdown state changes) and user activity logs.
+
+## 3. Visual Identity
+- **Primary Color:** #2563eb (Digital Blue)
+- **Secondary Color:** #64748b (Slate)
+- **Accent Color:** #f97316 (Orange)
+- **Device Type:** Desktop
+- **Language:** Vietnamese (Tiếng Việt)

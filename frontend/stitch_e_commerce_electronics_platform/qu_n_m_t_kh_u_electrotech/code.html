@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+
+<html lang="vi"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Quên mật khẩu - ElectroTech</title>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Configuration -->
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container-highest": "#e0e3e5",
+                        "on-background": "#191c1e",
+                        "inverse-primary": "#b4c5ff",
+                        "secondary": "#505f76",
+                        "surface": "#f7f9fb",
+                        "background": "#f7f9fb",
+                        "surface-container-high": "#e6e8ea",
+                        "on-primary-fixed": "#00174b",
+                        "inverse-surface": "#2d3133",
+                        "on-tertiary-fixed-variant": "#783200",
+                        "error": "#ba1a1a",
+                        "surface-variant": "#e0e3e5",
+                        "primary": "#004ac6",
+                        "inverse-on-surface": "#eff1f3",
+                        "error-container": "#ffdad6",
+                        "on-surface-variant": "#434655",
+                        "on-tertiary": "#ffffff",
+                        "on-surface": "#191c1e",
+                        "secondary-fixed": "#d3e4fe",
+                        "on-secondary-fixed-variant": "#38485d",
+                        "tertiary": "#8e3c00",
+                        "on-secondary": "#ffffff",
+                        "surface-tint": "#0053db",
+                        "on-tertiary-fixed": "#341100",
+                        "surface-container-lowest": "#ffffff",
+                        "on-primary-fixed-variant": "#003ea8",
+                        "primary-fixed-dim": "#b4c5ff",
+                        "surface-container-low": "#f2f4f6",
+                        "outline-variant": "#c3c6d7",
+                        "on-primary-container": "#eeefff",
+                        "surface-container": "#eceef0",
+                        "tertiary-fixed": "#ffdbca",
+                        "on-error-container": "#93000a",
+                        "on-secondary-fixed": "#0b1c30",
+                        "primary-container": "#2563eb",
+                        "on-primary": "#ffffff",
+                        "secondary-container": "#d0e1fb",
+                        "surface-dim": "#d8dadc",
+                        "secondary-fixed-dim": "#b7c8e1",
+                        "on-secondary-container": "#54647a",
+                        "primary-fixed": "#dbe1ff",
+                        "surface-bright": "#f7f9fb",
+                        "outline": "#737686",
+                        "tertiary-container": "#b54e00",
+                        "tertiary-fixed-dim": "#ffb690",
+                        "on-tertiary-container": "#ffece5",
+                        "on-error": "#ffffff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "margin-mobile": "16px",
+                        "max-width": "1280px",
+                        "unit": "4px",
+                        "margin-desktop": "64px",
+                        "gutter": "24px"
+                    },
+                    "fontFamily": {
+                        "body-lg": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "body-md": ["Inter"],
+                        "label-md": ["Inter"],
+                        "spec-code": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "display-lg": ["Inter"],
+                        "headline-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "label-md": ["14px", { "lineHeight": "20px", "fontWeight": "500" }],
+                        "spec-code": ["13px", { "lineHeight": "18px", "fontWeight": "600" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-md": ["20px", { "lineHeight": "28px", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-background text-on-background font-body-md min-h-screen flex flex-col md:flex-row w-full overflow-x-hidden selection:bg-primary-container selection:text-on-primary-container">
+<!-- Left Side: Brand Imagery (Hidden on Mobile) -->
+<div class="hidden md:flex md:w-1/2 lg:w-3/5 bg-surface-container relative items-center justify-center overflow-hidden">
+<div class="absolute inset-0 z-0">
+<img class="w-full h-full object-cover opacity-90" data-alt="A pristine, minimalist architectural space rendered in a high-key light mode aesthetic, featuring smooth, matte white surfaces and subtle geometric shadows. Floating in the center is an abstract, exploded-view representation of high-end computer hardware components, glowing with soft, cool blue and subtle orange accents. The lighting is diffused and professional, evoking a sense of precision, reliability, and advanced technology suitable for a premium e-commerce tech platform." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBzjuXgLtPQnKx-tlPhbL7riTRWor9C01HjOSFBCHsCXKCQvvu12S_4PR7hSaqrfxSewinJOo6B2mmdS5H8lloj_vTsqQlSay1UzRLhXGRemunpgz0jPhOqfDLxS6Of_not3lyARxa_u-mqBY6UkPwioWNwK3FCHr29gZKeyvG0BaIKTT49R3VvlUuoSx213LU5zgIc0B_CY8runwpu1fUa9usthLWxeOH9EiOjjY39IReYPfxgoWNg"/>
+</div>
+<div class="absolute inset-0 bg-gradient-to-r from-surface-container-highest/30 to-background/10 mix-blend-multiply z-10"></div>
+<div class="relative z-20 text-center p-12 max-w-lg backdrop-blur-sm bg-surface-container-lowest/40 rounded-3xl border border-surface-container-lowest/50 shadow-sm">
+<h2 class="font-display-lg text-display-lg text-on-surface mb-6 font-bold tracking-tight">ElectroTech</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant">Precision Engineering for Tech Enthusiasts. Access your account to manage orders, explore new arrivals, and build your perfect setup.</p>
+</div>
+</div>
+<!-- Right Side: Form Content -->
+<div class="w-full md:w-1/2 lg:w-2/5 flex flex-col justify-center items-center p-margin-mobile md:p-margin-desktop bg-surface-container-lowest min-h-screen relative z-10 shadow-[-10px_0_30px_-15px_rgba(0,0,0,0.05)]">
+<div class="w-full max-w-sm flex flex-col gap-8">
+<!-- Mobile Logo (Visible only on small screens) -->
+<div class="md:hidden text-center mb-4">
+<span class="font-headline-md text-headline-md font-bold text-on-surface">ElectroTech</span>
+</div>
+<!-- Header -->
+<div class="text-left flex flex-col gap-2">
+<div class="w-12 h-12 bg-secondary-container rounded-full flex items-center justify-center mb-2">
+<span class="material-symbols-outlined text-primary text-[24px]">key</span>
+</div>
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile md:font-headline-lg md:text-headline-lg text-on-surface">Quên mật khẩu</h1>
+<p class="font-body-md text-body-md text-on-surface-variant">
+                    Vui lòng nhập địa chỉ email liên kết với tài khoản của bạn. Chúng tôi sẽ gửi một mã xác nhận để giúp bạn đặt lại mật khẩu.
+                </p>
+</div>
+<!-- Form -->
+<form action="#" class="flex flex-col gap-6" method="POST" onsubmit="event.preventDefault(); document.getElementById('success-state').classList.remove('hidden'); this.classList.add('hidden');">
+<!-- Email Input -->
+<div class="flex flex-col gap-2">
+<label class="font-label-md text-label-md text-on-surface" for="email">Địa chỉ Email</label>
+<div class="relative">
+<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-on-surface-variant">
+<span class="material-symbols-outlined text-[20px]">mail</span>
+</div>
+<input class="w-full pl-10 pr-4 py-3 bg-surface border border-outline-variant rounded-xl font-body-md text-body-md text-on-surface placeholder:text-outline focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary-container/20 transition-all duration-200" id="email" name="email" placeholder="nhapemail@vídu.com" required="" type="email"/>
+</div>
+</div>
+<!-- Submit Button -->
+<button class="w-full py-3 px-6 rounded-full bg-[#f97316] hover:bg-[#ea580c] text-white font-label-md text-label-md shadow-sm hover:shadow-md transition-all duration-200 flex justify-center items-center gap-2 mt-2" type="submit">
+                    Gửi mã xác nhận
+                    <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+</button>
+</form>
+<!-- Success State (Hidden by default) -->
+<div class="hidden flex-col gap-6 text-center animate-[fadeIn_0.3s_ease-out]" id="success-state">
+<div class="mx-auto w-16 h-16 bg-secondary-container rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined text-primary text-[32px]">mark_email_read</span>
+</div>
+<div>
+<h3 class="font-headline-md text-headline-md text-on-surface mb-2">Đã gửi mã xác nhận</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">
+                        Vui lòng kiểm tra hộp thư đến của bạn để lấy mã khôi phục mật khẩu.
+                    </p>
+</div>
+</div>
+<!-- Footer Links -->
+<div class="text-center mt-4">
+<a class="inline-flex items-center gap-1.5 font-label-md text-label-md text-secondary hover:text-primary transition-colors duration-200 group" href="#">
+<span class="material-symbols-outlined text-[18px] group-hover:-translate-x-1 transition-transform">arrow_back</span>
+                    Quay lại trang đăng nhập
+                </a>
+</div>
+</div>
+</div>
+<style>
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</body></html>

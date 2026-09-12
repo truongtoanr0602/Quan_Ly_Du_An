@@ -1,30 +1,37 @@
 namespace ECommerce.Api.Entities;
 
-/// <summary>
-/// Sprint 1 persistence model only. The Product API belongs to US-3 and is not implemented here;
-/// this Entity exists because US-2 requires Category deletion to be blocked while Products reference it.
-/// </summary>
-public sealed class Product
+
+public class Product
 {
-    public int Id { get; set; }
+    public int ProductID { get; set; }
 
-    public int CategoryId { get; set; }
+    public int CategoryID { get; set; }
 
-    public Category? Category { get; set; }
+    public int BrandID { get; set; }
 
-    public string Name { get; set; } = string.Empty;
+    public string SKU { get; set; } = null!;
+
+    public string ProductName { get; set; } = null!;
 
     public string? Description { get; set; }
 
+    public string? Specifications { get; set; }
+
     public decimal Price { get; set; }
 
-    public string? Brand { get; set; }
-
-    public string? ImageUrl { get; set; }
-
     public int StockQuantity { get; set; }
+
+    public bool IsActive { get; set; }
 
     public DateTime CreatedAt { get; set; }
 
     public DateTime? UpdatedAt { get; set; }
+
+    // Navigation
+    public Category Category { get; set; } = null!;
+    public Brand Brand { get; set; } = null!;
+    public ICollection<ProductImage> Images { get; set; } = new List<ProductImage>();
+    public ICollection<InventoryTransaction> InventoryTransactions { get; set; } = new List<InventoryTransaction>();
+    public ICollection<CartItem> CartItems { get; set; } = new List<CartItem>();
+    public ICollection<OrderDetail> OrderDetails { get; set; } = new List<OrderDetail>();
 }

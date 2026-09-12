@@ -4,49 +4,72 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace ECommerce.Api.Data.Configurations;
 
-/// <summary>
-/// Persistence mapping only. Product API behavior belongs to US-3.
-/// </summary>
-public sealed class ProductConfiguration : IEntityTypeConfiguration<Product>
+public class ProductConfiguration : IEntityTypeConfiguration<Product>
 {
     public void Configure(EntityTypeBuilder<Product> builder)
     {
-        builder.ToTable("Products", table =>
-        {
-            table.HasCheckConstraint("CK_Products_Price_NonNegative", "[Price] >= 0");
-            table.HasCheckConstraint("CK_Products_StockQuantity_NonNegative", "[StockQuantity] >= 0");
-        });
+        builder.ToTable("Products");
 
-        builder.HasKey(product => product.Id);
+        builder.HasKey(p => p.ProductID);
 
-        builder.Property(product => product.Name)
+        builder.Property(p => p.ProductID)
+            .UseIdentityColumn();
+
+        builder.Property(p => p.SKU)
+            .IsRequired()
+            .HasMaxLength(100)
+            .IsUnicode(false);
+
+        builder.Property(p => p.ProductName)
             .IsRequired()
             .HasMaxLength(200);
 
-        builder.Property(product => product.Description)
-            .HasMaxLength(2000);
+        builder.Property(p => p.Description)
+            .HasColumnType("nvarchar(max)");
 
-        builder.Property(product => product.Price)
+        builder.Property(p => p.Specifications)
+            .HasColumnType("nvarchar(max)");
+
+        builder.Property(p => p.Price)
             .IsRequired()
             .HasColumnType("decimal(18,2)");
 
-        builder.Property(product => product.Brand)
-            .HasMaxLength(100);
-
-        builder.Property(product => product.ImageUrl)
-            .HasMaxLength(500);
-
-        builder.Property(product => product.StockQuantity)
-            .IsRequired();
-
-        builder.Property(product => product.CreatedAt)
+        builder.Property(p => p.StockQuantity)
             .IsRequired()
-            .HasColumnType("datetime2");
+            .HasDefaultValue(0);
 
-        builder.Property(product => product.UpdatedAt)
-            .HasColumnType("datetime2");
+        builder.Property(p => p.IsActive)
+            .IsRequired()
+            .HasDefaultValue(true);
 
-        builder.HasIndex(product => product.CategoryId)
-            .HasDatabaseName("IX_Products_CategoryId");
+        builder.Property(p => p.CreatedAt)
+            .IsRequired()
+            .HasDefaultValueSql("SYSDATETIME()");
+
+        // Unique
+        builder.HasIndex(p => p.SKU)
+            .IsUnique()
+            .HasDatabaseName("UQ_Products_SKU");
+
+        // Check constraints
+        builder.ToTable(t =>
+        {
+            t.HasCheckConstraint("CK_Products_Price", "[Price] >= 0");
+            t.HasCheckConstraint("CK_Products_Stock", "[StockQuantity] >= 0");
+        });
+
+        // FK â†’ Categories
+        builder.HasOne(p => p.Category)
+            .WithMany(c => c.Products)
+            .HasForeignKey(p => p.CategoryID)
+            .OnDelete(DeleteBehavior.NoAction)
+            .HasConstraintName("FK_Products_Categories");
+
+        // FK â†’ Brands
+        builder.HasOne(p => p.Brand)
+            .WithMany(b => b.Products)
+            .HasForeignKey(p => p.BrandID)
+            .OnDelete(DeleteBehavior.NoAction)
+            .HasConstraintName("FK_Products_Brands");
     }
 }

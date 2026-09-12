@@ -4,42 +4,57 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace ECommerce.Api.Data.Configurations;
 
-/// <summary>
-/// Minimum persistence mapping required by JWT authentication and Admin/Customer authorization.
-/// Registration and login behavior belong to US-7 and US-8.
-/// </summary>
-public sealed class UserConfiguration : IEntityTypeConfiguration<User>
+public class UserConfiguration : IEntityTypeConfiguration<User>
 {
     public void Configure(EntityTypeBuilder<User> builder)
     {
-        builder.ToTable("Users", table =>
-            table.HasCheckConstraint("CK_Users_Role", "[Role] IN ('Admin', 'Customer')"));
+        builder.ToTable("Users");
 
-        builder.HasKey(user => user.Id);
+        builder.HasKey(u => u.UserID);
 
-        builder.Property(user => user.FullName)
+        builder.Property(u => u.UserID)
+            .UseIdentityColumn();
+
+        builder.Property(u => u.Email)
+            .IsRequired()
+            .HasMaxLength(150)
+            .IsUnicode(false);
+
+        builder.Property(u => u.PasswordHash)
+            .IsRequired()
+            .HasMaxLength(255)
+            .IsUnicode(false);
+
+        builder.Property(u => u.FullName)
             .IsRequired()
             .HasMaxLength(100);
 
-        builder.Property(user => user.Email)
-            .IsRequired()
-            .HasMaxLength(256)
-            .UseCollation(DatabaseCollations.CaseInsensitive);
+        builder.Property(u => u.Phone)
+            .HasMaxLength(20)
+            .IsUnicode(false);
 
-        builder.Property(user => user.PasswordHash)
-            .IsRequired()
-            .HasMaxLength(500);
+        builder.Property(u => u.AvatarURL)
+            .HasMaxLength(500)
+            .IsUnicode(false);
 
-        builder.Property(user => user.Role)
+        builder.Property(u => u.IsActive)
             .IsRequired()
-            .HasMaxLength(20);
+            .HasDefaultValue(true);
 
-        builder.Property(user => user.CreatedAt)
+        builder.Property(u => u.CreatedAt)
             .IsRequired()
-            .HasColumnType("datetime2");
+            .HasDefaultValueSql("SYSDATETIME()");
 
-        builder.HasIndex(user => user.Email)
+        // Unique
+        builder.HasIndex(u => u.Email)
             .IsUnique()
-            .HasDatabaseName("IX_Users_Email");
+            .HasDatabaseName("UQ_Users_Email");
+
+        // FK â†’ Roles
+        builder.HasOne(u => u.Role)
+            .WithMany(r => r.Users)
+            .HasForeignKey(u => u.RoleID)
+            .OnDelete(DeleteBehavior.NoAction)
+            .HasConstraintName("FK_Users_Roles");
     }
 }

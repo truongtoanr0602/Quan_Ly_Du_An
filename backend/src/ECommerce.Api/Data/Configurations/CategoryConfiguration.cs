@@ -4,42 +4,42 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace ECommerce.Api.Data.Configurations;
 
-public sealed class CategoryConfiguration : IEntityTypeConfiguration<Category>
+public class CategoryConfiguration : IEntityTypeConfiguration<Category>
 {
-    public const int NameMaxLength = 100;
-
-    public const int NameMinLength = 2;
-
-    public const int DescriptionMaxLength = 500;
-
     public void Configure(EntityTypeBuilder<Category> builder)
     {
         builder.ToTable("Categories");
 
-        builder.HasKey(category => category.Id);
+        builder.HasKey(c => c.CategoryID);
 
-        builder.Property(category => category.Name)
+        builder.Property(c => c.CategoryID)
+            .UseIdentityColumn();
+
+        builder.Property(c => c.CategoryName)
             .IsRequired()
-            .HasMaxLength(NameMaxLength)
-            .UseCollation(DatabaseCollations.CaseInsensitive);
+            .HasMaxLength(100);
 
-        builder.Property(category => category.Description)
-            .HasMaxLength(DescriptionMaxLength);
+        builder.Property(c => c.Description)
+            .HasMaxLength(500);
 
-        builder.Property(category => category.CreatedAt)
+        builder.Property(c => c.IsActive)
             .IsRequired()
-            .HasColumnType("datetime2");
+            .HasDefaultValue(true);
 
-        // US-2: category names are unique, case-insensitively. The case-insensitive column collation
-        // makes this index enforce the rule at the database level, not only in CategoryService.
-        builder.HasIndex(category => category.Name)
+        builder.Property(c => c.CreatedAt)
+            .IsRequired()
+            .HasDefaultValueSql("SYSDATETIME()");
+
+        // Unique
+        builder.HasIndex(c => c.CategoryName)
             .IsUnique()
-            .HasDatabaseName("IX_Categories_Name");
+            .HasDatabaseName("UQ_Categories_Name");
 
-        // US-2: a Category that still has Products must not be deleted.
-        builder.HasMany(category => category.Products)
-            .WithOne(product => product.Category!)
-            .HasForeignKey(product => product.CategoryId)
-            .OnDelete(DeleteBehavior.Restrict);
+        // Self-referencing FK (parent â†’ child)
+        builder.HasOne(c => c.Parent)
+            .WithMany(c => c.Children)
+            .HasForeignKey(c => c.ParentID)
+            .OnDelete(DeleteBehavior.NoAction)
+            .HasConstraintName("FK_Categories_Parent");
     }
 }

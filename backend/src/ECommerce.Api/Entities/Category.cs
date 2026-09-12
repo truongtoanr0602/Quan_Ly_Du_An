@@ -1,14 +1,25 @@
 namespace ECommerce.Api.Entities;
 
-public sealed class Category
+public class Category
 {
-    public int Id { get; set; }
+    public int CategoryID { get; set; }
 
-    public string Name { get; set; } = string.Empty;
+    public string CategoryName { get; set; } = null!;
+
+    public int? ParentID { get; set; }
 
     public string? Description { get; set; }
 
+    public bool IsActive { get; set; }
+
     public DateTime CreatedAt { get; set; }
 
-    public ICollection<Product> Products { get; set; } = [];
+    public DateTime? UpdatedAt { get; set; }
+
+    // Navigation Self-referencing
+    public Category? Parent { get; set; }
+    public ICollection<Category> Children { get; set; } = new List<Category>();
+
+    // Navigation Products
+    public ICollection<Product> Products { get; set; } = new List<Product>();
 }
