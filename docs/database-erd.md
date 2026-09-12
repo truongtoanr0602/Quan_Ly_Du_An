@@ -28,7 +28,7 @@ erDiagram
 | Entity | Key fields | Constraints and notes | Sprint |
 | --- | --- | --- | --- |
 | `User` | `Id`, `FullName`, `Email`, `PasswordHash`, `Role`, `CreatedAt` | Email unique after normalization; role is `Admin` or `Customer`; password hash never leaves backend | 1 |
-| `Category` | `Id`, `Name`, `Description`, `CreatedAt` | Name uniqueness and delete behavior require Acceptance Criteria before migration | 1 |
+| `Category` | `Id`, `Name`, `Description`, `CreatedAt` | Name unique case-insensitively (`IX_Categories_Name` over a `SQL_Latin1_General_CP1_CI_AS` column); `Product.CategoryId` uses `DeleteBehavior.Restrict` so a Category with Products cannot be deleted. See `docs/acceptance-criteria/US-2-category-management.md` | 1 |
 | `Product` | `Id`, `CategoryId`, `Name`, `Description`, `Price`, `Brand`, `ImageUrl`, `StockQuantity`, `CreatedAt`, `UpdatedAt` | Required Category FK; `Price decimal(18,2) >= 0`; stock non-negative | 1 |
 | `Address` | `Id`, `UserId`, `ReceiverName`, `Phone`, `AddressLine`, `IsDefault` | Required User FK; default-address invariant belongs to service rules | 2 |
 | `Cart` | `Id`, `UserId`, `CreatedAt` | One cart per User | 2 |
