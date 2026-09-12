@@ -3,15 +3,22 @@ import { Link, useNavigate } from 'react-router-dom';
 import { orderService } from '../../services/orderService';
 import type { OrderDto } from '../../types/order';
 
-const ORDER_STATUSES = ['Pending', 'Confirmed', 'Processing', 'Shipped', 'Delivered', 'Cancelled'];
+const ORDER_STATUSES = ['PENDING', 'CONFIRMED', 'SHIPPING', 'COMPLETED', 'CANCELLED'];
+
+const statusLabels: Record<string, string> = {
+  PENDING: 'Chờ xác nhận',
+  CONFIRMED: 'Đã xác nhận',
+  SHIPPING: 'Đang giao hàng',
+  COMPLETED: 'Hoàn thành',
+  CANCELLED: 'Đã hủy',
+};
 
 const statusColors: Record<string, string> = {
-  Pending: 'bg-yellow-100 text-yellow-800',
-  Confirmed: 'bg-blue-100 text-blue-800',
-  Processing: 'bg-purple-100 text-purple-800',
-  Shipped: 'bg-indigo-100 text-indigo-800',
-  Delivered: 'bg-green-100 text-green-800',
-  Cancelled: 'bg-red-100 text-red-800',
+  PENDING: 'bg-yellow-100 text-yellow-800',
+  CONFIRMED: 'bg-blue-100 text-blue-800',
+  SHIPPING: 'bg-purple-100 text-purple-800',
+  COMPLETED: 'bg-green-100 text-green-800',
+  CANCELLED: 'bg-red-100 text-red-800',
 };
 
 export default function OrderManagementPage() {
@@ -148,7 +155,7 @@ export default function OrderManagementPage() {
             >
               <option value="">Tất cả</option>
               {ORDER_STATUSES.map((st) => (
-                <option key={st} value={st}>{st}</option>
+                <option key={st} value={st}>{statusLabels[st] || st}</option>
               ))}
             </select>
           </div>
@@ -186,7 +193,7 @@ export default function OrderManagementPage() {
                       <td className="p-4 font-bold">{formatPrice(ord.totalAmount)}</td>
                       <td className="p-4">
                         <span className={`px-2.5 py-1 rounded-full text-xs font-semibold ${statusColors[ord.orderStatus] || 'bg-gray-100 text-gray-800'}`}>
-                          {ord.orderStatus}
+                          {statusLabels[ord.orderStatus] || ord.orderStatus}
                         </span>
                       </td>
                       <td className="p-4 text-secondary">{new Date(ord.createdAt).toLocaleDateString('vi-VN')}</td>
@@ -312,7 +319,7 @@ export default function OrderManagementPage() {
                       className="w-full border border-outline-variant rounded-lg p-2 text-sm bg-surface text-on-surface"
                     >
                       {ORDER_STATUSES.map((st) => (
-                        <option key={st} value={st}>{st}</option>
+                        <option key={st} value={st}>{statusLabels[st] || st}</option>
                       ))}
                     </select>
                   </div>

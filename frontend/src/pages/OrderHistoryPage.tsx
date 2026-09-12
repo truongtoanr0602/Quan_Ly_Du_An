@@ -3,16 +3,16 @@ import { orderService } from '../services/orderService';
 import type { OrderDto } from '../types/order';
 
 const statusColors: Record<string, string> = {
-  Pending: 'bg-yellow-100 text-yellow-800',
-  Confirmed: 'bg-blue-100 text-blue-800',
-  Shipping: 'bg-purple-100 text-purple-800',
-  Delivered: 'bg-green-100 text-green-800',
-  Cancelled: 'bg-red-100 text-red-800',
+  PENDING: 'bg-yellow-100 text-yellow-800',
+  CONFIRMED: 'bg-blue-100 text-blue-800',
+  SHIPPING: 'bg-purple-100 text-purple-800',
+  COMPLETED: 'bg-green-100 text-green-800',
+  CANCELLED: 'bg-red-100 text-red-800',
 };
 
 const statusLabels: Record<string, string> = {
-  Pending: 'Chờ xác nhận', Confirmed: 'Đã xác nhận', Shipping: 'Đang giao',
-  Delivered: 'Đã giao', Cancelled: 'Đã hủy',
+  PENDING: 'Chờ xác nhận', CONFIRMED: 'Đã xác nhận', SHIPPING: 'Đang giao',
+  COMPLETED: 'Hoàn thành', CANCELLED: 'Đã hủy',
 };
 
 export default function OrderHistoryPage() {
@@ -73,7 +73,7 @@ export default function OrderHistoryPage() {
                 <div className="flex gap-2">
                   <button onClick={() => setSelectedOrder(selectedOrder?.orderId === order.orderId ? null : order)}
                     className="text-sm text-primary hover:underline">Chi tiết</button>
-                  {(order.orderStatus === 'Pending' || order.orderStatus === 'Confirmed') && (
+                  {(order.orderStatus === 'PENDING' || order.orderStatus === 'CONFIRMED') && (
                     <button onClick={() => handleCancel(order.orderId)} className="text-sm text-error hover:underline">Hủy đơn</button>
                   )}
                 </div>

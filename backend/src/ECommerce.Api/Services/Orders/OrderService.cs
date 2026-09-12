@@ -9,8 +9,8 @@ public class OrderService : IOrderService
 {
     private readonly AppDbContext _context;
 
-    private static readonly string[] CancellableStatuses = ["Pending", "Confirmed"];
-    private static readonly string[] ValidStatuses = ["Pending", "Confirmed", "Shipping", "Delivered", "Cancelled"];
+    private static readonly string[] CancellableStatuses = ["PENDING", "CONFIRMED"];
+    private static readonly string[] ValidStatuses = ["PENDING", "CONFIRMED", "SHIPPING", "COMPLETED", "CANCELLED"];
 
     public OrderService(AppDbContext context)
     {
@@ -55,8 +55,8 @@ public class OrderService : IOrderService
             ShippingFee = shippingFee,
             TotalAmount = subTotal + shippingFee,
             PaymentMethod = dto.PaymentMethod,
-            PaymentStatus = "Unpaid",
-            OrderStatus = "Pending",
+            PaymentStatus = "PENDING",
+            OrderStatus = "PENDING",
             Note = dto.Note,
             CreatedAt = DateTime.UtcNow
         };
@@ -81,7 +81,7 @@ public class OrderService : IOrderService
         // Ghi lịch sử trạng thái
         order.StatusHistories.Add(new OrderStatusHistory
         {
-            NewStatus = "Pending",
+            NewStatus = "PENDING",
             Note = "Order created",
             ChangedBy = userId,
             ChangedAt = DateTime.UtcNow
@@ -138,14 +138,14 @@ public class OrderService : IOrderService
         }
 
         var oldStatus = order.OrderStatus;
-        order.OrderStatus = "Cancelled";
+        order.OrderStatus = "CANCELLED";
         order.CancelledAt = DateTime.UtcNow;
         order.UpdatedAt = DateTime.UtcNow;
 
         order.StatusHistories.Add(new OrderStatusHistory
         {
             OldStatus = oldStatus,
-            NewStatus = "Cancelled",
+            NewStatus = "CANCELLED",
             Note = "Cancelled by customer",
             ChangedBy = userId,
             ChangedAt = DateTime.UtcNow
@@ -172,14 +172,14 @@ public class OrderService : IOrderService
         order.OrderStatus = dto.NewStatus;
         order.UpdatedAt = DateTime.UtcNow;
 
-        if (dto.NewStatus == "Confirmed")
+        if (dto.NewStatus == "CONFIRMED")
             order.ConfirmedAt = DateTime.UtcNow;
-        else if (dto.NewStatus == "Delivered")
+        else if (dto.NewStatus == "COMPLETED")
         {
             order.CompletedAt = DateTime.UtcNow;
-            order.PaymentStatus = "Paid";
+            order.PaymentStatus = "PAID";
         }
-        else if (dto.NewStatus == "Cancelled")
+        else if (dto.NewStatus == "CANCELLED")
         {
             order.CancelledAt = DateTime.UtcNow;
             // Hoàn lại stock

@@ -10,6 +10,7 @@ using ECommerce.Api.Services.Profile;
 using ECommerce.Api.Services.Admin;
 using ECommerce.Api.Services.Inventory;
 using ECommerce.Api.Services.Reports;
+using ECommerce.Api.Services.Chat;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
@@ -39,6 +40,9 @@ builder.Services.AddScoped<IProfileService, ProfileService>();
 builder.Services.AddScoped<IAdminService, AdminService>();
 builder.Services.AddScoped<IInventoryService, InventoryService>();
 builder.Services.AddScoped<IReportService, ReportService>();
+
+// AI Chatbot service
+builder.Services.AddHttpClient<IChatService, ChatService>();
 
 var jwtSettings = builder.Configuration.GetSection("Jwt");
 var secretKey = jwtSettings["Key"] ?? throw new InvalidOperationException("JWT Key is missing");

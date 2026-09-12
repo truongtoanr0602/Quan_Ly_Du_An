@@ -15,7 +15,7 @@ public class ReportService : IReportService
 
     public async Task<DashboardSummaryDto> GetDashboardSummaryAsync(CancellationToken cancellationToken = default)
     {
-        var completedStatuses = new[] { "Delivered" };
+        var completedStatuses = new[] { "COMPLETED" };
 
         var totalRevenue = await _context.Orders
             .Where(o => completedStatuses.Contains(o.OrderStatus))
@@ -30,7 +30,7 @@ public class ReportService : IReportService
         var totalProducts = await _context.Products.CountAsync(cancellationToken);
 
         var pendingOrders = await _context.Orders
-            .CountAsync(o => o.OrderStatus == "Pending", cancellationToken);
+            .CountAsync(o => o.OrderStatus == "PENDING", cancellationToken);
 
         var lowStockProducts = await _context.Products
             .CountAsync(p => p.StockQuantity <= 10 && p.IsActive, cancellationToken);
@@ -52,7 +52,7 @@ public class ReportService : IReportService
         var toDate = to ?? DateTime.UtcNow;
 
         var orders = await _context.Orders
-            .Where(o => o.OrderStatus == "Delivered" &&
+            .Where(o => o.OrderStatus == "COMPLETED" &&
                         o.CreatedAt >= fromDate &&
                         o.CreatedAt <= toDate)
             .ToListAsync(cancellationToken);
@@ -82,7 +82,7 @@ public class ReportService : IReportService
             .Include(od => od.Product)
                 .ThenInclude(p => p.Images)
             .Include(od => od.Order)
-            .Where(od => od.Order.OrderStatus == "Delivered")
+            .Where(od => od.Order.OrderStatus == "COMPLETED")
             .GroupBy(od => new { od.ProductID, od.Product.ProductName })
             .Select(g => new TopProductDto
             {

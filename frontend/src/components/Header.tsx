@@ -64,22 +64,48 @@ export default function Header() {
           </form>
         </div>
 
-        {/* Nav Links */}
-        <nav className="hidden lg:flex items-center gap-6">
-          <Link to="/products" className="text-sm font-medium text-secondary hover:text-primary transition-colors px-2 py-1 rounded">
-            Tất cả sản phẩm
+        {/* Nav Links - Phụ kiện & Thiết bị */}
+        <nav className="hidden lg:flex items-center gap-1 xl:gap-2">
+          <Link
+            to="/products"
+            className="text-sm font-medium text-secondary hover:text-primary hover:bg-surface-container-low transition-colors px-2.5 py-1 rounded-lg"
+          >
+            Tất cả
           </Link>
-          <Link to="/products?brand=Apple" className="text-sm font-medium text-secondary hover:text-primary transition-colors px-2 py-1 rounded">
-            Apple
+          <Link
+            to="/products?category=4"
+            className="text-sm font-medium text-secondary hover:text-primary hover:bg-surface-container-low transition-colors px-2.5 py-1 rounded-lg flex items-center gap-1"
+          >
+            <span className="material-symbols-outlined text-base">mouse</span>
+            Chuột & Bàn phím
           </Link>
-          <Link to="/products?brand=Samsung" className="text-sm font-medium text-secondary hover:text-primary transition-colors px-2 py-1 rounded">
-            Samsung
+          <Link
+            to="/products?category=5"
+            className="text-sm font-medium text-secondary hover:text-primary hover:bg-surface-container-low transition-colors px-2.5 py-1 rounded-lg flex items-center gap-1"
+          >
+            <span className="material-symbols-outlined text-base">headphones</span>
+            Tai nghe & Âm thanh
           </Link>
-          <Link to="/products?brand=Dell" className="text-sm font-medium text-secondary hover:text-primary transition-colors px-2 py-1 rounded">
-            Dell
+          <Link
+            to="/products?category=6"
+            className="text-sm font-medium text-secondary hover:text-primary hover:bg-surface-container-low transition-colors px-2.5 py-1 rounded-lg flex items-center gap-1"
+          >
+            <span className="material-symbols-outlined text-base">desktop_windows</span>
+            Màn hình
           </Link>
-          <Link to="/products?brand=Sony" className="text-sm font-medium text-secondary hover:text-primary transition-colors px-2 py-1 rounded">
-            Sony
+          <Link
+            to="/products?category=7"
+            className="text-sm font-medium text-secondary hover:text-primary hover:bg-surface-container-low transition-colors px-2.5 py-1 rounded-lg flex items-center gap-1"
+          >
+            <span className="material-symbols-outlined text-base">memory</span>
+            Linh kiện PC
+          </Link>
+          <Link
+            to="/products?category=8"
+            className="text-sm font-medium text-secondary hover:text-primary hover:bg-surface-container-low transition-colors px-2.5 py-1 rounded-lg flex items-center gap-1"
+          >
+            <span className="material-symbols-outlined text-base">cable</span>
+            Cáp sạc & Hub
           </Link>
         </nav>
 
@@ -172,6 +198,34 @@ export default function Header() {
               <span>Đăng nhập</span>
             </Link>
           )}
+        </div>
+      </div>
+
+      {/* Accessories Fast Navigation Sub-bar */}
+      <div className="bg-surface-container-low/80 border-t border-outline-variant/60 px-4 sm:px-6 lg:px-8 py-1.5 overflow-x-auto">
+        <div className="max-w-7xl mx-auto flex items-center gap-2 sm:gap-3 text-xs font-medium whitespace-nowrap">
+          <span className="text-secondary flex items-center gap-1 font-semibold pr-2 border-r border-outline-variant text-[11px] uppercase tracking-wider">
+            <span className="material-symbols-outlined text-sm text-primary">tune</span>
+            Phụ kiện:
+          </span>
+          <Link to="/products?category=4" className="px-2.5 py-1 rounded-full bg-surface-container hover:bg-primary/10 hover:text-primary transition-colors flex items-center gap-1">
+            <span className="material-symbols-outlined text-sm">mouse</span> Chuột Gaming & Văn phòng
+          </Link>
+          <Link to="/products?category=5" className="px-2.5 py-1 rounded-full bg-surface-container hover:bg-primary/10 hover:text-primary transition-colors flex items-center gap-1">
+            <span className="material-symbols-outlined text-sm">headphones</span> Tai nghe Bluetooth & Chống ồn
+          </Link>
+          <Link to="/products?category=6" className="px-2.5 py-1 rounded-full bg-surface-container hover:bg-primary/10 hover:text-primary transition-colors flex items-center gap-1">
+            <span className="material-symbols-outlined text-sm">monitor</span> Màn hình 4K IPS
+          </Link>
+          <Link to="/products?category=7" className="px-2.5 py-1 rounded-full bg-surface-container hover:bg-primary/10 hover:text-primary transition-colors flex items-center gap-1">
+            <span className="material-symbols-outlined text-sm">memory</span> Linh kiện RAM & SSD
+          </Link>
+          <Link to="/products?category=8" className="px-2.5 py-1 rounded-full bg-surface-container hover:bg-primary/10 hover:text-primary transition-colors flex items-center gap-1">
+            <span className="material-symbols-outlined text-sm">power</span> Cáp sạc & Hub USB-C
+          </Link>
+          <Link to="/products" className="ml-auto text-primary hover:underline flex items-center gap-0.5 text-xs font-semibold pl-2">
+            Tất cả phụ kiện <span className="material-symbols-outlined text-xs">arrow_forward</span>
+          </Link>
         </div>
       </div>
     </header>

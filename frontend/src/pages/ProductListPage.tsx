@@ -1,24 +1,40 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { productService, type Product } from '../services/productService';
 import { categoryService } from '../services/categoryService';
 import type { CategoryDto } from '../types/category';
 
 export default function ProductListPage() {
+  const [searchParams] = useSearchParams();
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<CategoryDto[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
-  // Filters state
-  const [keyword, setKeyword] = useState('');
-  const [debouncedKeyword, setDebouncedKeyword] = useState('');
-  const [category, setCategory] = useState<number | undefined>();
-  const [brand, setBrand] = useState<string | undefined>();
+  // Filters state initialized from URL params if present
+  const [keyword, setKeyword] = useState(() => searchParams.get('keyword') || '');
+  const [debouncedKeyword, setDebouncedKeyword] = useState(() => searchParams.get('keyword') || '');
+  const [category, setCategory] = useState<number | undefined>(() => {
+    const c = searchParams.get('category');
+    return c ? Number(c) : undefined;
+  });
+  const [brand, setBrand] = useState<string | undefined>(() => searchParams.get('brand') || undefined);
   const [minPrice, setMinPrice] = useState<number | ''>('');
   const [maxPrice, setMaxPrice] = useState<number | ''>('');
   const [sort, setSort] = useState('newest');
+
+  // Sync state when URL query params change
+  useEffect(() => {
+    const kw = searchParams.get('keyword') || '';
+    const b = searchParams.get('brand') || undefined;
+    const cat = searchParams.get('category') ? Number(searchParams.get('category')) : undefined;
+    setKeyword(kw);
+    setDebouncedKeyword(kw);
+    setBrand(b);
+    setCategory(cat);
+    setPage(1);
+  }, [searchParams]);
 
   useEffect(() => {
     const handler = setTimeout(() => {

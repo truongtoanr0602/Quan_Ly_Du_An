@@ -15,15 +15,27 @@ public sealed class ExceptionHandlingMiddleware(
         }
         catch (Exception exception)
         {
-            logger.LogError(exception, "An unhandled exception occurred while processing the request.");
+            var (statusCode, title) = exception switch
+            {
+                InvalidOperationException => (StatusCodes.Status400BadRequest, exception.Message),
+                KeyNotFoundException => (StatusCodes.Status404NotFound, exception.Message),
+                UnauthorizedAccessException => (StatusCodes.Status401Unauthorized, exception.Message),
+                Microsoft.EntityFrameworkCore.DbUpdateException dbEx => (StatusCodes.Status400BadRequest, dbEx.InnerException?.Message ?? dbEx.Message),
+                _ => (StatusCodes.Status500InternalServerError, exception.Message)
+            };
 
-            context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+            if (statusCode == StatusCodes.Status500InternalServerError)
+                logger.LogError(exception, "An unhandled exception occurred while processing the request: {Message}", exception.Message);
+            else
+                logger.LogWarning(exception, "A handled exception occurred: {Message}", exception.Message);
+
+            context.Response.StatusCode = statusCode;
             context.Response.ContentType = "application/problem+json";
 
             var problem = new ProblemDetails
             {
-                Status = StatusCodes.Status500InternalServerError,
-                Title = "An unexpected error occurred."
+                Status = statusCode,
+                Title = title
             };
 
             await JsonSerializer.SerializeAsync(
