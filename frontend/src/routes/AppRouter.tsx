@@ -18,40 +18,45 @@ import InventoryManagementPage from '../pages/admin/InventoryManagementPage';
 import UserManagementPage from '../pages/admin/UserManagementPage';
 import CategoryManagementPage from '../pages/admin/CategoryManagementPage';
 import ProductManagementPage from '../pages/admin/ProductManagementPage';
+import { ToastProvider } from '../contexts/ToastContext';
+import ChatBot from '../components/ChatBot';
 
 export default function AppRouter() {
   return (
     <BrowserRouter>
-      <Routes>
-        {/* Public layout with Header/Footer */}
-        <Route element={<MainLayout />}>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/products" element={<ProductListPage />} />
-          <Route path="/products/:id" element={<ProductDetailPage />} />
-          <Route path="/cart" element={<CartPage />} />
-          <Route path="/checkout" element={<CheckoutPage />} />
-          <Route path="/orders" element={<OrderHistoryPage />} />
-          <Route path="/profile" element={<ProfilePage />} />
-        </Route>
+      <ToastProvider>
+        <Routes>
+          {/* Public layout with Header/Footer */}
+          <Route element={<MainLayout />}>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/products" element={<ProductListPage />} />
+            <Route path="/products/:id" element={<ProductDetailPage />} />
+            <Route path="/cart" element={<CartPage />} />
+            <Route path="/checkout" element={<CheckoutPage />} />
+            <Route path="/orders" element={<OrderHistoryPage />} />
+            <Route path="/profile" element={<ProfilePage />} />
+          </Route>
 
-        {/* Auth pages (no header/footer) */}
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
-        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-        <Route path="/reset-password" element={<ResetPasswordPage />} />
+          {/* Auth pages (no header/footer) */}
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+          <Route path="/reset-password" element={<ResetPasswordPage />} />
 
-        {/* Admin Routes */}
-        <Route path="/admin">
-          <Route index element={<AdminDashboardPage />} />
-          <Route path="orders" element={<OrderManagementPage />} />
-          <Route path="inventory" element={<InventoryManagementPage />} />
-          <Route path="users" element={<UserManagementPage />} />
-          <Route path="categories" element={<CategoryManagementPage />} />
-          <Route path="products" element={<ProductManagementPage />} />
-        </Route>
+          {/* Admin Routes */}
+          <Route path="/admin">
+            <Route index element={<AdminDashboardPage />} />
+            <Route path="orders" element={<OrderManagementPage />} />
+            <Route path="inventory" element={<InventoryManagementPage />} />
+            <Route path="users" element={<UserManagementPage />} />
+            <Route path="categories" element={<CategoryManagementPage />} />
+            <Route path="products" element={<ProductManagementPage />} />
+          </Route>
 
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+        <ChatBot />
+      </ToastProvider>
     </BrowserRouter>
   );
 }

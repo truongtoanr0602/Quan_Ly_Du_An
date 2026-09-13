@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { cartService } from '../services/cartService';
 import { authService } from '../services/authService';
 import { productService } from '../services/productService';
+import { useToast } from '../contexts/ToastContext';
 
 interface ProductItem {
   id: number;
@@ -17,7 +18,7 @@ interface ProductItem {
 }
 
 export default function HomePage() {
-  const navigate = useNavigate();
+  const toast = useToast();
   const [addingId, setAddingId] = useState<number | null>(null);
   const [dbImages, setDbImages] = useState<Record<number, string>>({});
 
@@ -38,17 +39,27 @@ export default function HomePage() {
   const handleAddToCart = async (product: ProductItem) => {
     if (product.disabled) return;
     if (!authService.getCurrentUser()) {
-      alert('Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng');
-      navigate('/login');
+      toast.warning('Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng!', {
+        title: 'Chưa đăng nhập',
+        actionText: 'Đăng nhập ngay',
+        actionPath: '/login'
+      });
       return;
     }
 
     try {
       setAddingId(product.id);
       await cartService.addItem({ productId: product.id, quantity: 1 });
-      alert(`Đã thêm "${product.name}" vào giỏ hàng!`);
+      window.dispatchEvent(new CustomEvent('cart-updated'));
+      toast.success(`Đã thêm "${product.name}" vào giỏ hàng!`, {
+        title: 'Thành công',
+        actionText: 'Xem giỏ hàng',
+        actionPath: '/cart'
+      });
     } catch (err: any) {
-      alert(err.message || 'Không thể thêm sản phẩm vào giỏ hàng');
+      toast.error(err.message || 'Không thể thêm sản phẩm vào giỏ hàng.', {
+        title: 'Lỗi giỏ hàng'
+      });
     } finally {
       setAddingId(null);
     }

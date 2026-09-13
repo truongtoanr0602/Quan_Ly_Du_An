@@ -1,16 +1,40 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { authService, type UserInfo } from '../services/authService';
+import { cartService } from '../services/cartService';
 
 export default function Header() {
   const [search, setSearch] = useState('');
   const [user, setUser] = useState<UserInfo | null>(null);
+  const [cartCount, setCartCount] = useState<number>(0);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
 
+  const updateCartCount = async () => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      setCartCount(0);
+      return;
+    }
+    try {
+      const cart = await cartService.getCart();
+      setCartCount(cart.totalItems || 0);
+    } catch {
+      // ignore
+    }
+  };
+
   useEffect(() => {
     setUser(authService.getCurrentUser());
+    updateCartCount();
+
+    const handleCartUpdated = () => {
+      updateCartCount();
+    };
+
+    window.addEventListener('cart-updated', handleCartUpdated);
+    return () => window.removeEventListener('cart-updated', handleCartUpdated);
   }, []);
 
   // Close dropdown when clicking outside
@@ -36,6 +60,7 @@ export default function Header() {
   const handleLogout = () => {
     authService.logout();
     setUser(null);
+    setCartCount(0);
     setDropdownOpen(false);
     navigate('/');
     window.location.reload();
@@ -60,7 +85,7 @@ export default function Header() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="w-full pl-9 pr-3 py-1.5 bg-surface-container-low border border-outline-variant rounded-full text-xs sm:text-sm text-on-surface focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
-            placeholder="Tìm phụ kiện, sản phẩm..."
+            placeholder="Tìm kiếm sản phẩm..."
           />
         </form>
 
@@ -113,6 +138,11 @@ export default function Header() {
             title="Giỏ hàng"
           >
             <span className="material-symbols-outlined text-[22px]">shopping_cart</span>
+            {cartCount > 0 && (
+              <span className="absolute -top-0.5 -right-0.5 bg-primary text-white text-[10px] font-bold rounded-full h-5 min-w-[20px] px-1 flex items-center justify-center shadow-sm pointer-events-none">
+                {cartCount > 99 ? '99+' : cartCount}
+              </span>
+            )}
           </Link>
 
           {/* User Account / Profile */}

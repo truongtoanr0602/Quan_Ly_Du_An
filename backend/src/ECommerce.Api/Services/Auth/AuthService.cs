@@ -121,7 +121,7 @@ public class AuthService : IAuthService
             issuer: jwtSettings["Issuer"],
             audience: jwtSettings["Audience"],
             claims: claims,
-            expires: DateTime.UtcNow.AddHours(2), // Hạn 2 tiếng cho MVP
+            expires: DateTime.UtcNow.AddDays(7), // Hạn 7 ngày cho dev/test ổn định
             signingCredentials: creds
         );
 
