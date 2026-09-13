@@ -25,7 +25,7 @@ export default function ChatBot() {
 
   // Scroll to bottom when new messages arrive
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    messagesEndRef.current?.scrollIntoView?.({ behavior: 'smooth' });
   }, [messages]);
 
   // Focus input when chat opens
@@ -83,7 +83,7 @@ export default function ChatBot() {
 
   // Simple markdown-like rendering: **bold**, \n → <br>, bullet points
   const renderContent = (content: string) => {
-    const lines = content.split('\n');
+    const lines = (content || '').split('\n');
     return lines.map((line, i) => {
       // Bold **text**
       const parts = line.split(/(\*\*.*?\*\*)/g);
@@ -141,7 +141,7 @@ export default function ChatBot() {
       {/* Floating Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className={`fixed bottom-6 right-6 z-[60] w-14 h-14 rounded-full shadow-lg flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95 ${
+        className={`fixed bottom-6 right-6 z-[9990] w-14 h-14 rounded-full shadow-2xl flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95 cursor-pointer ${
           isOpen
             ? 'bg-secondary text-on-secondary rotate-0'
             : 'bg-primary text-on-primary'
@@ -155,7 +155,7 @@ export default function ChatBot() {
 
       {/* Chat Panel */}
       <div
-        className={`fixed bottom-24 right-6 z-[59] w-[380px] max-w-[calc(100vw-24px)] transition-all duration-300 origin-bottom-right ${
+        className={`fixed bottom-24 right-6 z-[9989] w-[380px] max-w-[calc(100vw-24px)] transition-all duration-300 origin-bottom-right ${
           isOpen
             ? 'scale-100 opacity-100 pointer-events-auto'
             : 'scale-95 opacity-0 pointer-events-none'

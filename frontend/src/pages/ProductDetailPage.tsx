@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import { productService, type Product } from '../services/productService';
 import { cartService } from '../services/cartService';
+import { useToast } from '../contexts/ToastContext';
 
 export default function ProductDetailPage() {
   const { id } = useParams();
-  const navigate = useNavigate();
+  const toast = useToast();
   const [product, setProduct] = useState<Product | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
@@ -55,9 +56,11 @@ export default function ProductDetailPage() {
     if (!product) return;
     const token = localStorage.getItem('token');
     if (!token) {
-      if (confirm('Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng. Bạn có muốn chuyển đến trang Đăng nhập?')) {
-        navigate('/login');
-      }
+      toast.warning('Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng!', {
+        title: 'Chưa đăng nhập',
+        actionText: 'Đăng nhập ngay',
+        actionPath: '/login'
+      });
       return;
     }
 
@@ -67,10 +70,18 @@ export default function ProductDetailPage() {
         productId: product.productID,
         quantity,
       });
+      window.dispatchEvent(new CustomEvent('cart-updated'));
       setCartSuccess(true);
-      setTimeout(() => setCartSuccess(false), 3000);
+      setTimeout(() => setCartSuccess(false), 4000);
+      toast.success(`Đã thêm ${quantity} x "${product.productName}" vào giỏ hàng!`, {
+        title: 'Thành công',
+        actionText: 'Xem giỏ hàng',
+        actionPath: '/cart'
+      });
     } catch (err: any) {
-      alert('Không thể thêm vào giỏ hàng: ' + (err.message || 'Lỗi không xác định'));
+      toast.error(err.message || 'Không thể thêm vào giỏ hàng.', {
+        title: 'Lỗi giỏ hàng'
+      });
     } finally {
       setIsAddingToCart(false);
     }

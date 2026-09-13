@@ -1,7 +1,9 @@
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { cartService } from '../services/cartService';
 import { authService } from '../services/authService';
+import { productService } from '../services/productService';
+import { useToast } from '../contexts/ToastContext';
 
 interface ProductItem {
   id: number;
@@ -16,23 +18,48 @@ interface ProductItem {
 }
 
 export default function HomePage() {
-  const navigate = useNavigate();
+  const toast = useToast();
   const [addingId, setAddingId] = useState<number | null>(null);
+  const [dbImages, setDbImages] = useState<Record<number, string>>({});
+
+  useEffect(() => {
+    productService.searchProducts({ pageNumber: 1, pageSize: 50 })
+      .then(res => {
+        const imgMap: Record<number, string> = {};
+        res.items.forEach(p => {
+          if (p.imageUrl) {
+            imgMap[p.productID] = p.imageUrl;
+          }
+        });
+        setDbImages(imgMap);
+      })
+      .catch(() => {});
+  }, []);
 
   const handleAddToCart = async (product: ProductItem) => {
     if (product.disabled) return;
     if (!authService.getCurrentUser()) {
-      alert('Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng');
-      navigate('/login');
+      toast.warning('Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng!', {
+        title: 'Chưa đăng nhập',
+        actionText: 'Đăng nhập ngay',
+        actionPath: '/login'
+      });
       return;
     }
 
     try {
       setAddingId(product.id);
       await cartService.addItem({ productId: product.id, quantity: 1 });
-      alert(`Đã thêm "${product.name}" vào giỏ hàng!`);
+      window.dispatchEvent(new CustomEvent('cart-updated'));
+      toast.success(`Đã thêm "${product.name}" vào giỏ hàng!`, {
+        title: 'Thành công',
+        actionText: 'Xem giỏ hàng',
+        actionPath: '/cart'
+      });
     } catch (err: any) {
-      alert(err.message || 'Không thể thêm sản phẩm vào giỏ hàng');
+      toast.error(err.message || 'Không thể thêm sản phẩm vào giỏ hàng.', {
+        title: 'Lỗi giỏ hàng'
+      });
     } finally {
       setAddingId(null);
     }
@@ -110,7 +137,7 @@ export default function HomePage() {
       oldPrice: '3.990.000₫',
       badge: 'Phím cơ',
       badgeColor: 'surface',
-      img: 'https://bizweb.dktcdn.net/100/512/769/products/legion-5-15imh05h-2020.jpg?v=1718703360580'
+      img: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSiiunur2cb18j9GGf34YaSRUCAHZlvs6SqELI1WO8xfA&s=10'
     },
     {
       id: 15,
@@ -119,7 +146,7 @@ export default function HomePage() {
       price: '1.290.000₫',
       badge: 'Chính hãng',
       badgeColor: 'surface',
-      img: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTRjqsLklosNlEAzAwrTeO5dFRBQU2Jc1QCKk1d8Q7lkg&s=10'
+      img: 'https://cdn2.cellphones.com.vn/x/media/catalog/product/g/r/group_8_1__2.png'
     }
   ];
 
@@ -142,7 +169,7 @@ export default function HomePage() {
       price: '2.950.000₫',
       badge: 'Linh kiện PC',
       badgeColor: 'surface',
-      img: '/images/pc_components_banner.jpg'
+      img: 'https://hoanghapc.vn/media/product/4789_ddr5_gskill_trident_z5_rgb_black_ha4.jpg'
     }
   ];
 
@@ -162,7 +189,7 @@ export default function HomePage() {
       <Link to={`/products/${p.id}`} className="h-60 bg-surface-bright/50 flex items-center justify-center p-6 overflow-hidden">
         <img
           className={`object-contain w-full h-full mix-blend-multiply group-hover:scale-105 transition-transform duration-500 ${p.disabled ? 'opacity-70' : ''}`}
-          src={p.img}
+          src={dbImages[p.id] || p.img}
           alt={p.name}
           loading="lazy"
         />

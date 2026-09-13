@@ -15,7 +15,7 @@ public class ChatService : IChatService
     private readonly ILogger<ChatService> _logger;
 
     private const string GeminiEndpoint =
-        "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent";
+        "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent";
 
     public ChatService(
         AppDbContext context,
@@ -31,15 +31,17 @@ public class ChatService : IChatService
 
     public async Task<ChatResponseDto> ChatAsync(ChatRequestDto request, CancellationToken cancellationToken = default)
     {
-        if (string.IsNullOrWhiteSpace(_apiKey))
-        {
-            return new ChatResponseDto(
-                "Xin lỗi, tính năng trợ lý AI đang được cấu hình. Vui lòng thử lại sau hoặc liên hệ quản trị viên.",
-                null);
-        }
-
         // 1. Extract keywords from user message for product search
         var keywords = ExtractKeywords(request.Message);
+
+        if (string.IsNullOrWhiteSpace(_apiKey))
+        {
+            var fallbackProducts = await ExtractRecommendedProductsAsync(string.Empty, keywords, cancellationToken);
+            var fallbackReply = (fallbackProducts?.Count ?? 0) > 0
+                ? $"Dưới đây là các sản phẩm phù hợp với nhu cầu \"{request.Message}\" tại ElectroTech:"
+                : "Xin chào! Bạn vui lòng nhập từ khóa sản phẩm bạn đang quan tâm (ví dụ: laptop, bàn phím, sạc...) để tôi tìm kiếm giúp bạn nhé!";
+            return new ChatResponseDto(fallbackReply, fallbackProducts);
+        }
 
         // 2. Query relevant products from database
         var productContext = await BuildProductContextAsync(keywords, request.Message, cancellationToken);
@@ -59,10 +61,12 @@ public class ChatService : IChatService
 
             if (!response.IsSuccessStatusCode)
             {
-                _logger.LogError("Gemini API error: {StatusCode} {Body}", response.StatusCode, responseBody);
-                return new ChatResponseDto(
-                    "Xin lỗi, tôi đang gặp sự cố kỹ thuật. Vui lòng thử lại sau.",
-                    null);
+                _logger.LogWarning("Gemini API returned {StatusCode}. Falling back to keyword search.", response.StatusCode);
+                var fallbackProducts = await ExtractRecommendedProductsAsync(string.Empty, keywords, cancellationToken);
+                var fallbackReply = (fallbackProducts?.Count ?? 0) > 0
+                    ? $"Dưới đây là một số sản phẩm phù hợp với nhu cầu \"{request.Message}\" tại cửa hàng ElectroTech:"
+                    : "Chào bạn! Hiện tại tôi chưa tìm thấy sản phẩm hoàn toàn trùng khớp với yêu cầu của bạn. Bạn vui lòng thử tìm kiếm theo từ khóa danh mục (ví dụ: Chuột, Bàn phím, Tai nghe, Laptop, Màn hình, Cáp sạc...).";
+                return new ChatResponseDto(fallbackReply, fallbackProducts);
             }
 
             // 5. Parse Gemini response
@@ -83,10 +87,12 @@ public class ChatService : IChatService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Unexpected error calling Gemini API");
-            return new ChatResponseDto(
-                "Đã xảy ra lỗi không mong muốn. Vui lòng thử lại sau.",
-                null);
+            _logger.LogError(ex, "Error occurred in ChatService, falling back to local product search");
+            var fallbackProducts = await ExtractRecommendedProductsAsync(string.Empty, keywords, cancellationToken);
+            var fallbackReply = (fallbackProducts?.Count ?? 0) > 0
+                ? $"Dưới đây là các sản phẩm gợi ý cho bạn tại ElectroTech:"
+                : "Xin chào! Bạn có thể tham khảo danh mục sản phẩm của ElectroTech ở thanh điều hướng phía trên hoặc liên hệ hỗ trợ.";
+            return new ChatResponseDto(fallbackReply, fallbackProducts);
         }
     }
 

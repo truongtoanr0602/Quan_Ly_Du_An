@@ -19,6 +19,12 @@ export const apiClient = async <T>(
   const response = await fetch(url, { ...options, headers });
   
   if (!response.ok) {
+    if (response.status === 401) {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      window.dispatchEvent(new CustomEvent('cart-updated'));
+      throw new Error('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.');
+    }
     const errorData = await response.json().catch(() => null);
     throw new Error(errorData?.title || errorData?.message || `API request failed with status ${response.status}`);
   }
