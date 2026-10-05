@@ -19,7 +19,7 @@ export interface OrderDetail {
   subTotal: number
   shippingFee: number
   totalAmount: number
-  paymentMethod: 'COD'
+  paymentMethod: 'COD' | 'QR'
   paymentStatus: string
   orderStatus: string
   note?: string
@@ -29,13 +29,13 @@ export interface OrderDetail {
 
 export interface CheckoutRequest {
   addressID: number
-  paymentMethod: 'COD'
+  paymentMethod: 'COD' | 'QR'
   note?: string
 }
 export interface OrderSummary {
   orderID: number
   totalAmount: number
-  paymentMethod: 'COD'
+  paymentMethod: 'COD' | 'QR'
   paymentStatus: string
   orderStatus: string
   createdAt: string

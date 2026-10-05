@@ -33,7 +33,7 @@ describe('CheckoutPage', () => {
 
   it('selects default address and submits COD once', async () => {
     renderPage()
-    expect(await screen.findByRole('radio')).toBeChecked()
+    expect((await screen.findAllByRole('radio'))[0]).toBeChecked()
     expect(screen.getByText('Thanh toan khi nhan hang (COD)')).toBeInTheDocument()
     fireEvent.change(screen.getByLabelText('Ghi chu'), { target: { value: 'Call first' } })
     fireEvent.click(screen.getByRole('button', { name: 'Dat hang' }))
@@ -45,7 +45,7 @@ describe('CheckoutPage', () => {
   it('navigates to the created order even when cart refresh fails', async () => {
     refresh.mockRejectedValue(new Error('Refresh failed'))
     renderPage()
-    await screen.findByRole('radio')
+    await screen.findAllByRole('radio')
 
     fireEvent.click(screen.getByRole('button', { name: 'Dat hang' }))
 
@@ -56,7 +56,7 @@ describe('CheckoutPage', () => {
   it('retains checkout and displays API errors', async () => {
     vi.mocked(orderService.checkout).mockRejectedValue(new Error('Het hang'))
     renderPage()
-    await screen.findByRole('radio')
+    await screen.findAllByRole('radio')
     fireEvent.click(screen.getByRole('button', { name: 'Dat hang' }))
     expect(await screen.findByRole('alert')).toHaveTextContent('Het hang')
     expect(refresh).not.toHaveBeenCalled()
@@ -66,5 +66,25 @@ describe('CheckoutPage', () => {
     useCart.mockReturnValue({ cart: { items: [], totalItems: 0, totalAmount: 0 }, isLoading: false, refresh })
     renderPage()
     expect(await screen.findByText('Cart destination')).toBeInTheDocument()
+  })
+
+  it('shows mock payment details when QR is selected', async () => {
+    renderPage()
+    fireEvent.click(await screen.findByRole('radio', { name: 'Chuyen khoan bang QR' }))
+
+    expect(screen.getByText('Thanh toan mo phong - khong chuyen tien that')).toBeInTheDocument()
+    expect(screen.getByText(/So tien: 200/)).toBeInTheDocument()
+  })
+
+  it('submits QR as the selected payment method', async () => {
+    renderPage()
+    fireEvent.click(await screen.findByRole('radio', { name: 'Chuyen khoan bang QR' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Dat hang' }))
+
+    await waitFor(() => expect(orderService.checkout).toHaveBeenCalledWith({
+      addressID: 5,
+      paymentMethod: 'QR',
+      note: undefined,
+    }))
   })
 })

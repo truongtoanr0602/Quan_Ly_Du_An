@@ -14,6 +14,7 @@ export default function CheckoutPage() {
   const [addresses, setAddresses] = useState<Address[]>([])
   const [addressID, setAddressID] = useState(0)
   const [note, setNote] = useState('')
+  const [paymentMethod, setPaymentMethod] = useState<'COD' | 'QR'>('COD')
   const [isLoading, setIsLoading] = useState(true)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -37,7 +38,7 @@ export default function CheckoutPage() {
     try {
       const order = await orderService.checkout({
         addressID,
-        paymentMethod: 'COD',
+        paymentMethod,
         note: note.trim() || undefined,
       })
       navigate('/orders/' + order.orderID)
@@ -70,7 +71,32 @@ export default function CheckoutPage() {
           </div>
         )}
         <h2 className="mb-3 mt-6 font-semibold">Phuong thuc thanh toan</h2>
-        <p className="rounded border p-4">Thanh toan khi nhan hang (COD)</p>
+        <div className="grid gap-3">
+          <label className="flex cursor-pointer gap-3 rounded border p-4">
+            <input type="radio" name="paymentMethod" value="COD"
+              checked={paymentMethod === 'COD'} onChange={() => setPaymentMethod('COD')} />
+            <span>Thanh toan khi nhan hang (COD)</span>
+          </label>
+          <label className="flex cursor-pointer gap-3 rounded border p-4">
+            <input type="radio" name="paymentMethod" value="QR"
+              checked={paymentMethod === 'QR'} onChange={() => setPaymentMethod('QR')} />
+            <span>Chuyen khoan bang QR</span>
+          </label>
+        </div>
+        {paymentMethod === 'QR' && (
+          <div className="mt-3 rounded border border-primary/30 p-4 text-center">
+            <p className="font-semibold text-primary">Thanh toan mo phong - khong chuyen tien that</p>
+            <img src="/mock-payment-qr.svg" alt="Ma QR thanh toan mo phong"
+              className="mx-auto my-3 h-44 w-44 rounded border bg-white p-2" />
+            <div className="space-y-1 text-sm">
+              <p>Ngan hang: ElectroTech Demo Bank</p>
+              <p>So tai khoan: 0000 0000 0000</p>
+              <p>Noi dung: ELECTROTECH DEMO</p>
+              <p className="font-semibold">So tien: {formatPrice(cart.totalAmount)}</p>
+            </div>
+            <p className="mt-2 text-xs">Don hang se co trang thai thanh toan dang cho xac nhan.</p>
+          </div>
+        )}
         <label className="mt-6 block">Ghi chu
           <textarea aria-label="Ghi chu" maxLength={1000} value={note}
             onChange={(event) => setNote(event.target.value)}

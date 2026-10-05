@@ -9,6 +9,7 @@ public sealed class CheckoutDto
     public int AddressID { get; init; }
 
     [Required]
+    [RegularExpression("^(COD|QR)$", ErrorMessage = "Payment method must be COD or QR.")]
     public string PaymentMethod { get; init; } = OrderConstants.Cod;
 
     [StringLength(1000)]

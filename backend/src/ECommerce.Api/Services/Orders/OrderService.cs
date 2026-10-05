@@ -12,7 +12,8 @@ public sealed class OrderService(AppDbContext context) : IOrderService
 {
     public async Task<OrderDetailDto> CheckoutAsync(int userId, CheckoutDto dto, CancellationToken ct = default)
     {
-        if (dto.AddressID <= 0 || !string.Equals(dto.PaymentMethod, OrderConstants.Cod, StringComparison.Ordinal))
+        if (dto.AddressID <= 0 ||
+            (dto.PaymentMethod != OrderConstants.Cod && dto.PaymentMethod != OrderConstants.Qr))
         {
             throw new DomainValidationException();
         }
@@ -64,7 +65,7 @@ public sealed class OrderService(AppDbContext context) : IOrderService
             SubTotal = subTotal,
             ShippingFee = 0m,
             TotalAmount = subTotal,
-            PaymentMethod = OrderConstants.Cod,
+            PaymentMethod = dto.PaymentMethod,
             PaymentStatus = OrderConstants.Pending,
             OrderStatus = OrderConstants.Pending,
             Note = string.IsNullOrWhiteSpace(dto.Note) ? null : dto.Note.Trim(),
