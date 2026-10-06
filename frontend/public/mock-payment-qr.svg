@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 210 210" role="img" aria-labelledby="title desc">
+  <title id="title">Mã QR thanh toán mô phỏng</title>
+  <desc id="desc">Mã minh họa dùng cho bản demo, không thực hiện giao dịch thật.</desc>
+  <rect width="210" height="210" fill="#fff"/>
+  <g fill="#111827">
+    <path d="M10 10h60v60H10zm10 10v40h40V20zm10 10h20v20H30zM140 10h60v60h-60zm10 10v40h40V20zm10 10h20v20h-20zM10 140h60v60H10zm10 10v40h40v-40zm10 10h20v20H30z"/>
+    <path d="M85 10h15v15H85zm30 0h10v25h-10zM80 40h20v10H80zm30 10h15v20h-15zM85 70h10v20H85zm25 10h20v10h-20zM75 100h20v15H75zm30-5h15v30h-15zm25 5h20v10h-20zm20-20h20v15h-20zm25 5h25v15h-25zM10 85h25v15H10zm35 0h20v25H45zm-35 30h15v15H10zm30 5h30v10H40zm45 10h15v25H85zm25 10h20v15h-20zm25-20h15v30h-15zm25-5h30v15h-30zm-80 55h20v30H80zm30-5h15v15h-15zm20 20h25v15h-25zm25-30h15v20h-15zm20 10h25v15h-25zm-5 30h30v15h-30z"/>
+  </g>
+  <rect x="76" y="76" width="58" height="58" rx="6" fill="#2563eb"/>
+  <text x="105" y="109" text-anchor="middle" font-family="Arial, sans-serif" font-size="15" font-weight="700" fill="#fff">DEMO</text>
+</svg>

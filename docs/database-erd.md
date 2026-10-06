@@ -35,7 +35,7 @@ erDiagram
 | `Address` | `Id`, `UserId`, `ReceiverName`, `Phone`, `AddressLine`, `IsDefault` | Required User FK; default-address invariant belongs to service rules | 2 |
 | `Cart` | `Id`, `UserId`, `CreatedAt` | One cart per User | 2 |
 | `CartItem` | `Id`, `CartId`, `ProductId`, `Quantity` | Unique Cart/Product pair; quantity positive | 2 |
-| `Order` | `Id`, `UserId`, shipping snapshot, `Status`, `PaymentMethod`, `TotalAmount`, `CreatedAt`, `UpdatedAt` | COD ordering/history is Sprint 2; admin status changes are Sprint 3; money uses `decimal(18,2)` | 2 |
+| `Order` | `Id`, `UserId`, shipping snapshot, `Status`, `PaymentMethod`, `TotalAmount`, `CreatedAt`, `UpdatedAt` | COD and mock QR ordering/history are Sprint 2; admin status changes are Sprint 3; money uses `decimal(18,2)` | 2 |
 | `OrderItem` | `Id`, `OrderId`, `ProductId`, `Quantity`, `UnitPrice` | Snapshot price uses `decimal(18,2)`; quantity positive | 2 |
 
 ## 4. Relationship Rules
