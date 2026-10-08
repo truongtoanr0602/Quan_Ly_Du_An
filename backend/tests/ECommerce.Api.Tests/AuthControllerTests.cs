@@ -82,5 +82,14 @@ public sealed class AuthControllerTests
                 ? Task.FromException<AuthResponseDto>(loginException)
                 : Task.FromResult(AuthResponse());
         }
+
+        public Task ChangePasswordAsync(int userId, ChangePasswordDto dto) =>
+            Task.CompletedTask;
+
+        public Task<string> RequestPasswordResetAsync(ForgotPasswordDto dto) =>
+            Task.FromResult("test-token");
+
+        public Task ResetPasswordAsync(ResetPasswordDto dto) =>
+            Task.CompletedTask;
     }
 }

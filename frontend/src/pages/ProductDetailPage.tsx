@@ -14,8 +14,6 @@ export default function ProductDetailPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [quantity, setQuantity] = useState(1);
-  const [isAddingToCart, setIsAddingToCart] = useState(false);
-  const [cartSuccess, setCartSuccess] = useState(false);
   const [activeTab, setActiveTab] = useState<'desc' | 'specs'>('desc');
 
   const [cartError, setCartError] = useState<string | null>(null);
@@ -91,41 +89,6 @@ export default function ProductDetailPage() {
       </div>
     );
   }
-
-  const handleAddToCart = async () => {
-    if (!product) return;
-    const token = localStorage.getItem('token');
-    if (!token) {
-      toast.warning('Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng!', {
-        title: 'Chưa đăng nhập',
-        actionText: 'Đăng nhập ngay',
-        actionPath: '/login'
-      });
-      return;
-    }
-
-    try {
-      setIsAddingToCart(true);
-      await cartService.addItem({
-        productId: product.productID,
-        quantity,
-      });
-      window.dispatchEvent(new CustomEvent('cart-updated'));
-      setCartSuccess(true);
-      setTimeout(() => setCartSuccess(false), 4000);
-      toast.success(`Đã thêm ${quantity} x "${product.productName}" vào giỏ hàng!`, {
-        title: 'Thành công',
-        actionText: 'Xem giỏ hàng',
-        actionPath: '/cart'
-      });
-    } catch (err: any) {
-      toast.error(err.message || 'Không thể thêm vào giỏ hàng.', {
-        title: 'Lỗi giỏ hàng'
-      });
-    } finally {
-      setIsAddingToCart(false);
-    }
-  };
 
   return (
     <div className="max-w-7xl mx-auto space-y-12">

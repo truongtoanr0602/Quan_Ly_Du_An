@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { profileService } from '../services/profileService';
+import { authService } from '../services/authService';
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState('');
@@ -12,7 +12,7 @@ export default function ForgotPasswordPage() {
     e.preventDefault();
     try {
       setLoading(true);
-      const result = await profileService.forgotPassword(email);
+      const result = await authService.forgotPassword(email);
       setToken(result.resetToken);
       setSubmitted(true);
     } catch (err: any) {

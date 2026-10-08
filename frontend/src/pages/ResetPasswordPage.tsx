@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useSearchParams, Link, useNavigate } from 'react-router-dom';
-import { profileService } from '../services/profileService';
+import { authService } from '../services/authService';
 
 export default function ResetPasswordPage() {
   const [searchParams] = useSearchParams();
@@ -16,7 +16,7 @@ export default function ResetPasswordPage() {
     if (newPassword.length < 6) { alert('Mật khẩu phải ít nhất 6 ký tự!'); return; }
     try {
       setLoading(true);
-      await profileService.resetPassword(token, newPassword);
+      await authService.resetPassword(token, newPassword);
       alert('Đặt lại mật khẩu thành công!');
       navigate('/login');
     } catch (err: any) {

@@ -40,3 +40,11 @@ public class AdminOrderDetailDto
     public decimal UnitPrice { get; set; }
     public decimal TotalPrice { get; set; }
 }
+
+public class PagedAdminOrderResult
+{
+    public List<AdminOrderDto> Items { get; set; } = [];
+    public int TotalCount { get; set; }
+    public int PageNumber { get; set; }
+    public int PageSize { get; set; }
+}

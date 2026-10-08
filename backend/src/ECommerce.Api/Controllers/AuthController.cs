@@ -32,7 +32,7 @@ public class AuthController(IAuthService authService) : ControllerBase
         try
         {
             var userId = User.GetUserId();
-            await _authService.ChangePasswordAsync(userId, dto);
+            await authService.ChangePasswordAsync(userId, dto);
             return Ok(new { Message = "Password changed successfully." });
         }
         catch (Exception ex)
@@ -47,7 +47,7 @@ public class AuthController(IAuthService authService) : ControllerBase
     {
         try
         {
-            var token = await _authService.RequestPasswordResetAsync(dto);
+            var token = await authService.RequestPasswordResetAsync(dto);
             return Ok(new { Message = "If this email exists, a reset link has been sent.", ResetToken = token });
         }
         catch (Exception ex)
@@ -62,7 +62,7 @@ public class AuthController(IAuthService authService) : ControllerBase
     {
         try
         {
-            await _authService.ResetPasswordAsync(dto);
+            await authService.ResetPasswordAsync(dto);
             return Ok(new { Message = "Password has been reset successfully." });
         }
         catch (Exception ex)

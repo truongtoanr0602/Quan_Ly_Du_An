@@ -1,4 +1,5 @@
 using ECommerce.Api.Helpers;
+using ECommerce.Api.DTOs.Orders;
 using ECommerce.Api.Services.Admin;
 using ECommerce.Api.Services.Orders;
 using Microsoft.AspNetCore.Authorization;
@@ -29,4 +30,24 @@ public class AdminController : ControllerBase
         var result = await _adminService.GetUsersAsync(pageNumber, pageSize, keyword, cancellationToken);
         return Ok(result);
     }
+
+    [HttpGet("orders")]
+    public async Task<IActionResult> GetOrders(
+        [FromQuery] int pageNumber = 1,
+        [FromQuery] int pageSize = 10,
+        [FromQuery] string? status = null,
+        CancellationToken cancellationToken = default) =>
+        Ok(await _adminService.GetOrdersAsync(pageNumber, pageSize, status, cancellationToken));
+
+    [HttpGet("orders/{orderId:long}")]
+    public async Task<IActionResult> GetOrder(long orderId, CancellationToken cancellationToken) =>
+        Ok(await _adminService.GetOrderAsync(orderId, cancellationToken));
+
+    [HttpPut("orders/{orderId:long}/status")]
+    public async Task<IActionResult> UpdateOrderStatus(
+        long orderId,
+        UpdateOrderStatusDto dto,
+        CancellationToken cancellationToken) =>
+        Ok(await _adminService.UpdateOrderStatusAsync(
+            orderId, User.GetUserId(), dto.NewStatus, dto.Note, cancellationToken));
 }

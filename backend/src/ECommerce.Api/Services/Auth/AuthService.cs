@@ -110,7 +110,7 @@ public class AuthService(AppDbContext context, IConfiguration configuration) : I
 
     public async Task ChangePasswordAsync(int userId, ChangePasswordDto dto)
     {
-        var user = await _context.Users.FindAsync(userId)
+        var user = await context.Users.FindAsync(userId)
             ?? throw new Exception("User not found.");
 
         if (!BCrypt.Net.BCrypt.Verify(dto.CurrentPassword, user.PasswordHash))
@@ -118,12 +118,12 @@ public class AuthService(AppDbContext context, IConfiguration configuration) : I
 
         user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.NewPassword);
         user.UpdatedAt = DateTime.UtcNow;
-        await _context.SaveChangesAsync();
+        await context.SaveChangesAsync();
     }
 
     public async Task<string> RequestPasswordResetAsync(ForgotPasswordDto dto)
     {
-        var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == dto.Email);
+        var user = await context.Users.FirstOrDefaultAsync(u => u.Email == dto.Email);
         if (user == null)
         {
             // Không tiết lộ email có tồn tại hay không
@@ -132,14 +132,14 @@ public class AuthService(AppDbContext context, IConfiguration configuration) : I
 
         // Tạo token
         var token = Guid.NewGuid().ToString("N");
-        _context.PasswordResetTokens.Add(new PasswordResetToken
+        context.PasswordResetTokens.Add(new PasswordResetToken
         {
             UserID = user.UserID,
             Token = token,
             ExpiresAt = DateTime.UtcNow.AddHours(1),
             CreatedAt = DateTime.UtcNow
         });
-        await _context.SaveChangesAsync();
+        await context.SaveChangesAsync();
 
         // MVP: trả token qua API (không gửi email)
         return token;
@@ -147,7 +147,7 @@ public class AuthService(AppDbContext context, IConfiguration configuration) : I
 
     public async Task ResetPasswordAsync(ResetPasswordDto dto)
     {
-        var resetToken = await _context.PasswordResetTokens
+        var resetToken = await context.PasswordResetTokens
             .Include(t => t.User)
             .FirstOrDefaultAsync(t => t.Token == dto.Token && t.UsedAt == null && t.ExpiresAt > DateTime.UtcNow)
             ?? throw new Exception("Invalid or expired reset token.");
@@ -156,7 +156,7 @@ public class AuthService(AppDbContext context, IConfiguration configuration) : I
         resetToken.User.UpdatedAt = DateTime.UtcNow;
         resetToken.UsedAt = DateTime.UtcNow;
 
-        await _context.SaveChangesAsync();
+        await context.SaveChangesAsync();
     }
 }
 

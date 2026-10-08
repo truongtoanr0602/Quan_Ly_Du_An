@@ -49,3 +49,37 @@ export interface PagedOrders {
   pageSize: number
   totalPages: number
 }
+
+export interface AdminOrderItem {
+  orderDetailId: number
+  productId: number
+  productName: string
+  sku: string
+  quantity: number
+  unitPrice: number
+  totalPrice: number
+}
+
+export interface OrderDto {
+  orderId: number
+  userId: number
+  customerName: string
+  customerEmail: string
+  receiverName: string
+  receiverPhone: string
+  shippingAddress: string
+  totalAmount: number
+  paymentMethod: 'COD' | 'QR'
+  paymentStatus: string
+  orderStatus: string
+  createdAt: string
+  updatedAt?: string
+  items: AdminOrderItem[]
+}
+
+export interface PagedAdminOrders {
+  items: OrderDto[]
+  totalCount: number
+  pageNumber: number
+  pageSize: number
+}

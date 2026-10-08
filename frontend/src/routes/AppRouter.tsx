@@ -1,10 +1,12 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import MainLayout from '../layouts/MainLayout';
 import HomePage from '../pages/HomePage';
 import LoginPage from '../pages/LoginPage';
 import RegisterPage from '../pages/RegisterPage';
 import ForgotPasswordPage from '../pages/ForgotPasswordPage';
 import ResetPasswordPage from '../pages/ResetPasswordPage';
+import CategoryManagementPage from '../pages/admin/CategoryManagementPage';
+import ProductManagementPage from '../pages/admin/ProductManagementPage';
 import ProductListPage from '../pages/ProductListPage';
 import ProductDetailPage from '../pages/ProductDetailPage';
 import ProfilePage from '../pages/ProfilePage';
@@ -17,10 +19,17 @@ import AuthProvider from '../contexts/AuthContext';
 import { CartProvider } from '../contexts/CartContext';
 import RequireAdmin from './RequireAdmin';
 import RequireCustomer from './RequireCustomer';
+import AdminDashboardPage from '../pages/admin/AdminDashboardPage';
+import OrderManagementPage from '../pages/admin/OrderManagementPage';
+import InventoryManagementPage from '../pages/admin/InventoryManagementPage';
+import UserManagementPage from '../pages/admin/UserManagementPage';
+import { ToastProvider } from '../contexts/ToastContext';
+import ChatBot from '../components/ChatBot';
 
 export default function AppRouter() {
   return (
     <BrowserRouter>
+      <ToastProvider>
       <AuthProvider>
         <CartProvider>
         <Routes>
@@ -39,11 +48,11 @@ export default function AppRouter() {
           </Route>
         </Route>
 
-          {/* Auth pages (no header/footer) */}
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/register" element={<RegisterPage />} />
-          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-          <Route path="/reset-password" element={<ResetPasswordPage />} />
+        {/* Auth pages (no header/footer) */}
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+        <Route path="/reset-password" element={<ResetPasswordPage />} />
 
         {/* Admin Routes */}
         <Route element={<RequireAdmin />}>
@@ -52,6 +61,10 @@ export default function AppRouter() {
               <Outlet />
             </div>
           }>
+            <Route index element={<AdminDashboardPage />} />
+            <Route path="orders" element={<OrderManagementPage />} />
+            <Route path="inventory" element={<InventoryManagementPage />} />
+            <Route path="users" element={<UserManagementPage />} />
             <Route path="categories" element={<CategoryManagementPage />} />
             <Route path="products" element={<ProductManagementPage />} />
           </Route>
@@ -59,8 +72,10 @@ export default function AppRouter() {
 
         <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
+        <ChatBot />
         </CartProvider>
       </AuthProvider>
+      </ToastProvider>
     </BrowserRouter>
   );
 }
