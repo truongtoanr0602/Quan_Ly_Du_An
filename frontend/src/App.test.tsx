@@ -7,6 +7,7 @@ describe('App', () => {
     render(<App />)
 
     expect(screen.getByRole('link', { name: 'ElectroTech' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Mở trợ lý AI' })).toBeInTheDocument()
   })
 })
 

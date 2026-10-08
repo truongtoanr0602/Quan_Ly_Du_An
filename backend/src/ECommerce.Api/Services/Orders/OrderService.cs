@@ -122,6 +122,55 @@ public sealed class OrderService(AppDbContext context) : IOrderService
         return MapDetail(order);
     }
 
+    public async Task<MockPaymentDto> GetMockPaymentAsync(int userId, long orderId, CancellationToken ct = default)
+    {
+        var order = await context.Orders.AsNoTracking()
+            .SingleOrDefaultAsync(x => x.OrderID == orderId && x.UserID == userId, ct)
+            ?? throw new ResourceNotFoundException();
+        EnsureQrOrder(order);
+        return MapMockPayment(order);
+    }
+
+    public async Task<MockPaymentDto> ConfirmMockPaymentAsync(int userId, long orderId, CancellationToken ct = default)
+    {
+        var order = await context.Orders
+            .SingleOrDefaultAsync(x => x.OrderID == orderId && x.UserID == userId, ct)
+            ?? throw new ResourceNotFoundException();
+        EnsureQrOrder(order);
+
+        if (order.OrderStatus == OrderConstants.Cancelled ||
+            (order.PaymentStatus != OrderConstants.Pending && order.PaymentStatus != OrderConstants.Paid))
+        {
+            throw new DomainConflictException();
+        }
+
+        if (order.PaymentStatus == OrderConstants.Pending)
+        {
+            order.PaymentStatus = OrderConstants.Paid;
+            await context.SaveChangesAsync(ct);
+        }
+
+        return MapMockPayment(order);
+    }
+
+    private static void EnsureQrOrder(Order order)
+    {
+        if (order.PaymentMethod != OrderConstants.Qr)
+        {
+            throw new DomainConflictException();
+        }
+    }
+
+    private static MockPaymentDto MapMockPayment(Order order) => new(
+        order.OrderID,
+        order.TotalAmount,
+        "VND",
+        $"ELECTROTECH DH{order.OrderID}",
+        "ElectroTech Demo Bank",
+        "0000 0000 0000",
+        "ELECTROTECH DEMO",
+        order.PaymentStatus);
+
     private static OrderDetailDto MapDetail(Order order) => new(
         order.OrderID, order.UserID, order.ReceiverName, order.ReceiverPhone,
         order.Province, order.District, order.Ward, order.ShippingAddress,

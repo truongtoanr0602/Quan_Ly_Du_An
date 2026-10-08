@@ -6,7 +6,7 @@ SQL Server is the primary database and Entity Framework Core is the only applica
 
 The implementation baseline is .NET 10 with EF Core 10 and SQL Server.
 
-Sprint 1 delivered `User`, `Category`, and `Product`. Active Sprint 2 owns `Address`, `Cart`, `CartItem`, `Order`, and `OrderItem` for the COD customer journey. Inventory administration, order cancellation, and administrative order status behavior remain Sprint 3.
+Sprint 1 delivered `User`, `Category`, and `Product`. Active Sprint 2 owns `Address`, `Cart`, `CartItem`, `Order`, and `OrderItem` for the COD and approved mock QR customer journey. Inventory administration, order cancellation, and administrative order status behavior remain Sprint 3.
 EF Core model audit for Sprint 2 reports no pending model changes; existing reviewed migrations already contain these tables and constraints.
 
 
@@ -35,7 +35,7 @@ erDiagram
 | `Address` | `Id`, `UserId`, `ReceiverName`, `Phone`, `AddressLine`, `IsDefault` | Required User FK; default-address invariant belongs to service rules | 2 |
 | `Cart` | `Id`, `UserId`, `CreatedAt` | One cart per User | 2 |
 | `CartItem` | `Id`, `CartId`, `ProductId`, `Quantity` | Unique Cart/Product pair; quantity positive | 2 |
-| `Order` | `Id`, `UserId`, shipping snapshot, `Status`, `PaymentMethod`, `TotalAmount`, `CreatedAt`, `UpdatedAt` | COD and mock QR ordering/history are Sprint 2; admin status changes are Sprint 3; money uses `decimal(18,2)` | 2 |
+| `Order` | `Id`, `UserId`, shipping snapshot, `Status`, `PaymentMethod`, `TotalAmount`, `CreatedAt`, `UpdatedAt` | COD and mock QR ordering/history are Sprint 2; mock QR confirmation sets payment status to `PAID`; admin status changes are Sprint 3; money uses `decimal(18,2)` | 2 |
 | `OrderItem` | `Id`, `OrderId`, `ProductId`, `Quantity`, `UnitPrice` | Snapshot price uses `decimal(18,2)`; quantity positive | 2 |
 
 ## 4. Relationship Rules

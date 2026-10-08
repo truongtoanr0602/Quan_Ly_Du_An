@@ -103,7 +103,7 @@ npm --prefix frontend test
 npm --prefix frontend run build
 ```
 
-Copy the example environment file for local development, then ensure the untracked `.env.local` contains the supplied backend HTTP API URL:
+Copy the example environment file for local development. Vite proxies `/api` to the supplied backend HTTP profile:
 
 ```powershell
 Copy-Item frontend/.env.example frontend/.env.local
@@ -112,7 +112,7 @@ Copy-Item frontend/.env.example frontend/.env.local
 Set `frontend/.env.local` to:
 
 ```dotenv
-VITE_API_BASE_URL=http://localhost:5296/api
+VITE_API_BASE_URL=/api
 ```
 
 Run the frontend:
@@ -122,6 +122,8 @@ npm --prefix frontend run dev
 ```
 
 Open the URL printed by Vite, normally `http://localhost:5173`.
+
+For mock QR scanning from a phone on the same network, run `npm --prefix frontend run dev -- --host 0.0.0.0`, open the store on the computer using its LAN IP, and then open the QR order. The phone must be able to reach the computer's Vite port. For a deployed frontend, provide an accessible `VITE_API_BASE_URL` or route `/api` to the backend on the same origin.
 
 ## Validate Project Skills
 

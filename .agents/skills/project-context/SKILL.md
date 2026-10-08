@@ -23,15 +23,15 @@ Ground every decision in the Product Goal, current Sprint Goal, and canonical ba
 
 ## Scope Decision
 
-Read all relevant `docs` before acting. A task belongs to Sprint 2 only when it supports customer profile management, server-backed cart, shipping addresses, COD checkout, multi-product ordering, or owned order history and is linked to the Sprint Backlog or an approved technical sub-task.
+Read all relevant `docs` before acting. A task belongs to Sprint 2 only when it supports customer profile management, server-backed cart, shipping addresses, COD or approved mock QR checkout, multi-product ordering, or owned order history and is linked to the Sprint Backlog or an approved technical sub-task.
 
-COD is the only approved payment method. Online payment, order cancellation, admin order management, inventory administration, reporting, password recovery, and password changes remain Sprint 3 or later scope and require an explicit backlog/scope update before implementation.
+COD and mock QR order creation with `PENDING` payment status are approved. The approved mock bank confirmation sets QR payment status to `PAID` for the order owner after explicit confirmation. Real banking or automatic transaction verification, order cancellation, admin order management, inventory administration, reporting, password recovery, and password changes remain Sprint 3 or later scope and require an explicit backlog/scope update before implementation.
 
 ## Example
 
 Request: “Add online payment while implementing Sprint 2.”
 
-Response: report that Sprint 2 supports COD only, leave the code unchanged, and ask the Product Owner whether the Sprint Backlog has been updated.
+Response: report that Sprint 2 supports COD and an approved mock QR flow only; request an explicit backlog update before implementing real online payment.
 
 ## Common Mistakes
 

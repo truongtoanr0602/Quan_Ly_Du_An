@@ -62,10 +62,9 @@ describe('CategoryManagementPage', () => {
     expect(screen.getByText('Laptops')).toBeInTheDocument()
   })
 
-  it('uses the auth logout action before navigating to login', async () => {
+  it('links the breadcrumb back to the admin dashboard', async () => {
     render(<MemoryRouter><CategoryManagementPage /></MemoryRouter>)
     await waitFor(() => expect(categoryService.getAll).toHaveBeenCalled())
-    screen.getAllByRole('button', { name: 'Log out' })[0].click()
-    expect(mockLogout).toHaveBeenCalledTimes(1)
+    expect(screen.getByRole('link', { name: 'Admin' })).toHaveAttribute('href', '/admin')
   })
 })

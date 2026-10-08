@@ -30,6 +30,7 @@ export interface ProductSearchRequest {
   minPrice?: number;
   maxPrice?: number;
   brand?: string;
+  sort?: 'newest' | 'price_asc' | 'price_desc';
   pageNumber: number;
   pageSize: number;
 }
@@ -57,11 +58,14 @@ export const productService = {
     if (params.minPrice !== undefined) searchParams.append('MinPrice', params.minPrice.toString());
     if (params.maxPrice !== undefined) searchParams.append('MaxPrice', params.maxPrice.toString());
     if (params.brand) searchParams.append('Brand', params.brand);
+    if (params.sort) searchParams.append('Sort', params.sort);
     searchParams.append('PageNumber', params.pageNumber.toString());
     searchParams.append('PageSize', params.pageSize.toString());
 
     return apiClient<PagedResult<Product>>(`/products?${searchParams.toString()}`);
   },
+
+  getActiveBrands: (): Promise<string[]> => apiClient<string[]>('/products/brands'),
 
   getProductById: (id: number): Promise<Product> => {
     return apiClient<Product>(`/products/${id}`);

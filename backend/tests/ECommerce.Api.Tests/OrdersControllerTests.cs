@@ -25,6 +25,26 @@ public sealed class OrdersControllerTests
         Assert.Equal(42, service.UserId);
     }
 
+    [Fact]
+    public async Task MockPaymentEndpointsRequireCustomerAndUseJwtIdentity()
+    {
+        var service = new RecordingOrderService();
+        using var factory = new TestApiFactory(configureTestServices: services =>
+        {
+            services.AddSingleton(service);
+            services.AddSingleton<IOrderService>(service);
+        });
+        using var anonymous = factory.CreateClient();
+        using var admin = factory.CreateClientWithRole("Admin", 1);
+        using var customer = factory.CreateClientWithRole("Customer", 42);
+
+        Assert.Equal(HttpStatusCode.Unauthorized, (await anonymous.GetAsync("/api/orders/99/mock-payment")).StatusCode);
+        Assert.Equal(HttpStatusCode.Forbidden, (await admin.PostAsync("/api/orders/99/mock-payment/confirm", null)).StatusCode);
+        Assert.Equal(HttpStatusCode.OK, (await customer.GetAsync("/api/orders/99/mock-payment")).StatusCode);
+        Assert.Equal(HttpStatusCode.OK, (await customer.PostAsync("/api/orders/99/mock-payment/confirm", null)).StatusCode);
+        Assert.Equal(42, service.UserId);
+    }
+
     private sealed class RecordingOrderService : IOrderService
     {
         public int UserId { get; private set; }
@@ -35,5 +55,17 @@ public sealed class OrdersControllerTests
         }
         public Task<PagedResult<OrderSummaryDto>> ListAsync(int userId, int pageNumber, int pageSize, CancellationToken ct = default) => throw new NotImplementedException();
         public Task<OrderDetailDto> GetAsync(int userId, long orderId, CancellationToken ct = default) => throw new NotImplementedException();
+        public Task<MockPaymentDto> GetMockPaymentAsync(int userId, long orderId, CancellationToken ct = default)
+        {
+            UserId = userId;
+            return Task.FromResult(Payment(orderId));
+        }
+        public Task<MockPaymentDto> ConfirmMockPaymentAsync(int userId, long orderId, CancellationToken ct = default)
+        {
+            UserId = userId;
+            return Task.FromResult(Payment(orderId) with { PaymentStatus = "PAID" });
+        }
+        private static MockPaymentDto Payment(long orderId) =>
+            new(orderId, 25m, "VND", $"ELECTROTECH DH{orderId}", "ElectroTech Demo Bank", "0000 0000 0000", "ELECTROTECH DEMO", "PENDING");
     }
 }

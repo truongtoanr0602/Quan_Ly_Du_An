@@ -32,6 +32,17 @@ export interface CheckoutRequest {
   paymentMethod: 'COD' | 'QR'
   note?: string
 }
+
+export interface MockPayment {
+  orderID: number
+  amount: number
+  currency: 'VND'
+  transferContent: string
+  bankName: string
+  accountNumber: string
+  accountName: string
+  paymentStatus: string
+}
 export interface OrderSummary {
   orderID: number
   totalAmount: number

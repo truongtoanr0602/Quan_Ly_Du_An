@@ -1,77 +1,37 @@
-﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
+namespace ECommerce.Api.Migrations;
 
-namespace ECommerce.Api.Migrations
+public partial class SeedRolesAndBrands : Migration
 {
-    /// <inheritdoc />
-    public partial class SeedRolesAndBrands : Migration
+    protected override void Up(MigrationBuilder migrationBuilder)
     {
-        /// <inheritdoc />
-        protected override void Up(MigrationBuilder migrationBuilder)
-        {
-            migrationBuilder.InsertData(
-                table: "Brands",
-                columns: new[] { "BrandID", "BrandName", "CreatedAt", "Description", "IsActive", "LogoURL", "UpdatedAt" },
-                values: new object[,]
-                {
-                    { 1, "Apple", new DateTime(2026, 8, 29, 0, 0, 0, 0, DateTimeKind.Utc), null, true, null, null },
-                    { 2, "ASUS", new DateTime(2026, 8, 29, 0, 0, 0, 0, DateTimeKind.Utc), null, true, null, null },
-                    { 3, "Lenovo", new DateTime(2026, 8, 29, 0, 0, 0, 0, DateTimeKind.Utc), null, true, null, null },
-                    { 4, "Dell", new DateTime(2026, 8, 29, 0, 0, 0, 0, DateTimeKind.Utc), null, true, null, null },
-                    { 5, "Sony", new DateTime(2026, 8, 29, 0, 0, 0, 0, DateTimeKind.Utc), null, true, null, null }
-                });
+        // Existing development databases contain user-managed roles and brands with different IDs.
+        // Match by name and let SQL Server allocate IDs so their existing references remain intact.
+        migrationBuilder.Sql("""
+            IF NOT EXISTS (SELECT 1 FROM dbo.Brands WHERE UPPER(LTRIM(RTRIM(BrandName))) = N'APPLE')
+                INSERT INTO dbo.Brands (BrandName, IsActive, CreatedAt) VALUES (N'Apple', 1, '2026-08-29T00:00:00');
+            IF NOT EXISTS (SELECT 1 FROM dbo.Brands WHERE UPPER(LTRIM(RTRIM(BrandName))) = N'ASUS')
+                INSERT INTO dbo.Brands (BrandName, IsActive, CreatedAt) VALUES (N'ASUS', 1, '2026-08-29T00:00:00');
+            IF NOT EXISTS (SELECT 1 FROM dbo.Brands WHERE UPPER(LTRIM(RTRIM(BrandName))) = N'LENOVO')
+                INSERT INTO dbo.Brands (BrandName, IsActive, CreatedAt) VALUES (N'Lenovo', 1, '2026-08-29T00:00:00');
+            IF NOT EXISTS (SELECT 1 FROM dbo.Brands WHERE UPPER(LTRIM(RTRIM(BrandName))) = N'DELL')
+                INSERT INTO dbo.Brands (BrandName, IsActive, CreatedAt) VALUES (N'Dell', 1, '2026-08-29T00:00:00');
+            IF NOT EXISTS (SELECT 1 FROM dbo.Brands WHERE UPPER(LTRIM(RTRIM(BrandName))) = N'SONY')
+                INSERT INTO dbo.Brands (BrandName, IsActive, CreatedAt) VALUES (N'Sony', 1, '2026-08-29T00:00:00');
 
-            migrationBuilder.InsertData(
-                table: "Roles",
-                columns: new[] { "RoleID", "CreatedAt", "Description", "RoleName" },
-                values: new object[,]
-                {
-                    { 1, new DateTime(2026, 8, 29, 0, 0, 0, 0, DateTimeKind.Utc), "Customer role", "Customer" },
-                    { 2, new DateTime(2026, 8, 29, 0, 0, 0, 0, DateTimeKind.Utc), "Administrator role", "Admin" }
-                });
-        }
+            IF NOT EXISTS (SELECT 1 FROM dbo.Roles WHERE UPPER(LTRIM(RTRIM(RoleName))) = N'CUSTOMER')
+                INSERT INTO dbo.Roles (RoleName, Description, CreatedAt) VALUES (N'Customer', N'Customer role', '2026-08-29T00:00:00');
+            IF NOT EXISTS (SELECT 1 FROM dbo.Roles WHERE UPPER(LTRIM(RTRIM(RoleName))) = N'ADMIN')
+                INSERT INTO dbo.Roles (RoleName, Description, CreatedAt) VALUES (N'Admin', N'Administrator role', '2026-08-29T00:00:00');
+            """);
+    }
 
-        /// <inheritdoc />
-        protected override void Down(MigrationBuilder migrationBuilder)
-        {
-            migrationBuilder.DeleteData(
-                table: "Brands",
-                keyColumn: "BrandID",
-                keyValue: 1);
-
-            migrationBuilder.DeleteData(
-                table: "Brands",
-                keyColumn: "BrandID",
-                keyValue: 2);
-
-            migrationBuilder.DeleteData(
-                table: "Brands",
-                keyColumn: "BrandID",
-                keyValue: 3);
-
-            migrationBuilder.DeleteData(
-                table: "Brands",
-                keyColumn: "BrandID",
-                keyValue: 4);
-
-            migrationBuilder.DeleteData(
-                table: "Brands",
-                keyColumn: "BrandID",
-                keyValue: 5);
-
-            migrationBuilder.DeleteData(
-                table: "Roles",
-                keyColumn: "RoleID",
-                keyValue: 1);
-
-            migrationBuilder.DeleteData(
-                table: "Roles",
-                keyColumn: "RoleID",
-                keyValue: 2);
-        }
+    protected override void Down(MigrationBuilder migrationBuilder)
+    {
+        // Seed rows may predate this migration and may be referenced by users or products.
+        // A rollback must not delete user-managed data.
     }
 }

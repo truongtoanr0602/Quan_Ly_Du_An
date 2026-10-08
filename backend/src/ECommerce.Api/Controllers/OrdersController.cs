@@ -27,4 +27,12 @@ public sealed class OrdersController(IOrderService service) : ControllerBase
     [HttpGet("{id:long}")]
     public async Task<ActionResult<OrderDetailDto>> GetById(long id, CancellationToken ct) =>
         Ok(await service.GetAsync(User.GetRequiredUserId(), id, ct));
+
+    [HttpGet("{id:long}/mock-payment")]
+    public async Task<ActionResult<MockPaymentDto>> GetMockPayment(long id, CancellationToken ct) =>
+        Ok(await service.GetMockPaymentAsync(User.GetRequiredUserId(), id, ct));
+
+    [HttpPost("{id:long}/mock-payment/confirm")]
+    public async Task<ActionResult<MockPaymentDto>> ConfirmMockPayment(long id, CancellationToken ct) =>
+        Ok(await service.ConfirmMockPaymentAsync(User.GetRequiredUserId(), id, ct));
 }

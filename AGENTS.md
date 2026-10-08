@@ -26,7 +26,7 @@ The Product Goal is to deliver a basic shopping journey from product discovery t
 
 Sprint 1 — Product Catalog & Authentication is the completed foundation.
 
-The current Sprint is **Sprint 2 — Shopping & Ordering**. Its Sprint Goal is to complete the authenticated customer journey from cart through COD ordering and owned order history.
+The current Sprint is **Sprint 2 — Shopping & Ordering**. Its Sprint Goal is to complete the authenticated customer journey from cart through COD or approved mock QR ordering and owned order history.
 
 Sprint 2 contains:
 
@@ -36,7 +36,7 @@ Sprint 2 contains:
 - US-14: Shipping address and supported payment method.
 - US-15: View owned order history and details.
 
-Sprint 2 supports COD only. Online payment, order cancellation, admin order management, inventory administration, reporting, password recovery, and password changes remain Sprint 3 or later scope unless the Product Backlog and Sprint Backlog are explicitly updated.
+Sprint 2 supports COD and the approved mock QR flow: create a QR order with `PENDING` payment status, scan a QR containing that saved order's amount and transfer content, and confirm in the mock bank to set payment status to `PAID`. Real banking, automatic transaction verification, order cancellation, admin order management, inventory administration, reporting, password recovery, and password changes remain Sprint 3 or later scope unless the Product Backlog and Sprint Backlog are explicitly updated.
 
 ## Approved Architecture
 

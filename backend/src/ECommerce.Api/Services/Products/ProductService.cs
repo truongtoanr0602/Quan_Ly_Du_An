@@ -59,9 +59,14 @@ public class ProductService : IProductService
         // Calculate total count before pagination
         var totalCount = await query.CountAsync(cancellationToken);
 
-        // Apply pagination
-        var products = await query
-            .OrderByDescending(p => p.CreatedAt) // Default sorting by newest
+        // Sort the full filtered result before paging so every page uses the same order.
+        var ordered = request.Sort switch
+        {
+            "price_asc" => query.OrderBy(p => p.Price).ThenBy(p => p.ProductID),
+            "price_desc" => query.OrderByDescending(p => p.Price).ThenBy(p => p.ProductID),
+            _ => query.OrderByDescending(p => p.CreatedAt).ThenByDescending(p => p.ProductID)
+        };
+        var products = await ordered
             .Skip((request.PageNumber - 1) * request.PageSize)
             .Take(request.PageSize)
             .Select(p => new ProductDto(
@@ -90,6 +95,14 @@ public class ProductService : IProductService
             PageSize = request.PageSize
         };
     }
+
+    public async Task<IReadOnlyList<string>> GetActiveBrandsAsync(CancellationToken cancellationToken = default) =>
+        await _context.Products.AsNoTracking()
+            .Where(product => product.IsActive && product.Brand.IsActive)
+            .Select(product => product.Brand.BrandName)
+            .Distinct()
+            .OrderBy(name => name)
+            .ToListAsync(cancellationToken);
 
     public async Task<ProductDto> GetProductByIdAsync(int id, bool includeInactive, CancellationToken cancellationToken = default)
     {

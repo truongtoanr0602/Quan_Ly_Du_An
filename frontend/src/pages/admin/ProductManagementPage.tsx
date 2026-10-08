@@ -1,10 +1,9 @@
 import { useState, useEffect } from 'react';
 import { productService, type Product, type ProductCreateRequest, type ProductUpdateRequest } from '../../services/productService';
 import { ApiError } from '../../services/apiClient';
-import { useAuth } from '../../contexts/AuthContext';
 import { categoryService } from '../../services/categoryService';
 import type { CategoryDto } from '../../types/category';
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 export default function ProductManagementPage() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -33,8 +32,6 @@ export default function ProductManagementPage() {
     isActive: true
   });
 
-  const navigate = useNavigate();
-  const { logout } = useAuth();
 
   useEffect(() => {
     fetchProducts();
@@ -145,10 +142,6 @@ export default function ProductManagementPage() {
     }
   };
 
-  const handleLogout = () => {
-    logout();
-    navigate('/login');
-  };
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price);
@@ -156,24 +149,13 @@ export default function ProductManagementPage() {
 
   return (
     <div className="flex-1 w-full min-h-screen bg-surface">
-      {/* TopNavBar */}
-      <header className="hidden md:flex justify-end items-center h-16 px-[--spacing-gutter] w-full bg-surface-container-lowest border-b border-outline-variant shadow-sm z-30 sticky top-0">
-        <div className="flex items-center gap-4">
-          <div className="h-8 w-8 rounded-full overflow-hidden border border-outline-variant bg-primary text-white flex items-center justify-center font-bold">
-            A
-          </div>
-          <button aria-label="Log out" onClick={handleLogout} className="p-2 text-secondary hover:bg-surface-container-low rounded-full transition-colors opacity-70 hover:opacity-100" title="Đăng xuất">
-            <span className="material-symbols-outlined">logout</span>
-          </button>
-        </div>
-      </header>
 
       {/* Page Content */}
       <main className="p-4 md:p-8 flex-1 w-full max-w-[--spacing-max-width] mx-auto">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
           <div>
             <div className="flex items-center text-sm text-secondary mb-2">
-              <span>Admin</span>
+              <Link to="/admin" className="hover:text-primary">Admin</Link>
               <span className="material-symbols-outlined text-sm mx-1">chevron_right</span>
               <span className="text-primary font-medium">Quản lý sản phẩm</span>
             </div>

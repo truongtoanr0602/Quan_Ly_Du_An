@@ -2,12 +2,12 @@ import { createContext, useContext, useEffect, useState } from 'react'
 import type { ReactNode } from 'react'
 import { authService } from '../services/authService'
 import type { AuthResponse, LoginRequest, RegisterRequest, UserInfo } from '../services/authService'
-import { clearSession, readSession, saveSession, subscribeToSessionChanges } from '../services/authSession'
+import { clearSession, isSessionRemembered, readSession, saveSession, subscribeToSessionChanges } from '../services/authSession'
 
 export interface AuthContextValue {
   user: UserInfo | null
   isAuthenticated: boolean
-  login: (request: LoginRequest) => Promise<AuthResponse>
+  login: (request: LoginRequest, remember?: boolean) => Promise<AuthResponse>
   register: (request: RegisterRequest) => Promise<AuthResponse>
   logout: () => void
   updateUser: (user: UserInfo) => void
@@ -22,9 +22,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(readSession()?.user ?? null)
   }), [])
 
-  const login = async (request: LoginRequest): Promise<AuthResponse> => {
+  const login = async (request: LoginRequest, remember = true): Promise<AuthResponse> => {
     const response = await authService.login(request)
-    saveSession(response)
+    saveSession(response, remember)
     setUser(response.user)
     return response
   }
@@ -39,7 +39,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const updateUser = (updatedUser: UserInfo): void => {
     const session = readSession()
     if (session) {
-      saveSession({ ...session, user: updatedUser })
+      saveSession({ ...session, user: updatedUser }, isSessionRemembered())
     }
     setUser(updatedUser)
   }

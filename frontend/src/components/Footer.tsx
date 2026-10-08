@@ -11,11 +11,10 @@ export default function Footer() {
           </p>
         </div>
         <div className="col-span-1 md:col-span-3 flex flex-wrap gap-x-12 gap-y-4 md:justify-end">
-          <Link to="#" className="text-base text-secondary hover:text-primary underline transition-all">About Us</Link>
-          <Link to="#" className="text-base text-secondary hover:text-primary underline transition-all">Privacy Policy</Link>
-          <Link to="#" className="text-base text-secondary hover:text-primary underline transition-all">Terms of Service</Link>
-          <Link to="#" className="text-base text-secondary hover:text-primary underline transition-all">Shipping Info</Link>
-          <Link to="#" className="text-base text-secondary hover:text-primary underline transition-all">Contact Support</Link>
+          <Link to="/products" className="text-base text-secondary hover:text-primary underline transition-all">Sản phẩm</Link>
+          <Link to="/cart" className="text-base text-secondary hover:text-primary underline transition-all">Giỏ hàng</Link>
+          <Link to="/orders" className="text-base text-secondary hover:text-primary underline transition-all">Đơn mua</Link>
+          <Link to="/profile" className="text-base text-secondary hover:text-primary underline transition-all">Tài khoản</Link>
         </div>
       </div>
     </footer>

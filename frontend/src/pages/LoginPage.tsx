@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { ApiError } from '../services/apiClient';
 
@@ -9,8 +9,10 @@ export default function LoginPage() {
   const [showPw, setShowPw] = useState(false);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [remember, setRemember] = useState(true);
   
   const navigate = useNavigate();
+  const location = useLocation();
   const { login } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -19,11 +21,16 @@ export default function LoginPage() {
     setIsLoading(true);
     
     try {
-      const response = await login({ email, password });
+      const response = await login({ email, password }, remember);
       if (response.user.role === 'Admin') {
-        navigate('/admin/products');
+        navigate('/admin');
       } else {
-        navigate('/');
+        const from = (location.state as { from?: { pathname?: string; search?: string; hash?: string } } | null)?.from;
+        const pathname = from?.pathname;
+        const destination = pathname?.startsWith('/') && !pathname.startsWith('//')
+          ? pathname + (from?.search ?? '') + (from?.hash ?? '')
+          : '/';
+        navigate(destination, { replace: true });
       }
     } catch (err: unknown) {
       setError(err instanceof ApiError || err instanceof Error ? err.message : 'Đăng nhập thất bại.');
@@ -59,7 +66,6 @@ export default function LoginPage() {
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <label className="block text-sm font-medium text-on-surface" htmlFor="password">Mật khẩu</label>
-              <a className="text-sm font-medium text-primary-container hover:text-primary transition-colors" href="#">Quên mật khẩu?</a>
             </div>
             <div className="relative">
               <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-secondary text-[20px]">lock</span>
@@ -70,7 +76,8 @@ export default function LoginPage() {
             </div>
           </div>
           <div className="flex items-center">
-            <input className="h-4 w-4 border-outline-variant rounded cursor-pointer" id="remember" type="checkbox" />
+            <input className="h-4 w-4 border-outline-variant rounded cursor-pointer" id="remember" type="checkbox"
+              checked={remember} onChange={(event) => setRemember(event.target.checked)} />
             <label className="ml-2 text-base text-secondary cursor-pointer" htmlFor="remember">Ghi nhớ đăng nhập</label>
           </div>
           <button 

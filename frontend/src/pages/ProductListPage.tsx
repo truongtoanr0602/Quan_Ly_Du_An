@@ -1,27 +1,53 @@
-import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { useState, useEffect, useRef } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
 import { productService, type Product } from '../services/productService';
 import { ApiError } from '../services/apiClient';
 import { categoryService } from '../services/categoryService';
 import type { CategoryDto } from '../types/category';
+import AddToCartButton from '../components/AddToCartButton';
 
 export default function ProductListPage() {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const categoryParam = searchParams.get('categoryId');
+  const parsedCategory = Number(categoryParam);
+  const category = categoryParam !== null && Number.isSafeInteger(parsedCategory) && parsedCategory > 0
+    ? parsedCategory
+    : undefined;
+  const urlKeyword = searchParams.get('keyword')?.trim() ?? '';
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<CategoryDto[]>([]);
+  const [brands, setBrands] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [categoryError, setCategoryError] = useState<string | null>(null);
+  const requestId = useRef(0);
 
   // Filters state
-  const [keyword, setKeyword] = useState('');
-  const [debouncedKeyword, setDebouncedKeyword] = useState('');
-  const [category, setCategory] = useState<number | undefined>();
+  const [keyword, setKeyword] = useState(urlKeyword);
+  const [debouncedKeyword, setDebouncedKeyword] = useState(urlKeyword);
   const [brand, setBrand] = useState<string | undefined>();
   const [minPrice, setMinPrice] = useState<number | ''>('');
   const [maxPrice, setMaxPrice] = useState<number | ''>('');
-  const [sort, setSort] = useState('newest');
+  const [sort, setSort] = useState<'newest' | 'price_asc' | 'price_desc'>('newest');
+
+  const changeCategory = (categoryId?: number) => {
+    const nextParams = new URLSearchParams(searchParams);
+    if (categoryId === undefined) nextParams.delete('categoryId');
+    else nextParams.set('categoryId', String(categoryId));
+    setSearchParams(nextParams);
+    setPage(1);
+  };
+
+  useEffect(() => {
+    setKeyword(urlKeyword);
+    setDebouncedKeyword(urlKeyword);
+    setBrand(undefined);
+    setMinPrice('');
+    setMaxPrice('');
+    setPage(1);
+  }, [urlKeyword]);
 
   useEffect(() => {
     const handler = setTimeout(() => {
@@ -43,6 +69,7 @@ export default function ProductListPage() {
 
   useEffect(() => {
     fetchCategories();
+    void productService.getActiveBrands().then(setBrands).catch(() => setBrands([]));
   }, []);
 
   useEffect(() => {
@@ -50,6 +77,7 @@ export default function ProductListPage() {
   }, [page, category, brand, sort, debouncedKeyword, minPrice, maxPrice]);
 
   const fetchProducts = async () => {
+    const currentRequest = ++requestId.current;
     setIsLoading(true);
     setLoadError(null);
     try {
@@ -59,20 +87,20 @@ export default function ProductListPage() {
         keyword: debouncedKeyword || undefined,
         categoryId: category,
         brand: brand,
+        sort,
         minPrice: minPrice !== '' ? minPrice : undefined,
         maxPrice: maxPrice !== '' ? maxPrice : undefined
       });
-      // Giả sử API hỗ trợ sort, ta xử lý ở frontend cho đơn giản trong MVP nếu API chưa support sort field.
-      let items = res.items;
-      if (sort === 'price_asc') items.sort((a, b) => a.price - b.price);
-      if (sort === 'price_desc') items.sort((a, b) => b.price - a.price);
-      
-      setProducts(items);
-      setTotalPages(Math.ceil(res.totalCount / res.pageSize) || 1);
+      if (currentRequest === requestId.current) {
+        setProducts(res.items);
+        setTotalPages(Math.ceil(res.totalCount / res.pageSize) || 1);
+      }
     } catch (err: unknown) {
-      setLoadError(err instanceof ApiError || err instanceof Error ? err.message : 'Không thể tải sản phẩm.');
+      if (currentRequest === requestId.current) {
+        setLoadError(err instanceof ApiError || err instanceof Error ? err.message : 'Không thể tải sản phẩm.');
+      }
     } finally {
-      setIsLoading(false);
+      if (currentRequest === requestId.current) setIsLoading(false);
     }
   };
 
@@ -109,14 +137,14 @@ export default function ProductListPage() {
                   type="radio" 
                   name="category"
                   checked={category === cat.categoryID}
-                  onChange={() => { setCategory(cat.categoryID); setPage(1); }}
+                  onChange={() => changeCategory(cat.categoryID)}
                   className="form-radio text-primary rounded-full border-outline-variant focus:ring-primary focus:ring-opacity-20 w-5 h-5 transition-all" 
                 />
                 <span className="text-base text-on-surface-variant group-hover:text-on-surface">{cat.categoryName}</span>
               </label>
             ))}
             {category !== undefined && (
-              <button onClick={() => { setCategory(undefined); setPage(1); }} className="text-sm text-primary mt-2">Bỏ lọc danh mục</button>
+              <button onClick={() => changeCategory()} className="text-sm text-primary mt-2">Bỏ lọc danh mục</button>
             )}
           </div>
         </section>
@@ -144,7 +172,7 @@ export default function ProductListPage() {
         <section className="pb-6">
           <h3 className="text-xl font-semibold text-on-surface mb-4">Thương hiệu</h3>
           <div className="space-y-3">
-            {['Apple', 'ASUS', 'Lenovo', 'Dell', 'Sony'].map((b) => (
+            {brands.map((b) => (
               <label key={b} className="flex items-center gap-3 cursor-pointer group">
                 <input 
                   type="radio" 
@@ -185,7 +213,7 @@ export default function ProductListPage() {
             <label className="text-sm font-medium text-on-surface-variant">Sắp xếp theo:</label>
             <select 
               value={sort} 
-              onChange={(e) => setSort(e.target.value)} 
+              onChange={(e) => { setSort(e.target.value as typeof sort); setPage(1); }}
               className="text-base bg-surface border border-outline-variant text-on-surface rounded focus:ring-primary focus:border-primary px-3 py-1.5 cursor-pointer"
             >
               <option value="newest">Mới nhất</option>
@@ -237,13 +265,8 @@ export default function ProductListPage() {
                   <div className="mt-auto pt-4 flex items-end justify-between">
                     <span className="text-xl font-semibold text-primary">{formatPrice(p.price)}</span>
                   </div>
-                  <button 
-                    disabled={p.stockQuantity <= 0}
-                    className="mt-4 w-full border border-primary text-primary hover:bg-primary hover:text-on-primary disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium py-2.5 rounded transition-colors flex items-center justify-center gap-2"
-                  >
-                    <span className="material-symbols-outlined text-sm">shopping_cart</span>
-                    Thêm vào giỏ
-                  </button>
+                  <AddToCartButton productID={p.productID} stockQuantity={p.stockQuantity}
+                    className="mt-4 w-full border border-primary text-primary hover:bg-primary hover:text-on-primary disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium py-2.5 rounded transition-colors flex items-center justify-center gap-2" />
                 </div>
               </article>
             ))}

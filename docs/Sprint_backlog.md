@@ -113,7 +113,7 @@ Customer có thể thực hiện hoàn chỉnh:
 * Đơn hàng được tạo thành công.  
 * Người dùng có thể xem lịch sử đơn hàng.
 
-**Phạm vi thanh toán:** hỗ trợ **COD** và **QR mô phỏng**. QR chỉ minh họa luồng lựa chọn thanh toán, không kết nối ngân hàng, cổng thanh toán hoặc tự động xác minh giao dịch.
+**Phạm vi thanh toán đã được duyệt:** hỗ trợ **COD** và **QR ngân hàng mô phỏng**. Đơn QR được tạo ở trạng thái thanh toán `PENDING`. Mã QR chứa liên kết tới trang ngân hàng thử cùng số tiền và nội dung lấy từ đơn đã lưu. Khách hàng sở hữu đơn xác nhận trên trang thử để chuyển trạng thái thanh toán sang `PAID`; xác nhận lặp lại an toàn. Không kết nối ngân hàng thật, cổng thanh toán hoặc tự động xác minh giao dịch.
 
 ---
 

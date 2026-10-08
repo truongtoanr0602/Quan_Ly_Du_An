@@ -25,6 +25,50 @@ public sealed class OrderServiceCheckoutTests
         Assert.Equal(3, await f.Context.Products.SumAsync(x => x.StockQuantity));
     }
 
+    [Fact]
+    public async Task MockQrCheckoutCreatesPendingOrderAndClearsCart()
+    {
+        await using var f = await Fixture.CreateAsync();
+
+        var result = await f.Service.CheckoutAsync(7, new CheckoutDto { AddressID = 11, PaymentMethod = "QR" });
+
+        Assert.Equal("QR", result.PaymentMethod);
+        Assert.Equal("PENDING", result.PaymentStatus);
+        Assert.Equal(25m, result.TotalAmount);
+        Assert.Empty(await f.Context.CartItems.ToListAsync());
+    }
+
+    [Fact]
+    public async Task MockPaymentUsesSavedOrderAmountAndConfirmationMarksOnlyPaymentPaid()
+    {
+        await using var f = await Fixture.CreateAsync();
+        var order = await f.Service.CheckoutAsync(7, new CheckoutDto { AddressID = 11, PaymentMethod = "QR" });
+
+        var payment = await f.Service.GetMockPaymentAsync(7, order.OrderID);
+        Assert.Equal(25m, payment.Amount);
+        Assert.Equal($"ELECTROTECH DH{order.OrderID}", payment.TransferContent);
+        Assert.Equal("PENDING", payment.PaymentStatus);
+
+        var confirmed = await f.Service.ConfirmMockPaymentAsync(7, order.OrderID);
+        Assert.Equal("PAID", confirmed.PaymentStatus);
+        Assert.Equal("PAID", (await f.Service.GetAsync(7, order.OrderID)).PaymentStatus);
+        Assert.Equal("PENDING", (await f.Service.GetAsync(7, order.OrderID)).OrderStatus);
+        Assert.Equal("PAID", (await f.Service.ConfirmMockPaymentAsync(7, order.OrderID)).PaymentStatus);
+        Assert.Single(await f.Context.Orders.ToListAsync());
+    }
+
+    [Fact]
+    public async Task MockPaymentHidesForeignOrdersAndRejectsCodConfirmation()
+    {
+        await using var f = await Fixture.CreateAsync();
+        var order = await f.Service.CheckoutAsync(7, new CheckoutDto { AddressID = 11, PaymentMethod = "COD" });
+
+        await Assert.ThrowsAsync<ResourceNotFoundException>(() => f.Service.GetMockPaymentAsync(8, order.OrderID));
+        await Assert.ThrowsAsync<ResourceNotFoundException>(() => f.Service.ConfirmMockPaymentAsync(8, order.OrderID));
+        await Assert.ThrowsAsync<DomainConflictException>(() => f.Service.ConfirmMockPaymentAsync(7, order.OrderID));
+        Assert.Equal("PENDING", (await f.Service.GetAsync(7, order.OrderID)).PaymentStatus);
+    }
+
     [Theory]
     [InlineData(0, "COD")]
     [InlineData(11, "CARD")]

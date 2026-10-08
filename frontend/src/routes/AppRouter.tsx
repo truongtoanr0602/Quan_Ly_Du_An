@@ -1,10 +1,15 @@
-import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import MainLayout from '../layouts/MainLayout';
+import AdminLayout from '../layouts/AdminLayout';
 import HomePage from '../pages/HomePage';
 import LoginPage from '../pages/LoginPage';
 import RegisterPage from '../pages/RegisterPage';
 import CategoryManagementPage from '../pages/admin/CategoryManagementPage';
 import ProductManagementPage from '../pages/admin/ProductManagementPage';
+import AdminDashboardPage from '../pages/admin/AdminDashboardPage';
+import OrderManagementPage from '../pages/admin/OrderManagementPage';
+import InventoryManagementPage from '../pages/admin/InventoryManagementPage';
+import UserManagementPage from '../pages/admin/UserManagementPage';
 import ProductListPage from '../pages/ProductListPage';
 import ProductDetailPage from '../pages/ProductDetailPage';
 import ProfilePage from '../pages/ProfilePage';
@@ -13,10 +18,12 @@ import CheckoutPage from '../pages/CheckoutPage';
 import AddressesPage from '../pages/AddressesPage';
 import OrderHistoryPage from '../pages/OrderHistoryPage';
 import OrderDetailPage from '../pages/OrderDetailPage';
+import MockBankPage from '../pages/MockBankPage';
 import AuthProvider from '../contexts/AuthContext';
 import { CartProvider } from '../contexts/CartContext';
 import RequireAdmin from './RequireAdmin';
 import RequireCustomer from './RequireCustomer';
+import ChatBot from '../components/ChatBot';
 
 export default function AppRouter() {
   return (
@@ -34,6 +41,7 @@ export default function AppRouter() {
             <Route path="/checkout" element={<CheckoutPage />} />
             <Route path="/orders" element={<OrderHistoryPage />} />
             <Route path="/orders/:id" element={<OrderDetailPage />} />
+            <Route path="/mock-bank/orders/:id" element={<MockBankPage />} />
             <Route path="/cart" element={<CartPage />} />
             <Route path="/addresses" element={<AddressesPage />} />
           </Route>
@@ -45,18 +53,19 @@ export default function AppRouter() {
 
         {/* Admin Routes */}
         <Route element={<RequireAdmin />}>
-          <Route path="/admin" element={
-            <div className="min-h-screen bg-background w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
-              <Outlet />
-            </div>
-          }>
+          <Route path="/admin" element={<AdminLayout />}>
+            <Route index element={<AdminDashboardPage />} />
+            <Route path="orders" element={<OrderManagementPage />} />
+            <Route path="inventory" element={<InventoryManagementPage />} />
             <Route path="categories" element={<CategoryManagementPage />} />
             <Route path="products" element={<ProductManagementPage />} />
+            <Route path="users" element={<UserManagementPage />} />
           </Route>
         </Route>
 
         <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
+        <ChatBot />
         </CartProvider>
       </AuthProvider>
     </BrowserRouter>

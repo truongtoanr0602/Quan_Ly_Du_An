@@ -61,6 +61,22 @@ public sealed class ProductsControllerTests
     }
 
     [Fact]
+    public async Task PublicBrandOptionsAndSortQueryReachProductService()
+    {
+        var service = new RecordingProductService();
+        using var factory = CreateProductFactory(service);
+        using var client = factory.CreateClient();
+
+        var brands = await client.GetFromJsonAsync<string[]>("/api/products/brands");
+        using var response = await client.GetAsync("/api/products?Sort=price_asc");
+
+        Assert.NotNull(brands);
+        Assert.Equal(["Brand"], brands);
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Equal("price_asc", service.LastRequest?.Sort);
+    }
+
+    [Fact]
     public async Task AnonymousCannotMutateProducts()
     {
         using var factory = CreateProductFactory(new RecordingProductService());
@@ -142,6 +158,9 @@ public sealed class ProductsControllerTests
         public Task<PagedResult<ProductDto>> SearchProductsAsync(ProductSearchRequestDto request, bool includeInactive, CancellationToken cancellationToken = default) =>
             Task.FromResult(new PagedResult<ProductDto>());
 
+        public Task<IReadOnlyList<string>> GetActiveBrandsAsync(CancellationToken cancellationToken = default) =>
+            Task.FromResult<IReadOnlyList<string>>(["Brand"]);
+
         public Task<ProductDto> GetProductByIdAsync(int id, bool includeInactive, CancellationToken cancellationToken = default) =>
             ThrowDetail(includeInactive);
 
@@ -167,6 +186,7 @@ public sealed class ProductsControllerTests
             DateTime.UtcNow, null);
 
         public bool LastIncludeInactive { get; private set; }
+        public ProductSearchRequestDto? LastRequest { get; private set; }
         public bool CreateCalled { get; private set; }
         public bool UpdateCalled { get; private set; }
         public bool DeleteCalled { get; private set; }
@@ -174,6 +194,7 @@ public sealed class ProductsControllerTests
         public Task<PagedResult<ProductDto>> SearchProductsAsync(ProductSearchRequestDto request, bool includeInactive, CancellationToken cancellationToken = default)
         {
             LastIncludeInactive = includeInactive;
+            LastRequest = request;
             return Task.FromResult(new PagedResult<ProductDto>
             {
                 Items = [ValidProduct],
@@ -182,6 +203,9 @@ public sealed class ProductsControllerTests
                 PageSize = 10
             });
         }
+
+        public Task<IReadOnlyList<string>> GetActiveBrandsAsync(CancellationToken cancellationToken = default) =>
+            Task.FromResult<IReadOnlyList<string>>(["Brand"]);
 
         public Task<ProductDto> GetProductByIdAsync(int id, bool includeInactive, CancellationToken cancellationToken = default)
         {

@@ -24,6 +24,10 @@ public class ProductsController : ControllerBase
         return Ok(result);
     }
 
+    [HttpGet("brands")]
+    public async Task<ActionResult<IReadOnlyList<string>>> GetActiveBrands(CancellationToken cancellationToken) =>
+        Ok(await _productService.GetActiveBrandsAsync(cancellationToken));
+
     [HttpGet("{id}")]
     public async Task<ActionResult<ProductDto>> GetProductById(int id, CancellationToken cancellationToken)
     {

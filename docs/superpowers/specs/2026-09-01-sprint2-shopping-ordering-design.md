@@ -4,6 +4,8 @@
 **Source of scope:** `docs/Sprint_backlog.md`  
 **Target branch:** `develop` through a reviewed feature branch
 
+**Approved scope update (2026-10-08):** `docs/Sprint_backlog.md` now permits COD and mock QR order creation with `PENDING` payment status, plus owner-confirmed mock bank payment to `PAID`. The QR contains a link with saved order amount and transfer content; the mock bank reloads canonical values from the API before confirming. References to COD-only checkout below describe the original design and are superseded by this update. Real payment and automatic transaction verification remain outside scope.
+
 ## 1. Goal and approved scope
 
 Sprint 2 completes the authenticated customer purchase journey:

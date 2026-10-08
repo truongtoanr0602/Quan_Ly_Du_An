@@ -2,8 +2,7 @@ import { useState, useEffect } from 'react';
 import type { CategoryDto, CategoryCreateDto, CategoryUpdateDto } from '../../types/category';
 import { categoryService } from '../../services/categoryService';
 import { ApiError } from '../../services/apiClient';
-import { useAuth } from '../../contexts/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 export default function CategoryManagementPage() {
   const [categories, setCategories] = useState<CategoryDto[]>([]);
@@ -21,8 +20,6 @@ export default function CategoryManagementPage() {
     isActive: true,
   });
 
-  const navigate = useNavigate();
-  const { logout } = useAuth();
 
   const fetchCategories = async () => {
     try {
@@ -97,31 +94,16 @@ export default function CategoryManagementPage() {
     }
   };
 
-  const handleLogout = () => {
-    logout();
-    navigate('/login');
-  };
 
   return (
     <div className="flex-1 w-full min-h-screen bg-surface">
-      {/* TopNavBar */}
-      <header className="hidden md:flex justify-end items-center h-16 px-[--spacing-gutter] w-full bg-surface-container-lowest border-b border-outline-variant shadow-sm z-30 sticky top-0">
-        <div className="flex items-center gap-4">
-          <div className="h-8 w-8 rounded-full overflow-hidden border border-outline-variant bg-primary text-white flex items-center justify-center font-bold">
-            A
-          </div>
-          <button aria-label="Log out" onClick={handleLogout} className="p-2 text-secondary hover:bg-surface-container-low rounded-full transition-colors opacity-70 hover:opacity-100" title="Đăng xuất">
-            <span className="material-symbols-outlined">logout</span>
-          </button>
-        </div>
-      </header>
 
       {/* Page Content */}
       <main className="p-4 md:p-8 flex-1 w-full max-w-[--spacing-max-width] mx-auto">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
           <div>
             <div className="flex items-center text-sm text-secondary mb-2">
-              <span>Admin</span>
+              <Link to="/admin" className="hover:text-primary">Admin</Link>
               <span className="material-symbols-outlined text-sm mx-1">chevron_right</span>
               <span className="text-primary font-medium">Quản lý danh mục</span>
             </div>

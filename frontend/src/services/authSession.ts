@@ -20,21 +20,31 @@ const notifySessionChange = (): void => {
   window.dispatchEvent(new Event(sessionChangedEvent))
 }
 
-export const saveSession = (session: StoredSession): void => {
-  localStorage.setItem(tokenStorageKey, session.token)
-  localStorage.setItem(userStorageKey, JSON.stringify(session.user))
+export const saveSession = (session: StoredSession, remember = true): void => {
+  localStorage.removeItem(tokenStorageKey)
+  localStorage.removeItem(userStorageKey)
+  sessionStorage.removeItem(tokenStorageKey)
+  sessionStorage.removeItem(userStorageKey)
+  const storage = remember ? localStorage : sessionStorage
+  storage.setItem(tokenStorageKey, session.token)
+  storage.setItem(userStorageKey, JSON.stringify(session.user))
   notifySessionChange()
 }
+
+export const isSessionRemembered = (): boolean => localStorage.getItem(tokenStorageKey) !== null
 
 export const clearSession = (): void => {
   localStorage.removeItem(tokenStorageKey)
   localStorage.removeItem(userStorageKey)
+  sessionStorage.removeItem(tokenStorageKey)
+  sessionStorage.removeItem(userStorageKey)
   notifySessionChange()
 }
 
 export const readSession = (): StoredSession | null => {
-  const token = localStorage.getItem(tokenStorageKey)
-  const rawUser = localStorage.getItem(userStorageKey)
+  const storage = localStorage.getItem(tokenStorageKey) ? localStorage : sessionStorage
+  const token = storage.getItem(tokenStorageKey)
+  const rawUser = storage.getItem(userStorageKey)
   if (!token || !rawUser) {
     if (token || rawUser) clearSession()
     return null

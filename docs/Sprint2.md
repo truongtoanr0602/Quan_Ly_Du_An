@@ -13,12 +13,15 @@ All Sprint 2 APIs require an authenticated JWT with role `Customer`. Controllers
 | US-9 | Customer updates personal information | `GET/PUT /api/profile`, `/profile` | Profile service, controller, page, and route tests |
 | US-12 | Add, remove, and change cart quantities | `GET /api/cart`; item add/update/remove; `/cart` | Cart service/controller/context/page tests |
 | US-13 | Place multiple products in one order | `POST /api/orders`, `/checkout` | Transactional checkout and checkout page tests |
-| US-14 | Manage shipping addresses and choose supported payment | `/api/addresses`, `/addresses`; COD-only checkout | Address service/controller/form/page tests |
+| US-14 | Manage shipping addresses and choose supported payment | `/api/addresses`, `/addresses`; COD or mock QR checkout; owned mock bank confirmation | Address, checkout, mock payment service/controller/page tests |
 | US-15 | View owned order history | `GET /api/orders`, `GET /api/orders/{id}`; `/orders`, `/orders/:id` | Ownership, pagination, history, and detail tests |
 
 ## Checkout rules
 
-- Payment method is exactly `COD`.
+Catalog integration uses `GET /api/products?Sort=newest|price_asc|price_desc` so sorting happens before pagination, and `GET /api/products/brands` for the active-product brand filter. These are additive public API options used by the storefront.
+
+- Payment method is `COD` or `QR`. A QR order starts with payment status `PENDING`. Its QR opens the mock bank page with the saved order's amount and transfer content.
+- `GET /api/orders/{id}/mock-payment` returns canonical mock payment details to the order owner. `POST /api/orders/{id}/mock-payment/confirm` confirms a pending QR payment as `PAID`; repeat confirmation is idempotent. Neither endpoint accepts a client amount or customer ID.
 - The selected address must belong to the authenticated customer.
 - The server revalidates cart quantities, active products, and current stock.
 - Product price/name/SKU and shipping fields are copied into immutable order snapshots.
@@ -29,7 +32,7 @@ All Sprint 2 APIs require an authenticated JWT with role `Customer`. Controllers
 
 ## Database result
 
-`dotnet ef migrations has-pending-model-changes` reports no pending model changes. Existing reviewed migrations already contain the Sprint 2 schema, so no empty migration was created.
+The existing `Orders.PaymentStatus` constraint already allows `PAID`, so mock payment confirmation needs no new schema migration. The separate seed-data migration reconciles the existing development database without deleting customer or order records.
 
 ## Local run and demo
 
@@ -45,7 +48,7 @@ npm --prefix frontend run dev
 Set `frontend/.env.local` to:
 
 ```dotenv
-VITE_API_BASE_URL=http://localhost:5296/api
+VITE_API_BASE_URL=/api
 ```
 
 Demo flow:
@@ -53,8 +56,8 @@ Demo flow:
 1. Register or sign in as a Customer.
 2. Add products to the cart and adjust quantities at `/cart`.
 3. Create a default address at `/addresses`.
-4. Review `/checkout`, keep COD selected, and place the order.
-5. Verify the cart is empty and inspect `/orders/{id}`.
+4. Review `/checkout`, choose COD or mock QR, and place the order. For QR, inspect the saved amount and content at `/orders/{id}`, scan the QR or open the mock bank page, then confirm the test payment.
+5. Verify QR payment status changes to `PAID` while order status stays `PENDING`; verify the cart is empty and inspect `/orders/{id}`.
 6. Confirm the newest order appears first at `/orders`.
 7. Update customer information at `/profile`.
 
@@ -75,4 +78,4 @@ git diff --check
 
 ## Sprint 3 exclusions
 
-Sprint 2 does not implement online payments, order cancellation, admin order/status management, inventory administration or stock mutation, revenue reporting, password reset, or password change.
+Sprint 2 does not implement real online payments, automatic bank verification, order cancellation, admin order/status management, inventory administration or stock mutation, revenue reporting, password reset, or password change. To scan from a phone on the same network, run Vite with `npm --prefix frontend run dev -- --host 0.0.0.0`, open the frontend on the computer by its LAN IP rather than `localhost`, and reopen the QR order. The development proxy sends `/api` requests to the local backend. In a production deployment, set `VITE_API_BASE_URL` to the accessible API URL or configure an equivalent reverse proxy.
