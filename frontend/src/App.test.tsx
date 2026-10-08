@@ -9,4 +9,3 @@ describe('App', () => {
     expect(screen.getByRole('link', { name: 'ElectroTech' })).toBeInTheDocument()
   })
 })
-

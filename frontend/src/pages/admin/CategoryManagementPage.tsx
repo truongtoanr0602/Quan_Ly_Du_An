@@ -121,7 +121,10 @@ export default function CategoryManagementPage() {
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
           <div>
             <div className="flex items-center text-sm text-secondary mb-2">
-              <span>Admin</span>
+              <Link to="/admin" className="hover:text-primary transition-colors flex items-center gap-1">
+                <span className="material-symbols-outlined text-sm">arrow_back</span>
+                Admin
+              </Link>
               <span className="material-symbols-outlined text-sm mx-1">chevron_right</span>
               <span className="text-primary font-medium">Quản lý danh mục</span>
             </div>

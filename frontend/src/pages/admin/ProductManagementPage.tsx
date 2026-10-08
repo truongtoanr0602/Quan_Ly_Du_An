@@ -4,7 +4,7 @@ import { ApiError } from '../../services/apiClient';
 import { useAuth } from '../../contexts/AuthContext';
 import { categoryService } from '../../services/categoryService';
 import type { CategoryDto } from '../../types/category';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 
 export default function ProductManagementPage() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -173,7 +173,10 @@ export default function ProductManagementPage() {
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
           <div>
             <div className="flex items-center text-sm text-secondary mb-2">
-              <span>Admin</span>
+              <Link to="/admin" className="hover:text-primary transition-colors flex items-center gap-1">
+                <span className="material-symbols-outlined text-sm">arrow_back</span>
+                Admin
+              </Link>
               <span className="material-symbols-outlined text-sm mx-1">chevron_right</span>
               <span className="text-primary font-medium">Quản lý sản phẩm</span>
             </div>

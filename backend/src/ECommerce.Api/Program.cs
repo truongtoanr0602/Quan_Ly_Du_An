@@ -8,6 +8,14 @@ using ECommerce.Api.Services.Cart;
 using ECommerce.Api.Services.Orders;
 using ECommerce.Api.Services.Addresses;
 using ECommerce.Api.Services.Auth;
+using ECommerce.Api.Services.Carts;
+using ECommerce.Api.Services.Addresses;
+using ECommerce.Api.Services.Orders;
+using ECommerce.Api.Services.Profile;
+using ECommerce.Api.Services.Admin;
+using ECommerce.Api.Services.Inventory;
+using ECommerce.Api.Services.Reports;
+using ECommerce.Api.Services.Chat;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
@@ -43,6 +51,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(connectionString);
 });
 
+// Sprint 1 services
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IAuthService, AuthService>();

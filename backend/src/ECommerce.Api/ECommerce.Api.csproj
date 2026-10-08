@@ -5,6 +5,7 @@
     <Nullable>enable</Nullable>
     <UserSecretsId>ECommerce.Api-0b6e7ea9-3e3b-4f65-a7b2-8a91bb6e515b</UserSecretsId>
     <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>ecommerce-api-8f1a4c62-5d3b-4a17-9e0c-2b7d6f4a1c83</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
