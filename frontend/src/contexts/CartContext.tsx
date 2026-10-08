@@ -1,101 +1,82 @@
-import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
-import type { Product } from '../services/productService';
+import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
+import { useAuth } from './AuthContext'
+import { cartService } from '../services/cartService'
+import type { Cart } from '../types/cart'
 
-export interface CartItem {
-  product: Product;
-  quantity: number;
+const emptyCart: Cart = { items: [], totalItems: 0, totalAmount: 0 }
+
+export interface CartContextValue {
+  cart: Cart
+  isLoading: boolean
+  error: string | null
+  refresh: () => Promise<void>
+  add: (productID: number, quantity: number) => Promise<void>
+  update: (productID: number, quantity: number) => Promise<void>
+  remove: (productID: number) => Promise<void>
+  clear: () => Promise<void>
 }
 
-interface CartContextType {
-  items: CartItem[];
-  addToCart: (product: Product, quantity?: number) => void;
-  removeFromCart: (productId: number) => void;
-  updateQuantity: (productId: number, quantity: number) => void;
-  clearCart: () => void;
-  totalItems: number;
-  totalPrice: number;
-}
-
-const CartContext = createContext<CartContextType | undefined>(undefined);
+const CartContext = createContext<CartContextValue | undefined>(undefined)
 
 export function CartProvider({ children }: { children: ReactNode }) {
-  const [items, setItems] = useState<CartItem[]>(() => {
-    const savedCart = localStorage.getItem('ecommerce_cart');
-    return savedCart ? JSON.parse(savedCart) : [];
-  });
+  const { isAuthenticated } = useAuth()
+  const [cart, setCart] = useState<Cart>(emptyCart)
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [loadedForAuth, setLoadedForAuth] = useState<boolean | null>(null)
+
+  const run = async (operation: () => Promise<Cart | void>) => {
+    setError(null)
+    try {
+      const result = await operation()
+      if (result) setCart(result)
+    } catch (reason: unknown) {
+      setError(reason instanceof Error ? reason.message : 'Khong the cap nhat gio hang.')
+      throw reason
+    }
+  }
+
+  const refresh = async () => {
+    if (!isAuthenticated) {
+      setCart(emptyCart)
+      setLoadedForAuth(false)
+      return
+    }
+    setIsLoading(true)
+    try {
+      await run(() => cartService.get())
+    } finally {
+      setIsLoading(false)
+      setLoadedForAuth(true)
+    }
+  }
 
   useEffect(() => {
-    localStorage.setItem('ecommerce_cart', JSON.stringify(items));
-  }, [items]);
+    void refresh().catch(() => undefined)
+  }, [isAuthenticated])
 
-  const addToCart = (product: Product, quantity: number = 1) => {
-    setItems(prev => {
-      const existingItem = prev.find(item => item.product.productID === product.productID);
-      if (existingItem) {
-        // Kiểm tra tồn kho trước khi tăng số lượng
-        const newQuantity = existingItem.quantity + quantity;
-        if (newQuantity > product.stockQuantity) {
-          alert('Không đủ số lượng tồn kho!');
-          return prev;
-        }
-        return prev.map(item => 
-          item.product.productID === product.productID 
-            ? { ...item, quantity: newQuantity }
-            : item
-        );
-      }
-      return [...prev, { product, quantity }];
-    });
-  };
+  const value = useMemo<CartContextValue>(() => ({
+    cart,
+    isLoading: isLoading || loadedForAuth !== isAuthenticated,
+    error,
+    refresh,
+    add: (productID, quantity) => run(() => cartService.add(productID, quantity)),
+    update: (productID, quantity) => run(() => cartService.update(productID, quantity)),
+    remove: async (productID) => {
+      await run(() => cartService.remove(productID))
+      await refresh()
+    },
+    clear: async () => {
+      await run(() => cartService.clear())
+      setCart(emptyCart)
+    },
+  }), [cart, isLoading, error, isAuthenticated, loadedForAuth])
 
-  const removeFromCart = (productId: number) => {
-    setItems(prev => prev.filter(item => item.product.productID !== productId));
-  };
-
-  const updateQuantity = (productId: number, quantity: number) => {
-    if (quantity <= 0) {
-      removeFromCart(productId);
-      return;
-    }
-    setItems(prev => prev.map(item => {
-      if (item.product.productID === productId) {
-        if (quantity > item.product.stockQuantity) {
-          alert('Không đủ số lượng tồn kho!');
-          return item;
-        }
-        return { ...item, quantity };
-      }
-      return item;
-    }));
-  };
-
-  const clearCart = () => {
-    setItems([]);
-  };
-
-  const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
-  
-  const totalPrice = items.reduce((sum, item) => sum + (item.product.price * item.quantity), 0);
-
-  return (
-    <CartContext.Provider value={{
-      items,
-      addToCart,
-      removeFromCart,
-      updateQuantity,
-      clearCart,
-      totalItems,
-      totalPrice
-    }}>
-      {children}
-    </CartContext.Provider>
-  );
+  return <CartContext.Provider value={value}>{children}</CartContext.Provider>
 }
 
-export function useCart() {
-  const context = useContext(CartContext);
-  if (context === undefined) {
-    throw new Error('useCart must be used within a CartProvider');
-  }
-  return context;
+export function useCart(): CartContextValue {
+  const context = useContext(CartContext)
+  if (!context) throw new Error('useCart must be used within a CartProvider')
+  return context
 }

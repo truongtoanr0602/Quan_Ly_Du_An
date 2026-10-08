@@ -30,5 +30,10 @@ public class RoleConfiguration : IEntityTypeConfiguration<Role>
         builder.HasIndex(r => r.RoleName)
             .IsUnique()
             .HasDatabaseName("UQ_Roles_RoleName");
+        var seedTimestamp = new DateTime(2026, 8, 29, 0, 0, 0, DateTimeKind.Utc);
+
+        builder.HasData(
+            new Role { RoleID = 1, RoleName = "Customer", Description = "Customer role", CreatedAt = seedTimestamp },
+            new Role { RoleID = 2, RoleName = "Admin", Description = "Administrator role", CreatedAt = seedTimestamp });
     }
 }

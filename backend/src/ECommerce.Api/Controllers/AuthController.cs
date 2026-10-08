@@ -8,41 +8,20 @@ namespace ECommerce.Api.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class AuthController : ControllerBase
+public class AuthController(IAuthService authService) : ControllerBase
 {
-    private readonly IAuthService _authService;
-
-    public AuthController(IAuthService authService)
-    {
-        _authService = authService;
-    }
-
     [HttpPost("login")]
-    public async Task<IActionResult> Login(LoginDto dto)
+    public async Task<IActionResult> Login(LoginDto dto, CancellationToken cancellationToken)
     {
-        try
-        {
-            var result = await _authService.LoginAsync(dto);
-            return Ok(result);
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(new { Message = ex.Message });
-        }
+        var result = await authService.LoginAsync(dto, cancellationToken);
+        return Ok(result);
     }
 
     [HttpPost("register")]
-    public async Task<IActionResult> Register(RegisterDto dto)
+    public async Task<IActionResult> Register(RegisterDto dto, CancellationToken cancellationToken)
     {
-        try
-        {
-            var result = await _authService.RegisterAsync(dto);
-            return Ok(result);
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(new { Message = ex.Message });
-        }
+        var result = await authService.RegisterAsync(dto, cancellationToken);
+        return Created("/api/auth/register", result);
     }
 
     // US-11: Change password
@@ -53,7 +32,7 @@ public class AuthController : ControllerBase
         try
         {
             var userId = User.GetUserId();
-            await _authService.ChangePasswordAsync(userId, dto);
+            await authService.ChangePasswordAsync(userId, dto);
             return Ok(new { Message = "Password changed successfully." });
         }
         catch (Exception ex)
@@ -68,7 +47,7 @@ public class AuthController : ControllerBase
     {
         try
         {
-            var token = await _authService.RequestPasswordResetAsync(dto);
+            var token = await authService.RequestPasswordResetAsync(dto);
             return Ok(new { Message = "If this email exists, a reset link has been sent.", ResetToken = token });
         }
         catch (Exception ex)
@@ -83,7 +62,7 @@ public class AuthController : ControllerBase
     {
         try
         {
-            await _authService.ResetPasswordAsync(dto);
+            await authService.ResetPasswordAsync(dto);
             return Ok(new { Message = "Password has been reset successfully." });
         }
         catch (Exception ex)

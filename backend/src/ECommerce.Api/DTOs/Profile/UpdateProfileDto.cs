@@ -2,15 +2,14 @@ using System.ComponentModel.DataAnnotations;
 
 namespace ECommerce.Api.DTOs.Profile;
 
-public class UpdateProfileDto
+public sealed class UpdateProfileDto
 {
-    [Required]
-    [MaxLength(100)]
-    public string FullName { get; set; } = null!;
+    [Required, StringLength(100)]
+    public string FullName { get; init; } = string.Empty;
 
-    [MaxLength(20)]
-    public string? Phone { get; set; }
+    [StringLength(20)]
+    public string? Phone { get; init; }
 
-    [MaxLength(500)]
-    public string? AvatarUrl { get; set; }
+    [StringLength(500)]
+    public string? AvatarURL { get; init; }
 }

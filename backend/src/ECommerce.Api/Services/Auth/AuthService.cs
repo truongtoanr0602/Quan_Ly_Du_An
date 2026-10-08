@@ -1,6 +1,7 @@
 using ECommerce.Api.Data;
 using ECommerce.Api.DTOs.Auth;
 using ECommerce.Api.Entities;
+using ECommerce.Api.Exceptions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
@@ -10,100 +11,80 @@ using System.Text;
 
 namespace ECommerce.Api.Services.Auth;
 
-public class AuthService : IAuthService
+public class AuthService(AppDbContext context, IConfiguration configuration) : IAuthService
 {
-    private readonly AppDbContext _context;
-    private readonly IConfiguration _configuration;
-
-    public AuthService(AppDbContext context, IConfiguration configuration)
+    public async Task<AuthResponseDto> RegisterAsync(
+        RegisterDto registerDto,
+        CancellationToken cancellationToken = default)
     {
-        _context = context;
-        _configuration = configuration;
-    }
-
-    public async Task<AuthResponseDto> RegisterAsync(RegisterDto registerDto)
-    {
-        // 1. Kiểm tra Email tồn tại chưa
-        if (await _context.Users.AnyAsync(u => u.Email == registerDto.Email))
+        if (await context.Users.AnyAsync(u => u.Email == registerDto.Email, cancellationToken))
         {
-            throw new Exception("Email is already registered."); // Hoặc ném custom exception TBD
+            throw new DomainConflictException();
         }
 
-        // 2. Mặc định là role Customer. Nếu email chứa "admin", cấp quyền Admin (dành cho Dev/Testing)
-        var roleName = registerDto.Email.ToLower().Contains("admin") ? "Admin" : "Customer";
-        var assignedRole = await _context.Roles.FirstOrDefaultAsync(r => r.RoleName == roleName);
-        if (assignedRole == null) 
-            throw new Exception($"Role {roleName} not found in database.");
+        var customerRole = await context.Roles
+            .SingleOrDefaultAsync(role => role.RoleName == "Customer", cancellationToken);
+        if (customerRole is null)
+        {
+            throw new DomainValidationException();
+        }
 
-        // 3. Tạo User
         var user = new User
         {
             Email = registerDto.Email,
             FullName = registerDto.FullName,
             Phone = registerDto.Phone,
             PasswordHash = BCrypt.Net.BCrypt.HashPassword(registerDto.Password),
-            RoleID = assignedRole.RoleID,
+            RoleID = customerRole.RoleID,
             IsActive = true,
             CreatedAt = DateTime.UtcNow
         };
 
-        _context.Users.Add(user);
-        await _context.SaveChangesAsync();
+        context.Users.Add(user);
+        await PersistenceBoundary.SaveChangesAsync(context, cancellationToken);
 
-        // 4. Generate Token & Trả về
-        var token = GenerateJwtToken(user, assignedRole.RoleName);
-
-        return new AuthResponseDto
-        {
-            Token = token,
-            User = new UserInfoDto
-            {
-                Id = user.UserID,
-                Email = user.Email,
-                FullName = user.FullName,
-                Role = assignedRole.RoleName
-            }
-        };
+        return CreateAuthResponse(user, customerRole.RoleName);
     }
 
-    public async Task<AuthResponseDto> LoginAsync(LoginDto loginDto)
+    public async Task<AuthResponseDto> LoginAsync(
+        LoginDto loginDto,
+        CancellationToken cancellationToken = default)
     {
-        var user = await _context.Users
+        var user = await context.Users
             .Include(u => u.Role)
-            .FirstOrDefaultAsync(u => u.Email == loginDto.Email);
+            .FirstOrDefaultAsync(u => u.Email == loginDto.Email, cancellationToken);
 
-        if (user == null || !user.IsActive)
+        if (user is null || !user.IsActive || !BCrypt.Net.BCrypt.Verify(loginDto.Password, user.PasswordHash))
         {
-            throw new Exception("Invalid email or password.");
+            throw new InvalidCredentialsException();
         }
 
-        var isPasswordValid = BCrypt.Net.BCrypt.Verify(loginDto.Password, user.PasswordHash);
-        if (!isPasswordValid)
-        {
-            throw new Exception("Invalid email or password.");
-        }
+        return CreateAuthResponse(user, user.Role.RoleName);
+    }
 
-        var token = GenerateJwtToken(user, user.Role.RoleName);
-
+    private AuthResponseDto CreateAuthResponse(User user, string roleName)
+    {
         return new AuthResponseDto
         {
-            Token = token,
+            Token = GenerateJwtToken(user, roleName),
             User = new UserInfoDto
             {
                 Id = user.UserID,
                 Email = user.Email,
                 FullName = user.FullName,
-                Role = user.Role.RoleName
+                Role = roleName
             }
         };
     }
 
     private string GenerateJwtToken(User user, string roleName)
     {
-        var jwtSettings = _configuration.GetSection("Jwt");
+        var jwtSettings = configuration.GetSection("Jwt");
         var secretKey = jwtSettings["Key"];
         if (string.IsNullOrEmpty(secretKey))
-            throw new Exception("JWT Key is not configured.");
+        {
+            throw new InvalidOperationException("JWT signing configuration is unavailable.");
+        }
 
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
@@ -121,16 +102,15 @@ public class AuthService : IAuthService
             issuer: jwtSettings["Issuer"],
             audience: jwtSettings["Audience"],
             claims: claims,
-            expires: DateTime.UtcNow.AddDays(7), // Hạn 7 ngày cho dev/test ổn định
-            signingCredentials: creds
-        );
+            expires: DateTime.UtcNow.AddHours(2),
+            signingCredentials: creds);
 
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
 
     public async Task ChangePasswordAsync(int userId, ChangePasswordDto dto)
     {
-        var user = await _context.Users.FindAsync(userId)
+        var user = await context.Users.FindAsync(userId)
             ?? throw new Exception("User not found.");
 
         if (!BCrypt.Net.BCrypt.Verify(dto.CurrentPassword, user.PasswordHash))
@@ -138,12 +118,12 @@ public class AuthService : IAuthService
 
         user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.NewPassword);
         user.UpdatedAt = DateTime.UtcNow;
-        await _context.SaveChangesAsync();
+        await context.SaveChangesAsync();
     }
 
     public async Task<string> RequestPasswordResetAsync(ForgotPasswordDto dto)
     {
-        var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == dto.Email);
+        var user = await context.Users.FirstOrDefaultAsync(u => u.Email == dto.Email);
         if (user == null)
         {
             // Không tiết lộ email có tồn tại hay không
@@ -152,14 +132,14 @@ public class AuthService : IAuthService
 
         // Tạo token
         var token = Guid.NewGuid().ToString("N");
-        _context.PasswordResetTokens.Add(new PasswordResetToken
+        context.PasswordResetTokens.Add(new PasswordResetToken
         {
             UserID = user.UserID,
             Token = token,
             ExpiresAt = DateTime.UtcNow.AddHours(1),
             CreatedAt = DateTime.UtcNow
         });
-        await _context.SaveChangesAsync();
+        await context.SaveChangesAsync();
 
         // MVP: trả token qua API (không gửi email)
         return token;
@@ -167,7 +147,7 @@ public class AuthService : IAuthService
 
     public async Task ResetPasswordAsync(ResetPasswordDto dto)
     {
-        var resetToken = await _context.PasswordResetTokens
+        var resetToken = await context.PasswordResetTokens
             .Include(t => t.User)
             .FirstOrDefaultAsync(t => t.Token == dto.Token && t.UsedAt == null && t.ExpiresAt > DateTime.UtcNow)
             ?? throw new Exception("Invalid or expired reset token.");
@@ -176,7 +156,7 @@ public class AuthService : IAuthService
         resetToken.User.UpdatedAt = DateTime.UtcNow;
         resetToken.UsedAt = DateTime.UtcNow;
 
-        await _context.SaveChangesAsync();
+        await context.SaveChangesAsync();
     }
 }
 

@@ -1,60 +1,52 @@
 using ECommerce.Api.Data;
 using ECommerce.Api.DTOs.Profile;
+using ECommerce.Api.Entities;
+using ECommerce.Api.Exceptions;
 using Microsoft.EntityFrameworkCore;
 
 namespace ECommerce.Api.Services.Profile;
 
-public class ProfileService : IProfileService
+public sealed class ProfileService(AppDbContext context) : IProfileService
 {
-    private readonly AppDbContext _context;
-
-    public ProfileService(AppDbContext context)
+    public async Task<ProfileDto> GetAsync(int userId, CancellationToken cancellationToken = default)
     {
-        _context = context;
+        var user = await context.Users
+            .AsNoTracking()
+            .SingleOrDefaultAsync(candidate => candidate.UserID == userId, cancellationToken)
+            ?? throw new ResourceNotFoundException();
+
+        return ToDto(user);
     }
 
-    public async Task<ProfileDto> GetProfileAsync(int userId, CancellationToken cancellationToken = default)
+    public async Task<ProfileDto> UpdateAsync(
+        int userId,
+        UpdateProfileDto dto,
+        CancellationToken cancellationToken = default)
     {
-        var user = await _context.Users
-            .Include(u => u.Role)
-            .FirstOrDefaultAsync(u => u.UserID == userId, cancellationToken)
-            ?? throw new KeyNotFoundException("User not found.");
+        var user = await context.Users
+            .SingleOrDefaultAsync(candidate => candidate.UserID == userId, cancellationToken)
+            ?? throw new ResourceNotFoundException();
 
-        return new ProfileDto
+        var fullName = dto.FullName.Trim();
+        if (fullName.Length == 0)
         {
-            UserId = user.UserID,
-            Email = user.Email,
-            FullName = user.FullName,
-            Phone = user.Phone,
-            AvatarUrl = user.AvatarURL,
-            Role = user.Role.RoleName,
-            CreatedAt = user.CreatedAt
-        };
+            throw new DomainValidationException();
+        }
+
+        user.FullName = fullName;
+        user.Phone = NormalizeOptional(dto.Phone);
+        user.AvatarURL = NormalizeOptional(dto.AvatarURL);
+
+        await context.SaveChangesAsync(cancellationToken);
+        return ToDto(user);
     }
 
-    public async Task<ProfileDto> UpdateProfileAsync(int userId, UpdateProfileDto dto, CancellationToken cancellationToken = default)
+    private static string? NormalizeOptional(string? value)
     {
-        var user = await _context.Users
-            .Include(u => u.Role)
-            .FirstOrDefaultAsync(u => u.UserID == userId, cancellationToken)
-            ?? throw new KeyNotFoundException("User not found.");
-
-        user.FullName = dto.FullName;
-        user.Phone = dto.Phone;
-        user.AvatarURL = dto.AvatarUrl;
-        user.UpdatedAt = DateTime.UtcNow;
-
-        await _context.SaveChangesAsync(cancellationToken);
-
-        return new ProfileDto
-        {
-            UserId = user.UserID,
-            Email = user.Email,
-            FullName = user.FullName,
-            Phone = user.Phone,
-            AvatarUrl = user.AvatarURL,
-            Role = user.Role.RoleName,
-            CreatedAt = user.CreatedAt
-        };
+        var normalized = value?.Trim();
+        return string.IsNullOrEmpty(normalized) ? null : normalized;
     }
+
+    private static ProfileDto ToDto(User user) =>
+        new(user.UserID, user.Email, user.FullName, user.Phone, user.AvatarURL);
 }

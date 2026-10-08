@@ -1,128 +1,72 @@
-import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { cartService } from '../services/cartService';
-import type { CartDto } from '../types/cart';
+import { Link } from 'react-router-dom'
+import { useState } from 'react'
+import { useCart } from '../contexts/CartContext'
+
+const formatPrice = (value: number) =>
+  new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value)
 
 export default function CartPage() {
-  const [cart, setCart] = useState<CartDto | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const { cart, isLoading, error, update, remove, clear } = useCart()
+  const [pendingProductID, setPendingProductID] = useState<number | null>(null)
+  const [isClearing, setIsClearing] = useState(false)
 
-  const fetchCart = async () => {
+  const mutateItem = async (productID: number, operation: () => Promise<void>) => {
+    if (pendingProductID !== null) return
+    setPendingProductID(productID)
     try {
-      setLoading(true);
-      const data = await cartService.getCart();
-      setCart(data);
-    } catch (err: any) {
-      setError(err.message || 'Failed to load cart');
+      await operation()
+    } catch {
+      // CartContext exposes the recoverable error inline.
     } finally {
-      setLoading(false);
+      setPendingProductID(null)
     }
-  };
-
-  useEffect(() => { fetchCart(); }, []);
-
-  const handleUpdateQuantity = async (cartItemId: number, quantity: number) => {
-    try {
-      const data = await cartService.updateItemQuantity(cartItemId, { quantity });
-      setCart(data);
-    } catch (err: any) {
-      alert(err.message);
-    }
-  };
-
-  const handleRemoveItem = async (cartItemId: number) => {
-    try {
-      await cartService.removeItem(cartItemId);
-      await fetchCart();
-    } catch (err: any) {
-      alert(err.message);
-    }
-  };
-
-  const handleClearCart = async () => {
-    if (!confirm('Xóa toàn bộ giỏ hàng?')) return;
-    try {
-      await cartService.clearCart();
-      await fetchCart();
-    } catch (err: any) {
-      alert(err.message);
-    }
-  };
-
-  if (loading) return <div className="p-8 text-center text-on-surface-variant">Đang tải giỏ hàng...</div>;
-  if (error) return <div className="p-8 text-center text-error">{error}</div>;
-  if (!cart || cart.items.length === 0) {
-    return (
-      <div className="p-8 text-center">
-        <span className="material-symbols-outlined text-6xl text-on-surface-variant mb-4 block">shopping_cart</span>
-        <h2 className="text-xl font-semibold text-on-surface mb-2">Giỏ hàng trống</h2>
-        <p className="text-on-surface-variant mb-4">Hãy thêm sản phẩm vào giỏ hàng</p>
-        <Link to="/products" className="inline-block bg-primary text-on-primary px-6 py-2 rounded-full font-medium hover:opacity-90 transition-opacity">
-          Xem sản phẩm
-        </Link>
-      </div>
-    );
   }
 
+  if (isLoading) return <p className="p-8">Dang tai gio hang...</p>
+
   return (
-    <div className="max-w-4xl mx-auto px-4 py-6">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-on-surface">Giỏ hàng ({cart.totalItems} sản phẩm)</h1>
-        <button onClick={handleClearCart} className="text-sm text-error hover:underline">Xóa tất cả</button>
+    <section className="mx-auto w-full max-w-5xl px-4 py-8">
+      <div className="mb-6 flex items-center justify-between">
+        <h1 className="text-2xl font-bold">Gio hang</h1>
+        {cart.items.length > 0 && <button disabled={isClearing} onClick={() => {
+          setIsClearing(true)
+          void clear().catch(() => undefined).finally(() => setIsClearing(false))
+        }} className="text-red-600 disabled:opacity-50">Xoa gio hang</button>}
       </div>
-
-      <div className="space-y-4">
-        {cart.items.map(item => (
-          <div key={item.cartItemId} className="flex gap-4 p-4 bg-surface-container-low rounded-2xl border border-outline-variant">
-            <div className="w-20 h-20 bg-surface-container rounded-xl flex-shrink-0 overflow-hidden">
-              {item.imageUrl ? (
-                <img src={item.imageUrl} alt={item.productName} className="w-full h-full object-cover" />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center">
-                  <span className="material-symbols-outlined text-on-surface-variant">image</span>
+      {error && <p role="alert" className="mb-4 text-red-600">{error}</p>}
+      {cart.items.length === 0 ? (
+        <p>Gio hang dang trong.</p>
+      ) : (
+        <div className="grid gap-6 lg:grid-cols-[1fr_20rem]">
+          <ul className="grid gap-4">
+            {cart.items.map((item) => (
+              <li key={item.productID} className="flex gap-4 rounded border p-4">
+                <div className="flex-1">
+                  <h2 className="font-semibold">{item.productName}</h2>
+                  <p>{item.sku}</p>
+                  <p>{formatPrice(item.unitPrice)}</p>
                 </div>
-              )}
-            </div>
-            <div className="flex-1 min-w-0">
-              <Link to={`/products/${item.productId}`} className="font-medium text-on-surface hover:text-primary transition-colors line-clamp-1">
-                {item.productName}
-              </Link>
-              <p className="text-primary font-semibold mt-1">{item.price.toLocaleString('vi-VN')}₫</p>
-              <div className="flex items-center gap-2 mt-2">
-                <button
-                  onClick={() => handleUpdateQuantity(item.cartItemId, item.quantity - 1)}
-                  disabled={item.quantity <= 1}
-                  className="w-8 h-8 rounded-full border border-outline-variant flex items-center justify-center hover:bg-surface-container-high disabled:opacity-40 transition-colors"
-                >−</button>
-                <span className="w-8 text-center font-medium text-on-surface">{item.quantity}</span>
-                <button
-                  onClick={() => handleUpdateQuantity(item.cartItemId, item.quantity + 1)}
-                  disabled={item.quantity >= item.stockQuantity}
-                  className="w-8 h-8 rounded-full border border-outline-variant flex items-center justify-center hover:bg-surface-container-high disabled:opacity-40 transition-colors"
-                >+</button>
-                <span className="text-xs text-on-surface-variant ml-2">Còn {item.stockQuantity}</span>
-              </div>
-            </div>
-            <div className="flex flex-col items-end justify-between">
-              <button onClick={() => handleRemoveItem(item.cartItemId)} className="text-on-surface-variant hover:text-error transition-colors">
-                <span className="material-symbols-outlined text-[20px]">close</span>
-              </button>
-              <p className="font-semibold text-on-surface">{item.subTotal.toLocaleString('vi-VN')}₫</p>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      <div className="mt-6 p-4 bg-surface-container-low rounded-2xl border border-outline-variant">
-        <div className="flex justify-between items-center text-lg font-bold text-on-surface">
-          <span>Tổng cộng:</span>
-          <span className="text-primary">{cart.totalPrice.toLocaleString('vi-VN')}₫</span>
+                <input
+                  aria-label={`So luong ${item.productName}`}
+                  type="number"
+                  min={1}
+                  max={item.stockQuantity}
+                  defaultValue={item.quantity}
+                  disabled={pendingProductID !== null}
+                  onBlur={(event) => void mutateItem(item.productID, () => update(item.productID, Number(event.target.value)))}
+                  className="h-10 w-20 rounded border p-2"
+                />
+                <button disabled={pendingProductID !== null} onClick={() => void mutateItem(item.productID, () => remove(item.productID))} className="text-red-600 disabled:opacity-50">Xoa</button>
+              </li>
+            ))}
+          </ul>
+          <aside className="rounded border p-4">
+            <p>{cart.totalItems} san pham</p>
+            <p className="my-4 text-xl font-bold">{formatPrice(cart.totalAmount)}</p>
+            <Link to="/checkout" className="block rounded bg-primary px-4 py-2 text-center text-white">Thanh toan</Link>
+          </aside>
         </div>
-        <Link to="/checkout" className="mt-4 block w-full bg-primary text-on-primary text-center py-3 rounded-full font-semibold hover:opacity-90 transition-opacity">
-          Tiến hành thanh toán
-        </Link>
-      </div>
-    </div>
-  );
+      )}
+    </section>
+  )
 }

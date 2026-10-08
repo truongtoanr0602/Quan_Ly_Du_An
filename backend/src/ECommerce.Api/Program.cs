@@ -1,12 +1,13 @@
+using ECommerce.Api.Configuration;
 using ECommerce.Api.Data;
 using ECommerce.Api.Middleware;
 using ECommerce.Api.Services.Products;
 using ECommerce.Api.Services.Categories;
-using ECommerce.Api.Services.Auth;
-using ECommerce.Api.Services.Carts;
-using ECommerce.Api.Services.Addresses;
-using ECommerce.Api.Services.Orders;
 using ECommerce.Api.Services.Profile;
+using ECommerce.Api.Services.Cart;
+using ECommerce.Api.Services.Orders;
+using ECommerce.Api.Services.Addresses;
+using ECommerce.Api.Services.Auth;
 using ECommerce.Api.Services.Admin;
 using ECommerce.Api.Services.Inventory;
 using ECommerce.Api.Services.Reports;
@@ -16,36 +17,65 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
+static string RequireConfigurationValue(IConfiguration configuration, string key)
+{
+    var value = configuration[key];
+    if (string.IsNullOrWhiteSpace(value))
+    {
+        throw new InvalidOperationException($"Required configuration '{key}' is missing.");
+    }
+
+    return value;
+}
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 
+var connectionString = RequireConfigurationValue(builder.Configuration, "ConnectionStrings:ECommerce");
+var issuer = RequireConfigurationValue(builder.Configuration, "Jwt:Issuer");
+var audience = RequireConfigurationValue(builder.Configuration, "Jwt:Audience");
+var secretKey = RequireConfigurationValue(builder.Configuration, "Jwt:Key");
+
+if (Encoding.UTF8.GetByteCount(secretKey) < 32)
+{
+    throw new InvalidOperationException("JWT signing key must be at least 32 bytes.");
+}
+
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
-    options.UseSqlServer(builder.Configuration.GetConnectionString("ECommerce"));
+    options.UseSqlServer(connectionString);
 });
 
 // Sprint 1 services
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
-
-// Sprint 2 services
+builder.Services.AddScoped<IProfileService, ProfileService>();
+builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<ICartService, CartService>();
 builder.Services.AddScoped<IAddressService, AddressService>();
-builder.Services.AddScoped<IOrderService, OrderService>();
-builder.Services.AddScoped<IProfileService, ProfileService>();
-
-// Sprint 3 services
 builder.Services.AddScoped<IAdminService, AdminService>();
 builder.Services.AddScoped<IInventoryService, InventoryService>();
 builder.Services.AddScoped<IReportService, ReportService>();
-
-// AI Chatbot service
 builder.Services.AddHttpClient<IChatService, ChatService>();
+builder.Services.AddSingleton(serviceProvider =>
+{
+    var section = serviceProvider
+        .GetRequiredService<IConfiguration>()
+        .GetSection("BootstrapAdmin");
 
-var jwtSettings = builder.Configuration.GetSection("Jwt");
-var secretKey = jwtSettings["Key"] ?? throw new InvalidOperationException("JWT Key is missing");
+    return new BootstrapAdminOptions(
+        section["Email"],
+        section["Password"],
+        section["FullName"]);
+});
+builder.Services.AddScoped<DevelopmentAdminBootstrapper>();
+
+if (builder.Environment.IsDevelopment())
+{
+    builder.Services.AddHostedService<DevelopmentAdminBootstrapHostedService>();
+}
 
 builder.Services.AddAuthentication(options =>
 {
@@ -60,8 +90,8 @@ builder.Services.AddAuthentication(options =>
         ValidateAudience = true,
         ValidateLifetime = true,
         ValidateIssuerSigningKey = true,
-        ValidIssuer = jwtSettings["Issuer"],
-        ValidAudience = jwtSettings["Audience"],
+        ValidIssuer = issuer,
+        ValidAudience = audience,
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey))
     };
 });

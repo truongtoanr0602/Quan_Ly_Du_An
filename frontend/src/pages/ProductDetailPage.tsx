@@ -1,32 +1,61 @@
 import { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { productService, type Product } from '../services/productService';
-import { cartService } from '../services/cartService';
-import { useToast } from '../contexts/ToastContext';
+import { ApiError } from '../services/apiClient';
+import { useCart } from '../contexts/CartContext';
+import { useAuth } from '../contexts/AuthContext';
 
 export default function ProductDetailPage() {
   const { id } = useParams();
-  const toast = useToast();
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const { add } = useCart();
   const [product, setProduct] = useState<Product | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [quantity, setQuantity] = useState(1);
-  const [isAddingToCart, setIsAddingToCart] = useState(false);
-  const [cartSuccess, setCartSuccess] = useState(false);
   const [activeTab, setActiveTab] = useState<'desc' | 'specs'>('desc');
 
-  useEffect(() => {
-    const fetchProduct = async () => {
-      try {
-        if (id) {
-          const data = await productService.getProductById(Number(id));
-          setProduct(data);
-        }
-      } catch (error) {
-        console.error('Error fetching product:', error);
-      } finally {
-        setIsLoading(false);
+  const [cartError, setCartError] = useState<string | null>(null);
+  const [cartMessage, setCartMessage] = useState<string | null>(null);
+  const fetchProduct = async () => {
+    setIsLoading(true);
+    setLoadError(null);
+    try {
+      if (id) {
+        const data = await productService.getProductById(Number(id));
+        setProduct(data);
+      } else {
+        setProduct(null);
       }
-    };
+    } catch (error: unknown) {
+      if (error instanceof ApiError && error.status === 404) {
+        setProduct(null);
+      } else {
+        setLoadError(error instanceof ApiError || error instanceof Error ? error.message : 'Không thể tải sản phẩm.');
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleAddToCart = async () => {
+    if (!product) return;
+    if (!user) {
+      navigate('/login');
+      return;
+    }
+    setCartError(null);
+    setCartMessage(null);
+    try {
+      await add(product.productID, quantity);
+      setCartMessage('Da them san pham vao gio hang.');
+    } catch (error: unknown) {
+      setCartError(error instanceof Error ? error.message : 'Khong the them vao gio hang.');
+    }
+  };
+
+  useEffect(() => {
     fetchProduct();
   }, [id]);
 
@@ -42,6 +71,15 @@ export default function ProductDetailPage() {
     );
   }
 
+  if (loadError) {
+    return (
+      <div role="alert" className="flex justify-center items-center min-h-[50vh] flex-col gap-4 text-center">
+        <p>{loadError}</p>
+        <button type="button" onClick={fetchProduct} className="text-primary hover:underline">Thử lại</button>
+      </div>
+    );
+  }
+
   if (!product) {
     return (
       <div className="flex justify-center items-center min-h-[50vh] flex-col gap-4">
@@ -51,41 +89,6 @@ export default function ProductDetailPage() {
       </div>
     );
   }
-
-  const handleAddToCart = async () => {
-    if (!product) return;
-    const token = localStorage.getItem('token');
-    if (!token) {
-      toast.warning('Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng!', {
-        title: 'Chưa đăng nhập',
-        actionText: 'Đăng nhập ngay',
-        actionPath: '/login'
-      });
-      return;
-    }
-
-    try {
-      setIsAddingToCart(true);
-      await cartService.addItem({
-        productId: product.productID,
-        quantity,
-      });
-      window.dispatchEvent(new CustomEvent('cart-updated'));
-      setCartSuccess(true);
-      setTimeout(() => setCartSuccess(false), 4000);
-      toast.success(`Đã thêm ${quantity} x "${product.productName}" vào giỏ hàng!`, {
-        title: 'Thành công',
-        actionText: 'Xem giỏ hàng',
-        actionPath: '/cart'
-      });
-    } catch (err: any) {
-      toast.error(err.message || 'Không thể thêm vào giỏ hàng.', {
-        title: 'Lỗi giỏ hàng'
-      });
-    } finally {
-      setIsAddingToCart(false);
-    }
-  };
 
   return (
     <div className="max-w-7xl mx-auto space-y-12">
@@ -157,29 +160,18 @@ export default function ProductDetailPage() {
             </div>
           </div>
 
-          <div className="flex flex-col gap-3">
-            <div className="flex gap-4">
-              <button 
-                disabled={product.stockQuantity <= 0 || isAddingToCart}
-                onClick={handleAddToCart}
-                className="flex-1 bg-accent hover:bg-accent-hover text-white py-3.5 px-6 rounded-lg font-medium text-base transition-colors shadow-sm flex justify-center items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <span className="material-symbols-outlined">shopping_cart</span>
-                {isAddingToCart ? 'Đang thêm...' : 'Thêm vào giỏ hàng'}
-              </button>
-            </div>
-            {cartSuccess && (
-              <div className="p-3 bg-green-50 text-green-700 border border-green-200 rounded-lg text-sm flex items-center justify-between">
-                <span className="flex items-center gap-1.5 font-medium">
-                  <span className="material-symbols-outlined text-green-600 text-lg">check_circle</span>
-                  Đã thêm sản phẩm vào giỏ hàng!
-                </span>
-                <Link to="/cart" className="text-primary font-semibold hover:underline text-xs">
-                  Xem giỏ hàng &rarr;
-                </Link>
-              </div>
-            )}
+          <div className="flex gap-4">
+            <button 
+              disabled={product.stockQuantity <= 0}
+              className="flex-1 bg-accent hover:bg-accent-hover text-white py-3.5 px-6 rounded-lg font-medium text-base transition-colors shadow-sm flex justify-center items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              onClick={() => void handleAddToCart()}
+            >
+              <span className="material-symbols-outlined">shopping_cart</span>
+              Thêm vào giỏ hàng
+            </button>
           </div>
+          {cartError && <p role="alert" className="mt-3 text-red-600">{cartError}</p>}
+          {cartMessage && <p className="mt-3 text-green-700">{cartMessage}</p>}
           
           <div className="mt-8 pt-6 border-t border-outline-variant grid grid-cols-2 gap-4 text-sm">
             <div className="flex items-center gap-3 text-on-surface-variant">

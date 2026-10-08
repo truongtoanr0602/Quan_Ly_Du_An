@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { cartService } from '../services/cartService';
-import { authService } from '../services/authService';
+import { readSession } from '../services/authSession';
 import { productService } from '../services/productService';
 import { useToast } from '../contexts/ToastContext';
 
@@ -38,7 +38,7 @@ export default function HomePage() {
 
   const handleAddToCart = async (product: ProductItem) => {
     if (product.disabled) return;
-    if (!authService.getCurrentUser()) {
+    if (!readSession()) {
       toast.warning('Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng!', {
         title: 'Chưa đăng nhập',
         actionText: 'Đăng nhập ngay',
@@ -49,7 +49,7 @@ export default function HomePage() {
 
     try {
       setAddingId(product.id);
-      await cartService.addItem({ productId: product.id, quantity: 1 });
+      await cartService.add(product.id, 1);
       window.dispatchEvent(new CustomEvent('cart-updated'));
       toast.success(`Đã thêm "${product.name}" vào giỏ hàng!`, {
         title: 'Thành công',

@@ -50,6 +50,33 @@ foreach ($skillName in $expectedSkills) {
     }
 }
 
+$repositoryRoot = Resolve-Path (Join-Path $PSScriptRoot '..\..')
+$agentsFile = Join-Path $repositoryRoot 'AGENTS.md'
+$projectContextFile = Join-Path $skillsRoot 'project-context\SKILL.md'
+$activeSprintFiles = @($agentsFile, $projectContextFile)
+
+foreach ($file in $activeSprintFiles) {
+    $content = Get-Content -Raw -LiteralPath $file
+
+    foreach ($required in @('Sprint 2', 'US-9', 'US-12', 'US-13', 'US-14', 'US-15')) {
+        if ($content -notmatch [regex]::Escape($required)) {
+            $failures.Add("Active Sprint context is missing '$required': $file")
+        }
+    }
+
+    foreach ($excluded in @(
+        'order cancellation',
+        'admin order management',
+        'inventory administration',
+        'reporting',
+        'password recovery'
+    )) {
+        if ($content -notmatch [regex]::Escape($excluded)) {
+            $failures.Add("Sprint 3 exclusion is missing '$excluded': $file")
+        }
+    }
+}
+
 if ($failures.Count -gt 0) {
     $failures | ForEach-Object { [Console]::Error.WriteLine($_) }
     exit 1

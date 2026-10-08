@@ -113,7 +113,7 @@ Customer có thể thực hiện hoàn chỉnh:
 * Đơn hàng được tạo thành công.  
 * Người dùng có thể xem lịch sử đơn hàng.
 
-**Phạm vi thanh toán:** ưu tiên **COD** để phù hợp với thời gian và phạm vi của dự án.
+**Phạm vi thanh toán:** hỗ trợ **COD** và **QR mô phỏng**. QR chỉ minh họa luồng lựa chọn thanh toán, không kết nối ngân hàng, cổng thanh toán hoặc tự động xác minh giao dịch.
 
 ---
 
@@ -286,4 +286,3 @@ Cách chia này ưu tiên phát triển theo dependency của hệ thống:
 Sau **Sprint 2**, nhóm phải đạt được một **MVP có quy trình mua hàng end-to-end**. Sprint 3 tập trung vào các chức năng quản trị còn lại, bảo mật tài khoản, testing, integration và hoàn thiện sản phẩm.
 
 Sprint Backlog là cơ sở để nhóm tạo **Sprint trên Jira**, estimate Story Point, phân rã thành Task/Sub-task và theo dõi tiến độ trong từng Sprint.
-

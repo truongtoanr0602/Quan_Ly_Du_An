@@ -1,36 +1,27 @@
 using ECommerce.Api.DTOs.Profile;
-using ECommerce.Api.Helpers;
+using ECommerce.Api.Extensions;
 using ECommerce.Api.Services.Profile;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ECommerce.Api.Controllers;
 
-[Route("api/[controller]")]
 [ApiController]
-[Authorize]
-public class ProfileController : ControllerBase
+[Authorize(Roles = "Customer")]
+[Route("api/profile")]
+public sealed class ProfileController(IProfileService service) : ControllerBase
 {
-    private readonly IProfileService _profileService;
-
-    public ProfileController(IProfileService profileService)
-    {
-        _profileService = profileService;
-    }
-
     [HttpGet]
-    public async Task<IActionResult> GetProfile(CancellationToken cancellationToken)
+    public async Task<ActionResult<ProfileDto>> Get(CancellationToken cancellationToken)
     {
-        var userId = User.GetUserId();
-        var profile = await _profileService.GetProfileAsync(userId, cancellationToken);
-        return Ok(profile);
+        return Ok(await service.GetAsync(User.GetRequiredUserId(), cancellationToken));
     }
 
     [HttpPut]
-    public async Task<IActionResult> UpdateProfile(UpdateProfileDto dto, CancellationToken cancellationToken)
+    public async Task<ActionResult<ProfileDto>> Update(
+        UpdateProfileDto dto,
+        CancellationToken cancellationToken)
     {
-        var userId = User.GetUserId();
-        var profile = await _profileService.UpdateProfileAsync(userId, dto, cancellationToken);
-        return Ok(profile);
+        return Ok(await service.UpdateAsync(User.GetRequiredUserId(), dto, cancellationToken));
     }
 }

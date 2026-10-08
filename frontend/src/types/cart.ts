@@ -1,26 +1,16 @@
-export interface CartItemDto {
-  cartItemId: number;
-  productId: number;
-  productName: string;
-  imageUrl?: string;
-  price: number;
-  quantity: number;
-  stockQuantity: number;
-  subTotal: number;
+export interface CartItem {
+  productID: number
+  productName: string
+  sku: string
+  unitPrice: number
+  quantity: number
+  stockQuantity: number
+  imageURL?: string
+  lineTotal: number
 }
 
-export interface CartDto {
-  cartId: number;
-  items: CartItemDto[];
-  totalPrice: number;
-  totalItems: number;
-}
-
-export interface AddCartItemRequest {
-  productId: number;
-  quantity: number;
-}
-
-export interface UpdateCartItemRequest {
-  quantity: number;
+export interface Cart {
+  items: CartItem[]
+  totalItems: number
+  totalAmount: number
 }

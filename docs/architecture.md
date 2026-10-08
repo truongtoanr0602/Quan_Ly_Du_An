@@ -1,5 +1,9 @@
 # **BÁO CÁO CHỐT KIẾN TRÚC HỆ THỐNG, DATABASE ERD VÀ CẤU TRÚC SOLUTION .NET**
 
+> Current architecture status: **Sprint 2 - Shopping & Ordering** is active on the approved Sprint 1 technical foundation. The historical baseline sections below remain design context.
+
+
+
 ## **1\. Thông tin chung**
 
 **Tên dự án:** Website bán hàng trực tuyến  

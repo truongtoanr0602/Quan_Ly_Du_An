@@ -1,118 +1,83 @@
-import { useState, useEffect } from 'react';
-import { profileService } from '../services/profileService';
-import type { ProfileDto } from '../types/admin';
+import { useEffect, useState, type FormEvent } from 'react'
+import { useAuth } from '../contexts/AuthContext'
+import { profileService, type Profile } from '../services/profileService'
 
 export default function ProfilePage() {
-  const [profile, setProfile] = useState<ProfileDto | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
-  const [tab, setTab] = useState<'info' | 'password'>('info');
-  const [form, setForm] = useState({ fullName: '', phone: '' });
-  const [pwForm, setPwForm] = useState({ currentPassword: '', newPassword: '', confirmPassword: '' });
+  const { updateUser } = useAuth()
+  const [profile, setProfile] = useState<Profile | null>(null)
+  const [fullName, setFullName] = useState('')
+  const [phone, setPhone] = useState('')
+  const [avatarURL, setAvatarURL] = useState('')
+  const [error, setError] = useState<string | null>(null)
+  const [success, setSuccess] = useState<string | null>(null)
+  const [isSaving, setIsSaving] = useState(false)
 
   useEffect(() => {
-    profileService.getProfile()
-      .then(data => { setProfile(data); setForm({ fullName: data.fullName, phone: data.phone || '' }); })
-      .catch(() => {})
-      .finally(() => setLoading(false));
-  }, []);
+    let active = true
+    profileService.get()
+      .then((result) => {
+        if (!active) return
+        setProfile(result)
+        setFullName(result.fullName)
+        setPhone(result.phone ?? '')
+        setAvatarURL(result.avatarURL ?? '')
+      })
+      .catch((reason: unknown) => {
+        if (active) setError(reason instanceof Error ? reason.message : 'Khong the tai ho so.')
+      })
+    return () => { active = false }
+  }, [])
 
-  const handleUpdateProfile = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const submit = async (event: FormEvent) => {
+    event.preventDefault()
+    setError(null)
+    setSuccess(null)
+    setIsSaving(true)
     try {
-      setSaving(true);
-      const updated = await profileService.updateProfile(form);
-      setProfile(updated);
-      alert('Cập nhật thành công!');
-    } catch (err: any) {
-      alert(err.message);
+      const updated = await profileService.update({
+        fullName: fullName.trim(),
+        phone: phone.trim() || undefined,
+        avatarURL: avatarURL.trim() || undefined,
+      })
+      setProfile(updated)
+      setFullName(updated.fullName)
+      setPhone(updated.phone ?? '')
+      setAvatarURL(updated.avatarURL ?? '')
+      updateUser({ id: updated.userID, email: updated.email, fullName: updated.fullName, role: 'Customer' })
+      setSuccess('Cap nhat ho so thanh cong.')
+    } catch (reason: unknown) {
+      setError(reason instanceof Error ? reason.message : 'Khong the cap nhat ho so.')
     } finally {
-      setSaving(false);
+      setIsSaving(false)
     }
-  };
+  }
 
-  const handleChangePassword = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (pwForm.newPassword !== pwForm.confirmPassword) { alert('Mật khẩu xác nhận không khớp!'); return; }
-    if (pwForm.newPassword.length < 6) { alert('Mật khẩu mới phải ít nhất 6 ký tự!'); return; }
-    try {
-      setSaving(true);
-      await profileService.changePassword({ currentPassword: pwForm.currentPassword, newPassword: pwForm.newPassword });
-      alert('Đổi mật khẩu thành công!');
-      setPwForm({ currentPassword: '', newPassword: '', confirmPassword: '' });
-    } catch (err: any) {
-      alert(err.message);
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  if (loading) return <div className="p-8 text-center text-on-surface-variant">Đang tải...</div>;
-  if (!profile) return <div className="p-8 text-center text-error">Không thể tải thông tin</div>;
+  if (!profile && !error) return <p>Dang tai ho so...</p>
 
   return (
-    <div className="max-w-2xl mx-auto px-4 py-6">
-      <h1 className="text-2xl font-bold text-on-surface mb-6">Tài khoản của tôi</h1>
-
-      <div className="flex gap-1 mb-6 bg-surface-container-low rounded-full p-1">
-        <button onClick={() => setTab('info')}
-          className={`flex-1 py-2 px-4 rounded-full text-sm font-medium transition-colors ${tab === 'info' ? 'bg-primary text-on-primary' : 'text-on-surface-variant hover:text-on-surface'}`}>
-          Thông tin cá nhân
-        </button>
-        <button onClick={() => setTab('password')}
-          className={`flex-1 py-2 px-4 rounded-full text-sm font-medium transition-colors ${tab === 'password' ? 'bg-primary text-on-primary' : 'text-on-surface-variant hover:text-on-surface'}`}>
-          Đổi mật khẩu
-        </button>
-      </div>
-
-      {tab === 'info' ? (
-        <form onSubmit={handleUpdateProfile} className="space-y-4 p-6 bg-surface-container-low rounded-2xl border border-outline-variant">
-          <div>
-            <label className="block text-sm font-medium text-on-surface-variant mb-1">Email</label>
-            <input type="email" value={profile.email} disabled className="w-full px-4 py-3 bg-surface-container border border-outline-variant rounded-xl text-on-surface-variant" />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-on-surface-variant mb-1">Họ tên</label>
-            <input type="text" value={form.fullName} onChange={e => setForm(p => ({ ...p, fullName: e.target.value }))}
-              className="w-full px-4 py-3 bg-surface-container-low border border-outline-variant rounded-xl text-on-surface focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20" required />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-on-surface-variant mb-1">Số điện thoại</label>
-            <input type="tel" value={form.phone} onChange={e => setForm(p => ({ ...p, phone: e.target.value }))}
-              className="w-full px-4 py-3 bg-surface-container-low border border-outline-variant rounded-xl text-on-surface focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20" />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-on-surface-variant mb-1">Vai trò</label>
-            <input type="text" value={profile.role} disabled className="w-full px-4 py-3 bg-surface-container border border-outline-variant rounded-xl text-on-surface-variant" />
-          </div>
-          <button type="submit" disabled={saving}
-            className="w-full bg-primary text-on-primary py-3 rounded-full font-semibold hover:opacity-90 transition-opacity disabled:opacity-50">
-            {saving ? 'Đang lưu...' : 'Lưu thay đổi'}
-          </button>
-        </form>
-      ) : (
-        <form onSubmit={handleChangePassword} className="space-y-4 p-6 bg-surface-container-low rounded-2xl border border-outline-variant">
-          <div>
-            <label className="block text-sm font-medium text-on-surface-variant mb-1">Mật khẩu hiện tại</label>
-            <input type="password" value={pwForm.currentPassword} onChange={e => setPwForm(p => ({ ...p, currentPassword: e.target.value }))}
-              className="w-full px-4 py-3 bg-surface-container-low border border-outline-variant rounded-xl text-on-surface focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20" required />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-on-surface-variant mb-1">Mật khẩu mới</label>
-            <input type="password" value={pwForm.newPassword} onChange={e => setPwForm(p => ({ ...p, newPassword: e.target.value }))}
-              className="w-full px-4 py-3 bg-surface-container-low border border-outline-variant rounded-xl text-on-surface focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20" required minLength={6} />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-on-surface-variant mb-1">Xác nhận mật khẩu mới</label>
-            <input type="password" value={pwForm.confirmPassword} onChange={e => setPwForm(p => ({ ...p, confirmPassword: e.target.value }))}
-              className="w-full px-4 py-3 bg-surface-container-low border border-outline-variant rounded-xl text-on-surface focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20" required minLength={6} />
-          </div>
-          <button type="submit" disabled={saving}
-            className="w-full bg-primary text-on-primary py-3 rounded-full font-semibold hover:opacity-90 transition-opacity disabled:opacity-50">
-            {saving ? 'Đang xử lý...' : 'Đổi mật khẩu'}
+    <section className="mx-auto w-full max-w-2xl px-4 py-8">
+      <h1 className="mb-6 text-2xl font-bold">Ho so ca nhan</h1>
+      {error && <p role="alert" className="mb-4 text-red-600">{error}</p>}
+      {success && <p className="mb-4 text-green-700">{success}</p>}
+      {profile && (
+        <form onSubmit={submit} className="grid gap-4">
+          <label>Email
+            <input value={profile.email} disabled className="mt-1 w-full rounded border p-2" />
+          </label>
+          <label>Ho ten
+            <input aria-label="Ho ten" required maxLength={100} value={fullName} onChange={(event) => setFullName(event.target.value)} className="mt-1 w-full rounded border p-2" />
+          </label>
+          <label>So dien thoai
+            <input value={phone} maxLength={20} onChange={(event) => setPhone(event.target.value)} className="mt-1 w-full rounded border p-2" />
+          </label>
+          <label>Avatar URL
+            <input value={avatarURL} maxLength={500} onChange={(event) => setAvatarURL(event.target.value)} className="mt-1 w-full rounded border p-2" />
+          </label>
+          <button type="submit" disabled={isSaving || fullName.trim().length === 0} className="rounded bg-primary px-4 py-2 text-white disabled:opacity-50">
+            {isSaving ? 'Dang luu...' : 'Luu thay doi'}
           </button>
         </form>
       )}
-    </div>
-  );
+    </section>
+  )
 }

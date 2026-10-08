@@ -1,104 +1,34 @@
-import { useState, useEffect } from 'react';
-import { orderService } from '../services/orderService';
-import type { OrderDto } from '../types/order';
+import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
+import { orderService } from '../services/orderService'
+import type { PagedOrders } from '../types/order'
 
-const statusColors: Record<string, string> = {
-  PENDING: 'bg-yellow-100 text-yellow-800',
-  CONFIRMED: 'bg-blue-100 text-blue-800',
-  SHIPPING: 'bg-purple-100 text-purple-800',
-  COMPLETED: 'bg-green-100 text-green-800',
-  CANCELLED: 'bg-red-100 text-red-800',
-};
-
-const statusLabels: Record<string, string> = {
-  PENDING: 'Chờ xác nhận', CONFIRMED: 'Đã xác nhận', SHIPPING: 'Đang giao',
-  COMPLETED: 'Hoàn thành', CANCELLED: 'Đã hủy',
-};
+const money = (value: number) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value)
 
 export default function OrderHistoryPage() {
-  const [orders, setOrders] = useState<OrderDto[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [selectedOrder, setSelectedOrder] = useState<OrderDto | null>(null);
-
+  const [data, setData] = useState<PagedOrders | null>(null)
+  const [page, setPage] = useState(1)
+  const [error, setError] = useState<string | null>(null)
   useEffect(() => {
-    orderService.getMyOrders().then(setOrders).catch(() => {}).finally(() => setLoading(false));
-  }, []);
-
-  const handleCancel = async (orderId: number) => {
-    if (!confirm('Bạn chắc chắn muốn hủy đơn hàng này?')) return;
-    try {
-      const updated = await orderService.cancelOrder(orderId);
-      setOrders(prev => prev.map(o => o.orderId === orderId ? updated : o));
-      if (selectedOrder?.orderId === orderId) setSelectedOrder(updated);
-      alert('Đã hủy đơn hàng thành công');
-    } catch (err: any) {
-      alert(err.message || 'Không thể hủy đơn hàng');
-    }
-  };
-
-  if (loading) return <div className="p-8 text-center text-on-surface-variant">Đang tải...</div>;
-
-  return (
-    <div className="max-w-4xl mx-auto px-4 py-6">
-      <h1 className="text-2xl font-bold text-on-surface mb-6">Lịch sử đơn hàng</h1>
-      {orders.length === 0 ? (
-        <div className="text-center py-12 text-on-surface-variant">
-          <span className="material-symbols-outlined text-6xl mb-4 block">receipt_long</span>
-          <p>Chưa có đơn hàng nào</p>
-        </div>
-      ) : (
-        <div className="space-y-4">
-          {orders.map(order => (
-            <div key={order.orderId} className="p-4 bg-surface-container-low rounded-2xl border border-outline-variant">
-              <div className="flex justify-between items-start mb-3">
-                <div>
-                  <p className="font-semibold text-on-surface">Đơn #{order.orderId}</p>
-                  <p className="text-sm text-on-surface-variant">{new Date(order.createdAt).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</p>
-                </div>
-                <span className={`text-xs font-medium px-3 py-1 rounded-full ${statusColors[order.orderStatus] || 'bg-gray-100 text-gray-800'}`}>
-                  {statusLabels[order.orderStatus] || order.orderStatus}
-                </span>
-              </div>
-              <div className="space-y-2 mb-3">
-                {order.items.slice(0, 2).map(item => (
-                  <div key={item.orderDetailId} className="flex justify-between text-sm">
-                    <span className="text-on-surface">{item.productName} x{item.quantity}</span>
-                    <span className="text-on-surface-variant">{item.totalPrice.toLocaleString('vi-VN')}₫</span>
-                  </div>
-                ))}
-                {order.items.length > 2 && <p className="text-xs text-on-surface-variant">...và {order.items.length - 2} sản phẩm khác</p>}
-              </div>
-              <div className="flex justify-between items-center pt-3 border-t border-outline-variant">
-                <p className="font-semibold text-on-surface">Tổng: <span className="text-primary">{order.totalAmount.toLocaleString('vi-VN')}₫</span></p>
-                <div className="flex gap-2">
-                  <button onClick={() => setSelectedOrder(selectedOrder?.orderId === order.orderId ? null : order)}
-                    className="text-sm text-primary hover:underline">Chi tiết</button>
-                  {(order.orderStatus === 'PENDING' || order.orderStatus === 'CONFIRMED') && (
-                    <button onClick={() => handleCancel(order.orderId)} className="text-sm text-error hover:underline">Hủy đơn</button>
-                  )}
-                </div>
-              </div>
-              {selectedOrder?.orderId === order.orderId && (
-                <div className="mt-3 pt-3 border-t border-outline-variant space-y-2 text-sm">
-                  <p><strong>Người nhận:</strong> {order.receiverName} - {order.receiverPhone}</p>
-                  <p><strong>Địa chỉ:</strong> {order.shippingAddress}</p>
-                  <p><strong>Thanh toán:</strong> {order.paymentMethod} ({order.paymentStatus})</p>
-                  {order.note && <p><strong>Ghi chú:</strong> {order.note}</p>}
-                  <div className="mt-2">
-                    <p className="font-medium mb-1">Chi tiết sản phẩm:</p>
-                    {order.items.map(item => (
-                      <div key={item.orderDetailId} className="flex justify-between py-1">
-                        <span>{item.productName} (SKU: {item.sku}) x{item.quantity}</span>
-                        <span>{item.unitPrice.toLocaleString('vi-VN')}₫ = {item.totalPrice.toLocaleString('vi-VN')}₫</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
+    setError(null)
+    orderService.list(page, 10).then(setData)
+      .catch((reason: unknown) => setError(reason instanceof Error ? reason.message : 'Khong the tai don hang.'))
+  }, [page])
+  return <section className="mx-auto w-full max-w-5xl px-4 py-8">
+    <h1 className="mb-6 text-2xl font-bold">Don hang cua toi</h1>
+    {error && <p role="alert" className="text-red-600">{error}</p>}
+    {!data && !error ? <p>Dang tai don hang...</p> : data?.items.length === 0 ? <p>Chua co don hang.</p> : <div className="grid gap-4">
+      {data?.items.map((order) => <article key={order.orderID} className="rounded border p-4">
+        <div className="flex justify-between"><h2 className="font-semibold">Don #{order.orderID}</h2><span>{order.orderStatus}</span></div>
+        <p>{new Date(order.createdAt).toLocaleDateString('vi-VN')} ? {order.totalItems} san pham</p>
+        <p className="font-bold">{money(order.totalAmount)}</p>
+        <Link className="text-primary" to={'/orders/' + order.orderID}>Xem chi tiet</Link>
+      </article>)}
+      {data && data.totalPages > 1 && <div className="flex gap-3">
+        <button disabled={page === 1} onClick={() => setPage(page - 1)}>Trang truoc</button>
+        <span>{page}/{data.totalPages}</span>
+        <button disabled={page === data.totalPages} onClick={() => setPage(page + 1)}>Trang sau</button>
+      </div>}
+    </div>}
+  </section>
 }

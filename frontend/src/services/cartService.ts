@@ -1,24 +1,18 @@
-import { apiClient } from './apiClient';
-import type { CartDto, AddCartItemRequest, UpdateCartItemRequest } from '../types/cart';
+import { apiClient } from './apiClient'
+import type { Cart } from '../types/cart'
 
 export const cartService = {
-  getCart: (): Promise<CartDto> => apiClient<CartDto>('/carts'),
-
-  addItem: (data: AddCartItemRequest): Promise<CartDto> =>
-    apiClient<CartDto>('/carts/items', {
-      method: 'POST',
-      body: JSON.stringify(data),
-    }),
-
-  updateItemQuantity: (cartItemId: number, data: UpdateCartItemRequest): Promise<CartDto> =>
-    apiClient<CartDto>(`/carts/items/${cartItemId}`, {
-      method: 'PUT',
-      body: JSON.stringify(data),
-    }),
-
-  removeItem: (cartItemId: number): Promise<void> =>
-    apiClient<void>(`/carts/items/${cartItemId}`, { method: 'DELETE' }),
-
-  clearCart: (): Promise<void> =>
-    apiClient<void>('/carts', { method: 'DELETE' }),
-};
+  get: (): Promise<Cart> => apiClient<Cart>('/cart'),
+  add: (productID: number, quantity: number): Promise<Cart> => apiClient<Cart>('/cart/items', {
+    method: 'POST',
+    body: JSON.stringify({ productID, quantity }),
+  }),
+  update: (productID: number, quantity: number): Promise<Cart> => apiClient<Cart>(`/cart/items/${productID}`, {
+    method: 'PUT',
+    body: JSON.stringify({ quantity }),
+  }),
+  remove: (productID: number): Promise<void> => apiClient<void>(`/cart/items/${productID}`, {
+    method: 'DELETE',
+  }),
+  clear: (): Promise<void> => apiClient<void>('/cart', { method: 'DELETE' }),
+}

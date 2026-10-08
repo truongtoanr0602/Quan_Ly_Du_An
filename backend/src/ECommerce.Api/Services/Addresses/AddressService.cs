@@ -1,119 +1,114 @@
 using ECommerce.Api.Data;
+using System.Data;
 using ECommerce.Api.DTOs.Addresses;
 using ECommerce.Api.Entities;
+using ECommerce.Api.Exceptions;
 using Microsoft.EntityFrameworkCore;
 
 namespace ECommerce.Api.Services.Addresses;
 
-public class AddressService : IAddressService
+public sealed class AddressService(AppDbContext context) : IAddressService
 {
-    private readonly AppDbContext _context;
-
-    public AddressService(AppDbContext context)
+    public async Task<IReadOnlyList<AddressDto>> ListAsync(int userId, CancellationToken ct = default)
     {
-        _context = context;
+        return await context.Addresses
+            .AsNoTracking()
+            .Where(address => address.UserID == userId)
+            .OrderByDescending(address => address.IsDefault)
+            .ThenByDescending(address => address.CreatedAt)
+            .Select(address => ToDto(address))
+            .ToArrayAsync(ct);
     }
 
-    public async Task<List<AddressDto>> GetUserAddressesAsync(int userId, CancellationToken cancellationToken = default)
+    public async Task<AddressDto> CreateAsync(int userId, AddressWriteDto dto, CancellationToken ct = default)
     {
-        return await _context.Addresses
-            .Where(a => a.UserID == userId)
-            .OrderByDescending(a => a.IsDefault)
-            .ThenByDescending(a => a.CreatedAt)
-            .Select(a => MapToDto(a))
-            .ToListAsync(cancellationToken);
-    }
-
-    public async Task<AddressDto> GetByIdAsync(int userId, int addressId, CancellationToken cancellationToken = default)
-    {
-        var address = await _context.Addresses
-            .FirstOrDefaultAsync(a => a.AddressID == addressId && a.UserID == userId, cancellationToken)
-            ?? throw new KeyNotFoundException("Address not found.");
-
-        return MapToDto(address);
-    }
-
-    public async Task<AddressDto> CreateAsync(int userId, AddressCreateDto dto, CancellationToken cancellationToken = default)
-    {
-        if (dto.IsDefault)
-        {
-            await ClearDefaultAsync(userId, cancellationToken);
-        }
+        await using var transaction = await context.Database.BeginTransactionAsync(IsolationLevel.Serializable, ct);
+        var hasAddress = await context.Addresses.AnyAsync(address => address.UserID == userId, ct);
+        var makeDefault = dto.IsDefault || !hasAddress;
+        if (makeDefault) await ClearDefaultsAsync(userId, null, ct);
 
         var address = new Address
         {
             UserID = userId,
-            ReceiverName = dto.ReceiverName,
-            ReceiverPhone = dto.ReceiverPhone,
-            Province = dto.Province,
-            District = dto.District,
-            Ward = dto.Ward,
-            FullAddress = dto.FullAddress,
-            IsDefault = dto.IsDefault,
+            ReceiverName = Required(dto.ReceiverName),
+            ReceiverPhone = Required(dto.ReceiverPhone),
+            Province = Optional(dto.Province),
+            District = Optional(dto.District),
+            Ward = Optional(dto.Ward),
+            FullAddress = Required(dto.FullAddress),
+            IsDefault = makeDefault,
             CreatedAt = DateTime.UtcNow
         };
-
-        _context.Addresses.Add(address);
-        await _context.SaveChangesAsync(cancellationToken);
-
-        return MapToDto(address);
+        context.Addresses.Add(address);
+        await context.SaveChangesAsync(ct);
+        await transaction.CommitAsync(ct);
+        return ToDto(address);
     }
 
-    public async Task<AddressDto> UpdateAsync(int userId, int addressId, AddressUpdateDto dto, CancellationToken cancellationToken = default)
+    public async Task<AddressDto> UpdateAsync(
+        int userId,
+        int addressId,
+        AddressWriteDto dto,
+        CancellationToken ct = default)
     {
-        var address = await _context.Addresses
-            .FirstOrDefaultAsync(a => a.AddressID == addressId && a.UserID == userId, cancellationToken)
-            ?? throw new KeyNotFoundException("Address not found.");
+        await using var transaction = await context.Database.BeginTransactionAsync(IsolationLevel.Serializable, ct);
+        var address = await context.Addresses
+            .SingleOrDefaultAsync(candidate => candidate.AddressID == addressId && candidate.UserID == userId, ct)
+            ?? throw new ResourceNotFoundException();
 
-        if (dto.IsDefault && !address.IsDefault)
-        {
-            await ClearDefaultAsync(userId, cancellationToken);
-        }
-
-        address.ReceiverName = dto.ReceiverName;
-        address.ReceiverPhone = dto.ReceiverPhone;
-        address.Province = dto.Province;
-        address.District = dto.District;
-        address.Ward = dto.Ward;
-        address.FullAddress = dto.FullAddress;
+        if (dto.IsDefault) await ClearDefaultsAsync(userId, addressId, ct);
+        address.ReceiverName = Required(dto.ReceiverName);
+        address.ReceiverPhone = Required(dto.ReceiverPhone);
+        address.Province = Optional(dto.Province);
+        address.District = Optional(dto.District);
+        address.Ward = Optional(dto.Ward);
+        address.FullAddress = Required(dto.FullAddress);
         address.IsDefault = dto.IsDefault;
-        address.UpdatedAt = DateTime.UtcNow;
-
-        await _context.SaveChangesAsync(cancellationToken);
-        return MapToDto(address);
+        await context.SaveChangesAsync(ct);
+        await transaction.CommitAsync(ct);
+        return ToDto(address);
     }
 
-    public async Task DeleteAsync(int userId, int addressId, CancellationToken cancellationToken = default)
+    public async Task DeleteAsync(int userId, int addressId, CancellationToken ct = default)
     {
-        var address = await _context.Addresses
-            .FirstOrDefaultAsync(a => a.AddressID == addressId && a.UserID == userId, cancellationToken)
-            ?? throw new KeyNotFoundException("Address not found.");
+        var address = await context.Addresses
+            .SingleOrDefaultAsync(candidate => candidate.AddressID == addressId && candidate.UserID == userId, ct)
+            ?? throw new ResourceNotFoundException();
 
-        _context.Addresses.Remove(address);
-        await _context.SaveChangesAsync(cancellationToken);
+        context.Addresses.Remove(address);
+        await context.SaveChangesAsync(ct);
     }
 
-    private async Task ClearDefaultAsync(int userId, CancellationToken cancellationToken)
+    private async Task ClearDefaultsAsync(int userId, int? exceptAddressId, CancellationToken ct)
     {
-        var defaults = await _context.Addresses
-            .Where(a => a.UserID == userId && a.IsDefault)
-            .ToListAsync(cancellationToken);
-
-        foreach (var addr in defaults)
-        {
-            addr.IsDefault = false;
-        }
+        var defaults = await context.Addresses
+            .Where(address => address.UserID == userId
+                && address.IsDefault
+                && (!exceptAddressId.HasValue || address.AddressID != exceptAddressId.Value))
+            .ToArrayAsync(ct);
+        foreach (var address in defaults) address.IsDefault = false;
     }
 
-    private static AddressDto MapToDto(Address a) => new()
+    private static string Required(string value)
     {
-        AddressId = a.AddressID,
-        ReceiverName = a.ReceiverName,
-        ReceiverPhone = a.ReceiverPhone,
-        Province = a.Province,
-        District = a.District,
-        Ward = a.Ward,
-        FullAddress = a.FullAddress,
-        IsDefault = a.IsDefault
-    };
+        var normalized = value.Trim();
+        if (normalized.Length == 0) throw new DomainValidationException();
+        return normalized;
+    }
+
+    private static string? Optional(string? value)
+    {
+        var normalized = value?.Trim();
+        return string.IsNullOrEmpty(normalized) ? null : normalized;
+    }
+
+    private static AddressDto ToDto(Address address) => new(
+        address.AddressID,
+        address.ReceiverName,
+        address.ReceiverPhone,
+        address.Province,
+        address.District,
+        address.Ward,
+        address.FullAddress,
+        address.IsDefault);
 }

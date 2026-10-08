@@ -1,60 +1,35 @@
 using ECommerce.Api.DTOs.Addresses;
-using ECommerce.Api.Helpers;
+using ECommerce.Api.Extensions;
 using ECommerce.Api.Services.Addresses;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ECommerce.Api.Controllers;
 
-[Route("api/[controller]")]
 [ApiController]
-[Authorize]
-public class AddressesController : ControllerBase
+[Authorize(Roles = "Customer")]
+[Route("api/addresses")]
+public sealed class AddressesController(IAddressService service) : ControllerBase
 {
-    private readonly IAddressService _addressService;
-
-    public AddressesController(IAddressService addressService)
-    {
-        _addressService = addressService;
-    }
-
     [HttpGet]
-    public async Task<IActionResult> GetAddresses(CancellationToken cancellationToken)
-    {
-        var userId = User.GetUserId();
-        var addresses = await _addressService.GetUserAddressesAsync(userId, cancellationToken);
-        return Ok(addresses);
-    }
-
-    [HttpGet("{id}")]
-    public async Task<IActionResult> GetAddress(int id, CancellationToken cancellationToken)
-    {
-        var userId = User.GetUserId();
-        var address = await _addressService.GetByIdAsync(userId, id, cancellationToken);
-        return Ok(address);
-    }
+    public async Task<ActionResult<IReadOnlyList<AddressDto>>> List(CancellationToken ct) =>
+        Ok(await service.ListAsync(User.GetRequiredUserId(), ct));
 
     [HttpPost]
-    public async Task<IActionResult> CreateAddress(AddressCreateDto dto, CancellationToken cancellationToken)
+    public async Task<ActionResult<AddressDto>> Create(AddressWriteDto dto, CancellationToken ct)
     {
-        var userId = User.GetUserId();
-        var address = await _addressService.CreateAsync(userId, dto, cancellationToken);
-        return CreatedAtAction(nameof(GetAddress), new { id = address.AddressId }, address);
+        var result = await service.CreateAsync(User.GetRequiredUserId(), dto, ct);
+        return CreatedAtAction(nameof(List), result);
     }
 
-    [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateAddress(int id, AddressUpdateDto dto, CancellationToken cancellationToken)
-    {
-        var userId = User.GetUserId();
-        var address = await _addressService.UpdateAsync(userId, id, dto, cancellationToken);
-        return Ok(address);
-    }
+    [HttpPut("{id:int}")]
+    public async Task<ActionResult<AddressDto>> Update(int id, AddressWriteDto dto, CancellationToken ct) =>
+        Ok(await service.UpdateAsync(User.GetRequiredUserId(), id, dto, ct));
 
-    [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteAddress(int id, CancellationToken cancellationToken)
+    [HttpDelete("{id:int}")]
+    public async Task<IActionResult> Delete(int id, CancellationToken ct)
     {
-        var userId = User.GetUserId();
-        await _addressService.DeleteAsync(userId, id, cancellationToken);
+        await service.DeleteAsync(User.GetRequiredUserId(), id, ct);
         return NoContent();
     }
 }

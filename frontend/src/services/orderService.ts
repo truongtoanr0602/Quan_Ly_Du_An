@@ -1,35 +1,24 @@
-import { apiClient } from './apiClient';
-import type { OrderDto, CreateOrderRequest, PagedOrderResult } from '../types/order';
+import { apiClient } from './apiClient'
+import type { CheckoutRequest, OrderDetail, OrderDto, PagedAdminOrders, PagedOrders } from '../types/order'
 
 export const orderService = {
-  createOrder: (data: CreateOrderRequest): Promise<OrderDto> =>
-    apiClient<OrderDto>('/orders', {
-      method: 'POST',
-      body: JSON.stringify(data),
-    }),
-
-  getMyOrders: (): Promise<OrderDto[]> => apiClient<OrderDto[]>('/orders'),
-
-  getOrderById: (id: number): Promise<OrderDto> => apiClient<OrderDto>(`/orders/${id}`),
-
-  cancelOrder: (id: number): Promise<OrderDto> =>
-    apiClient<OrderDto>(`/orders/${id}/cancel`, { method: 'PUT' }),
-
-  // Admin endpoints
-  getAllOrders: (pageNumber = 1, pageSize = 10, status?: string): Promise<PagedOrderResult> => {
-    const params = new URLSearchParams();
-    params.append('pageNumber', pageNumber.toString());
-    params.append('pageSize', pageSize.toString());
-    if (status) params.append('status', status);
-    return apiClient<PagedOrderResult>(`/orders/admin?${params.toString()}`);
+  checkout: (request: CheckoutRequest): Promise<OrderDetail> => apiClient<OrderDetail>('/orders', {
+    method: 'POST',
+    body: JSON.stringify(request),
+  }),
+  list: (pageNumber = 1, pageSize = 10): Promise<PagedOrders> =>
+    apiClient<PagedOrders>('/orders?pageNumber=' + pageNumber + '&pageSize=' + pageSize),
+  get: (orderID: number): Promise<OrderDetail> => apiClient<OrderDetail>('/orders/' + orderID),
+  getAllOrders: (pageNumber = 1, pageSize = 10, status?: string): Promise<PagedAdminOrders> => {
+    const params = new URLSearchParams({ pageNumber: String(pageNumber), pageSize: String(pageSize) })
+    if (status) params.set('status', status)
+    return apiClient<PagedAdminOrders>('/admin/orders?' + params.toString())
   },
-
-  getOrderByIdAdmin: (id: number): Promise<OrderDto> =>
-    apiClient<OrderDto>(`/orders/admin/${id}`),
-
-  updateOrderStatus: (id: number, newStatus: string, note?: string): Promise<OrderDto> =>
-    apiClient<OrderDto>(`/orders/${id}/status`, {
+  getOrderByIdAdmin: (orderID: number): Promise<OrderDto> =>
+    apiClient<OrderDto>('/admin/orders/' + orderID),
+  updateOrderStatus: (orderID: number, newStatus: string, note?: string): Promise<OrderDto> =>
+    apiClient<OrderDto>('/admin/orders/' + orderID + '/status', {
       method: 'PUT',
       body: JSON.stringify({ newStatus, note }),
     }),
-};
+}

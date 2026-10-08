@@ -1,270 +1,133 @@
 using ECommerce.Api.Data;
+using ECommerce.Api.Domain;
+using ECommerce.Api.DTOs;
 using ECommerce.Api.DTOs.Orders;
 using ECommerce.Api.Entities;
+using ECommerce.Api.Exceptions;
 using Microsoft.EntityFrameworkCore;
 
 namespace ECommerce.Api.Services.Orders;
 
-public class OrderService : IOrderService
+public sealed class OrderService(AppDbContext context) : IOrderService
 {
-    private readonly AppDbContext _context;
-
-    private static readonly string[] CancellableStatuses = ["PENDING", "CONFIRMED"];
-    private static readonly string[] ValidStatuses = ["PENDING", "CONFIRMED", "SHIPPING", "COMPLETED", "CANCELLED"];
-
-    public OrderService(AppDbContext context)
+    public async Task<OrderDetailDto> CheckoutAsync(int userId, CheckoutDto dto, CancellationToken ct = default)
     {
-        _context = context;
-    }
-
-    public async Task<OrderDto> CreateOrderAsync(int userId, CreateOrderDto dto, CancellationToken cancellationToken = default)
-    {
-        // Lấy giỏ hàng
-        var cart = await _context.Carts
-            .Include(c => c.Items)
-                .ThenInclude(ci => ci.Product)
-            .FirstOrDefaultAsync(c => c.UserID == userId, cancellationToken)
-            ?? throw new InvalidOperationException("Cart is empty.");
-
-        if (cart.Items.Count == 0)
-            throw new InvalidOperationException("Cart is empty.");
-
-        // Validate stock
-        foreach (var item in cart.Items)
+        if (dto.AddressID <= 0 ||
+            (dto.PaymentMethod != OrderConstants.Cod && dto.PaymentMethod != OrderConstants.Qr))
         {
-            if (!item.Product.IsActive)
-                throw new InvalidOperationException($"Product '{item.Product.ProductName}' is no longer available.");
-            if (item.Quantity > item.Product.StockQuantity)
-                throw new InvalidOperationException($"Not enough stock for '{item.Product.ProductName}'. Available: {item.Product.StockQuantity}.");
+            throw new DomainValidationException();
         }
 
-        // Tính tổng
-        var subTotal = cart.Items.Sum(ci => ci.Product.Price * ci.Quantity);
-        var shippingFee = 0m; // MVP: miễn phí ship
+        await using var transaction = await context.Database.BeginTransactionAsync(ct);
+        var address = await context.Addresses
+            .SingleOrDefaultAsync(x => x.AddressID == dto.AddressID && x.UserID == userId, ct)
+            ?? throw new ResourceNotFoundException();
+        var cart = await context.Carts
+            .Include(x => x.Items)
+            .ThenInclude(x => x.Product)
+            .SingleOrDefaultAsync(x => x.UserID == userId, ct);
 
+        if (cart is null || cart.Items.Count == 0)
+        {
+            throw new DomainValidationException();
+        }
+
+        foreach (var line in cart.Items)
+        {
+            if (line.Quantity <= 0 || line.Product is null || !line.Product.IsActive || line.Quantity > line.Product.StockQuantity)
+            {
+                throw new DomainValidationException();
+            }
+        }
+
+        var items = cart.Items
+            .OrderBy(x => x.CartItemID)
+            .Select(x => new OrderDetail
+            {
+                ProductID = x.ProductID,
+                ProductName = x.Product.ProductName,
+                SKU = x.Product.SKU,
+                Quantity = x.Quantity,
+                UnitPrice = x.Product.Price,
+                TotalPrice = x.Product.Price * x.Quantity
+            })
+            .ToList();
+        var subTotal = items.Sum(x => x.TotalPrice);
         var order = new Order
         {
             UserID = userId,
-            ReceiverName = dto.ReceiverName,
-            ReceiverPhone = dto.ReceiverPhone,
-            Province = dto.Province,
-            District = dto.District,
-            Ward = dto.Ward,
-            ShippingAddress = dto.ShippingAddress,
+            ReceiverName = address.ReceiverName,
+            ReceiverPhone = address.ReceiverPhone,
+            Province = address.Province,
+            District = address.District,
+            Ward = address.Ward,
+            ShippingAddress = address.FullAddress,
             SubTotal = subTotal,
-            ShippingFee = shippingFee,
-            TotalAmount = subTotal + shippingFee,
+            ShippingFee = 0m,
+            TotalAmount = subTotal,
             PaymentMethod = dto.PaymentMethod,
-            PaymentStatus = "PENDING",
-            OrderStatus = "PENDING",
-            Note = dto.Note,
-            CreatedAt = DateTime.UtcNow
+            PaymentStatus = OrderConstants.Pending,
+            OrderStatus = OrderConstants.Pending,
+            Note = string.IsNullOrWhiteSpace(dto.Note) ? null : dto.Note.Trim(),
+            OrderDetails = items
         };
 
-        // Tạo OrderDetails (snapshot sản phẩm)
-        foreach (var item in cart.Items)
-        {
-            order.OrderDetails.Add(new OrderDetail
-            {
-                ProductID = item.ProductID,
-                ProductName = item.Product.ProductName,
-                SKU = item.Product.SKU,
-                Quantity = item.Quantity,
-                UnitPrice = item.Product.Price,
-                TotalPrice = item.Product.Price * item.Quantity
-            });
+        context.Orders.Add(order);
+        context.CartItems.RemoveRange(cart.Items);
+        await context.SaveChangesAsync(ct);
+        await transaction.CommitAsync(ct);
+        return MapDetail(order);
+    }
 
-            // Trừ stock
-            item.Product.StockQuantity -= item.Quantity;
+    public async Task<PagedResult<OrderSummaryDto>> ListAsync(
+        int userId, int pageNumber, int pageSize, CancellationToken ct = default)
+    {
+        if (pageNumber < 1 || pageSize is < 1 or > 100)
+        {
+            throw new DomainValidationException();
         }
 
-        // Ghi lịch sử trạng thái
-        order.StatusHistories.Add(new OrderStatusHistory
-        {
-            NewStatus = "PENDING",
-            Note = "Order created",
-            ChangedBy = userId,
-            ChangedAt = DateTime.UtcNow
-        });
-
-        _context.Orders.Add(order);
-
-        // Xóa giỏ hàng
-        _context.CartItems.RemoveRange(cart.Items);
-
-        await _context.SaveChangesAsync(cancellationToken);
-        return MapToDto(order);
-    }
-
-    public async Task<List<OrderDto>> GetUserOrdersAsync(int userId, CancellationToken cancellationToken = default)
-    {
-        var orders = await _context.Orders
-            .Where(o => o.UserID == userId)
-            .Include(o => o.OrderDetails)
-            .OrderByDescending(o => o.CreatedAt)
-            .ToListAsync(cancellationToken);
-
-        return orders.Select(MapToDto).ToList();
-    }
-
-    public async Task<OrderDto> GetOrderByIdAsync(int userId, long orderId, CancellationToken cancellationToken = default)
-    {
-        var order = await _context.Orders
-            .Include(o => o.OrderDetails)
-            .FirstOrDefaultAsync(o => o.OrderID == orderId && o.UserID == userId, cancellationToken)
-            ?? throw new KeyNotFoundException("Order not found.");
-
-        return MapToDto(order);
-    }
-
-    public async Task<OrderDto> CancelOrderAsync(int userId, long orderId, CancellationToken cancellationToken = default)
-    {
-        var order = await _context.Orders
-            .Include(o => o.OrderDetails)
-            .FirstOrDefaultAsync(o => o.OrderID == orderId && o.UserID == userId, cancellationToken)
-            ?? throw new KeyNotFoundException("Order not found.");
-
-        if (!CancellableStatuses.Contains(order.OrderStatus))
-            throw new InvalidOperationException($"Cannot cancel order with status '{order.OrderStatus}'. Only orders with status 'Pending' or 'Confirmed' can be cancelled.");
-
-        // Hoàn lại stock
-        foreach (var detail in order.OrderDetails)
-        {
-            var product = await _context.Products.FindAsync([detail.ProductID], cancellationToken);
-            if (product != null)
-            {
-                product.StockQuantity += detail.Quantity;
-            }
-        }
-
-        var oldStatus = order.OrderStatus;
-        order.OrderStatus = "CANCELLED";
-        order.CancelledAt = DateTime.UtcNow;
-        order.UpdatedAt = DateTime.UtcNow;
-
-        order.StatusHistories.Add(new OrderStatusHistory
-        {
-            OldStatus = oldStatus,
-            NewStatus = "CANCELLED",
-            Note = "Cancelled by customer",
-            ChangedBy = userId,
-            ChangedAt = DateTime.UtcNow
-        });
-
-        await _context.SaveChangesAsync(cancellationToken);
-        return MapToDto(order);
-    }
-
-    public async Task<OrderDto> UpdateOrderStatusAsync(long orderId, int adminUserId, UpdateOrderStatusDto dto, CancellationToken cancellationToken = default)
-    {
-        if (!ValidStatuses.Contains(dto.NewStatus))
-            throw new InvalidOperationException($"Invalid status '{dto.NewStatus}'. Valid statuses: {string.Join(", ", ValidStatuses)}.");
-
-        var order = await _context.Orders
-            .Include(o => o.OrderDetails)
-            .FirstOrDefaultAsync(o => o.OrderID == orderId, cancellationToken)
-            ?? throw new KeyNotFoundException("Order not found.");
-
-        if (order.OrderStatus == dto.NewStatus)
-            throw new InvalidOperationException("Order is already in this status.");
-
-        var oldStatus = order.OrderStatus;
-        order.OrderStatus = dto.NewStatus;
-        order.UpdatedAt = DateTime.UtcNow;
-
-        if (dto.NewStatus == "CONFIRMED")
-            order.ConfirmedAt = DateTime.UtcNow;
-        else if (dto.NewStatus == "COMPLETED")
-        {
-            order.CompletedAt = DateTime.UtcNow;
-            order.PaymentStatus = "PAID";
-        }
-        else if (dto.NewStatus == "CANCELLED")
-        {
-            order.CancelledAt = DateTime.UtcNow;
-            // Hoàn lại stock
-            foreach (var detail in order.OrderDetails)
-            {
-                var product = await _context.Products.FindAsync([detail.ProductID], cancellationToken);
-                if (product != null)
-                    product.StockQuantity += detail.Quantity;
-            }
-        }
-
-        order.StatusHistories.Add(new OrderStatusHistory
-        {
-            OldStatus = oldStatus,
-            NewStatus = dto.NewStatus,
-            Note = dto.Note,
-            ChangedBy = adminUserId,
-            ChangedAt = DateTime.UtcNow
-        });
-
-        await _context.SaveChangesAsync(cancellationToken);
-        return MapToDto(order);
-    }
-
-    public async Task<PagedOrderResult> GetAllOrdersAsync(int pageNumber, int pageSize, string? status, CancellationToken cancellationToken = default)
-    {
-        var query = _context.Orders
-            .Include(o => o.OrderDetails)
-            .Include(o => o.User)
-            .AsQueryable();
-
-        if (!string.IsNullOrEmpty(status))
-            query = query.Where(o => o.OrderStatus == status);
-
-        var totalCount = await query.CountAsync(cancellationToken);
-
-        var orders = await query
-            .OrderByDescending(o => o.CreatedAt)
+        var query = context.Orders.AsNoTracking().Where(x => x.UserID == userId);
+        var totalCount = await query.CountAsync(ct);
+        var items = await query
+            .OrderByDescending(x => x.CreatedAt)
+            .ThenByDescending(x => x.OrderID)
             .Skip((pageNumber - 1) * pageSize)
             .Take(pageSize)
-            .ToListAsync(cancellationToken);
+            .Select(x => new OrderSummaryDto(
+                x.OrderID,
+                x.TotalAmount,
+                x.PaymentMethod,
+                x.PaymentStatus,
+                x.OrderStatus,
+                x.CreatedAt,
+                x.OrderDetails.Sum(item => item.Quantity)))
+            .ToListAsync(ct);
 
-        return new PagedOrderResult
+        return new PagedResult<OrderSummaryDto>
         {
-            Items = orders.Select(MapToDto).ToList(),
+            Items = items,
             TotalCount = totalCount,
             PageNumber = pageNumber,
             PageSize = pageSize
         };
     }
 
-    public async Task<OrderDto> GetOrderByIdAdminAsync(long orderId, CancellationToken cancellationToken = default)
+    public async Task<OrderDetailDto> GetAsync(int userId, long orderId, CancellationToken ct = default)
     {
-        var order = await _context.Orders
-            .Include(o => o.OrderDetails)
-            .FirstOrDefaultAsync(o => o.OrderID == orderId, cancellationToken)
-            ?? throw new KeyNotFoundException("Order not found.");
-
-        return MapToDto(order);
+        var order = await context.Orders.AsNoTracking()
+            .Include(x => x.OrderDetails)
+            .SingleOrDefaultAsync(x => x.OrderID == orderId && x.UserID == userId, ct)
+            ?? throw new ResourceNotFoundException();
+        return MapDetail(order);
     }
 
-    private static OrderDto MapToDto(Order order) => new()
-    {
-        OrderId = order.OrderID,
-        ReceiverName = order.ReceiverName,
-        ReceiverPhone = order.ReceiverPhone,
-        ShippingAddress = order.ShippingAddress,
-        SubTotal = order.SubTotal,
-        ShippingFee = order.ShippingFee,
-        TotalAmount = order.TotalAmount,
-        PaymentMethod = order.PaymentMethod,
-        PaymentStatus = order.PaymentStatus,
-        OrderStatus = order.OrderStatus,
-        Note = order.Note,
-        CreatedAt = order.CreatedAt,
-        UpdatedAt = order.UpdatedAt,
-        Items = order.OrderDetails.Select(d => new OrderDetailDto
-        {
-            OrderDetailId = d.OrderDetailID,
-            ProductId = d.ProductID,
-            ProductName = d.ProductName,
-            Sku = d.SKU,
-            Quantity = d.Quantity,
-            UnitPrice = d.UnitPrice,
-            TotalPrice = d.TotalPrice
-        }).ToList()
-    };
+    private static OrderDetailDto MapDetail(Order order) => new(
+        order.OrderID, order.UserID, order.ReceiverName, order.ReceiverPhone,
+        order.Province, order.District, order.Ward, order.ShippingAddress,
+        order.SubTotal, order.ShippingFee, order.TotalAmount, order.PaymentMethod,
+        order.PaymentStatus, order.OrderStatus, order.Note, order.CreatedAt,
+        order.OrderDetails.OrderBy(x => x.OrderDetailID)
+            .Select(x => new OrderItemDto(x.ProductID, x.ProductName, x.SKU, x.Quantity, x.UnitPrice, x.TotalPrice))
+            .ToList());
 }

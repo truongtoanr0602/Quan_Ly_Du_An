@@ -123,6 +123,43 @@ namespace ECommerce.Api.Migrations
                         .HasDatabaseName("UQ_Brands_Name");
 
                     b.ToTable("Brands", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            BrandID = 1,
+                            BrandName = "Apple",
+                            CreatedAt = new DateTime(2026, 8, 29, 0, 0, 0, 0, DateTimeKind.Utc),
+                            IsActive = true
+                        },
+                        new
+                        {
+                            BrandID = 2,
+                            BrandName = "ASUS",
+                            CreatedAt = new DateTime(2026, 8, 29, 0, 0, 0, 0, DateTimeKind.Utc),
+                            IsActive = true
+                        },
+                        new
+                        {
+                            BrandID = 3,
+                            BrandName = "Lenovo",
+                            CreatedAt = new DateTime(2026, 8, 29, 0, 0, 0, 0, DateTimeKind.Utc),
+                            IsActive = true
+                        },
+                        new
+                        {
+                            BrandID = 4,
+                            BrandName = "Dell",
+                            CreatedAt = new DateTime(2026, 8, 29, 0, 0, 0, 0, DateTimeKind.Utc),
+                            IsActive = true
+                        },
+                        new
+                        {
+                            BrandID = 5,
+                            BrandName = "Sony",
+                            CreatedAt = new DateTime(2026, 8, 29, 0, 0, 0, 0, DateTimeKind.Utc),
+                            IsActive = true
+                        });
                 });
 
             modelBuilder.Entity("ECommerce.Api.Entities.Cart", b =>
@@ -396,7 +433,7 @@ namespace ECommerce.Api.Migrations
                         {
                             t.HasCheckConstraint("CK_Orders_OrderStatus", "[OrderStatus] IN ('PENDING','CONFIRMED','SHIPPING','COMPLETED','CANCELLED')");
 
-                            t.HasCheckConstraint("CK_Orders_PaymentMethod", "[PaymentMethod] = 'COD'");
+                            t.HasCheckConstraint("CK_Orders_PaymentMethod", "[PaymentMethod] IN ('COD','QR')");
 
                             t.HasCheckConstraint("CK_Orders_PaymentStatus", "[PaymentStatus] IN ('PENDING','PAID','FAILED')");
 
@@ -717,6 +754,22 @@ namespace ECommerce.Api.Migrations
                         .HasDatabaseName("UQ_Roles_RoleName");
 
                     b.ToTable("Roles", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            RoleID = 1,
+                            CreatedAt = new DateTime(2026, 8, 29, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Customer role",
+                            RoleName = "Customer"
+                        },
+                        new
+                        {
+                            RoleID = 2,
+                            CreatedAt = new DateTime(2026, 8, 29, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Administrator role",
+                            RoleName = "Admin"
+                        });
                 });
 
             modelBuilder.Entity("ECommerce.Api.Entities.User", b =>

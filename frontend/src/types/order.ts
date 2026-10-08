@@ -1,44 +1,85 @@
-export interface OrderDetailDto {
-  orderDetailId: number;
-  productId: number;
-  productName: string;
-  sku: string;
-  quantity: number;
-  unitPrice: number;
-  totalPrice: number;
+export interface OrderItem {
+  productID: number
+  productName: string
+  sku: string
+  quantity: number
+  unitPrice: number
+  totalPrice: number
+}
+
+export interface OrderDetail {
+  orderID: number
+  userID: number
+  receiverName: string
+  receiverPhone: string
+  province?: string
+  district?: string
+  ward?: string
+  shippingAddress: string
+  subTotal: number
+  shippingFee: number
+  totalAmount: number
+  paymentMethod: 'COD' | 'QR'
+  paymentStatus: string
+  orderStatus: string
+  note?: string
+  createdAt: string
+  items: OrderItem[]
+}
+
+export interface CheckoutRequest {
+  addressID: number
+  paymentMethod: 'COD' | 'QR'
+  note?: string
+}
+export interface OrderSummary {
+  orderID: number
+  totalAmount: number
+  paymentMethod: 'COD' | 'QR'
+  paymentStatus: string
+  orderStatus: string
+  createdAt: string
+  totalItems: number
+}
+
+export interface PagedOrders {
+  items: OrderSummary[]
+  totalCount: number
+  pageNumber: number
+  pageSize: number
+  totalPages: number
+}
+
+export interface AdminOrderItem {
+  orderDetailId: number
+  productId: number
+  productName: string
+  sku: string
+  quantity: number
+  unitPrice: number
+  totalPrice: number
 }
 
 export interface OrderDto {
-  orderId: number;
-  receiverName: string;
-  receiverPhone: string;
-  shippingAddress: string;
-  subTotal: number;
-  shippingFee: number;
-  totalAmount: number;
-  paymentMethod: string;
-  paymentStatus: string;
-  orderStatus: string;
-  note?: string;
-  createdAt: string;
-  updatedAt?: string;
-  items: OrderDetailDto[];
+  orderId: number
+  userId: number
+  customerName: string
+  customerEmail: string
+  receiverName: string
+  receiverPhone: string
+  shippingAddress: string
+  totalAmount: number
+  paymentMethod: 'COD' | 'QR'
+  paymentStatus: string
+  orderStatus: string
+  createdAt: string
+  updatedAt?: string
+  items: AdminOrderItem[]
 }
 
-export interface CreateOrderRequest {
-  receiverName: string;
-  receiverPhone: string;
-  shippingAddress: string;
-  province?: string;
-  district?: string;
-  ward?: string;
-  paymentMethod: string;
-  note?: string;
-}
-
-export interface PagedOrderResult {
-  items: OrderDto[];
-  totalCount: number;
-  pageNumber: number;
-  pageSize: number;
+export interface PagedAdminOrders {
+  items: OrderDto[]
+  totalCount: number
+  pageNumber: number
+  pageSize: number
 }

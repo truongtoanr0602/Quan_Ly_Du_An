@@ -82,7 +82,7 @@ public class OrderConfiguration : IEntityTypeConfiguration<Order>
         builder.ToTable(t =>
         {
             t.HasCheckConstraint("CK_Orders_PaymentMethod",
-                "[PaymentMethod] = 'COD'");
+                "[PaymentMethod] IN ('COD','QR')");
 
             t.HasCheckConstraint("CK_Orders_PaymentStatus",
                 "[PaymentStatus] IN ('PENDING','PAID','FAILED')");

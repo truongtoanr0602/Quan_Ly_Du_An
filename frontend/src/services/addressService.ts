@@ -1,24 +1,18 @@
-import { apiClient } from './apiClient';
-import type { AddressDto, AddressCreateRequest, AddressUpdateRequest } from '../types/address';
+import { apiClient } from './apiClient'
+import type { Address, AddressWriteRequest } from '../types/address'
 
 export const addressService = {
-  getAddresses: (): Promise<AddressDto[]> => apiClient<AddressDto[]>('/addresses'),
-
-  getAddressById: (id: number): Promise<AddressDto> =>
-    apiClient<AddressDto>(`/addresses/${id}`),
-
-  createAddress: (data: AddressCreateRequest): Promise<AddressDto> =>
-    apiClient<AddressDto>('/addresses', {
-      method: 'POST',
-      body: JSON.stringify(data),
-    }),
-
-  updateAddress: (id: number, data: AddressUpdateRequest): Promise<AddressDto> =>
-    apiClient<AddressDto>(`/addresses/${id}`, {
+  list: (): Promise<Address[]> => apiClient<Address[]>('/addresses'),
+  create: (request: AddressWriteRequest): Promise<Address> => apiClient<Address>('/addresses', {
+    method: 'POST',
+    body: JSON.stringify(request),
+  }),
+  update: (addressID: number, request: AddressWriteRequest): Promise<Address> =>
+    apiClient<Address>(`/addresses/${addressID}`, {
       method: 'PUT',
-      body: JSON.stringify(data),
+      body: JSON.stringify(request),
     }),
-
-  deleteAddress: (id: number): Promise<void> =>
-    apiClient<void>(`/addresses/${id}`, { method: 'DELETE' }),
-};
+  remove: (addressID: number): Promise<void> => apiClient<void>(`/addresses/${addressID}`, {
+    method: 'DELETE',
+  }),
+}

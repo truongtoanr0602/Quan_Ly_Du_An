@@ -1,44 +1,27 @@
 import { useState, useEffect } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { productService, type Product } from '../services/productService';
+import { ApiError } from '../services/apiClient';
 import { categoryService } from '../services/categoryService';
-import { cartService } from '../services/cartService';
-import { useToast } from '../contexts/ToastContext';
 import type { CategoryDto } from '../types/category';
 
 export default function ProductListPage() {
-  const [searchParams] = useSearchParams();
-  const toast = useToast();
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<CategoryDto[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [addingId, setAddingId] = useState<number | null>(null);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [categoryError, setCategoryError] = useState<string | null>(null);
 
-  // Filters state initialized from URL params if present
-  const [keyword, setKeyword] = useState(() => searchParams.get('keyword') || '');
-  const [debouncedKeyword, setDebouncedKeyword] = useState(() => searchParams.get('keyword') || '');
-  const [category, setCategory] = useState<number | undefined>(() => {
-    const c = searchParams.get('category');
-    return c ? Number(c) : undefined;
-  });
-  const [brand, setBrand] = useState<string | undefined>(() => searchParams.get('brand') || undefined);
+  // Filters state
+  const [keyword, setKeyword] = useState('');
+  const [debouncedKeyword, setDebouncedKeyword] = useState('');
+  const [category, setCategory] = useState<number | undefined>();
+  const [brand, setBrand] = useState<string | undefined>();
   const [minPrice, setMinPrice] = useState<number | ''>('');
   const [maxPrice, setMaxPrice] = useState<number | ''>('');
   const [sort, setSort] = useState('newest');
-
-  // Sync state when URL query params change
-  useEffect(() => {
-    const kw = searchParams.get('keyword') || '';
-    const b = searchParams.get('brand') || undefined;
-    const cat = searchParams.get('category') ? Number(searchParams.get('category')) : undefined;
-    setKeyword(kw);
-    setDebouncedKeyword(kw);
-    setBrand(b);
-    setCategory(cat);
-    setPage(1);
-  }, [searchParams]);
 
   useEffect(() => {
     const handler = setTimeout(() => {
@@ -48,8 +31,18 @@ export default function ProductListPage() {
     return () => clearTimeout(handler);
   }, [keyword]);
 
+  const fetchCategories = async () => {
+    setCategoryError(null);
+    try {
+      const data = await categoryService.getAll();
+      setCategories(data);
+    } catch (err: unknown) {
+      setCategoryError(err instanceof ApiError || err instanceof Error ? err.message : 'Category request failed.');
+    }
+  };
+
   useEffect(() => {
-    categoryService.getAll().then(setCategories).catch(console.error);
+    fetchCategories();
   }, []);
 
   useEffect(() => {
@@ -58,6 +51,7 @@ export default function ProductListPage() {
 
   const fetchProducts = async () => {
     setIsLoading(true);
+    setLoadError(null);
     try {
       const res = await productService.searchProducts({
         pageNumber: page,
@@ -75,43 +69,10 @@ export default function ProductListPage() {
       
       setProducts(items);
       setTotalPages(Math.ceil(res.totalCount / res.pageSize) || 1);
-    } catch (err) {
-      console.error('Failed to fetch products:', err);
+    } catch (err: unknown) {
+      setLoadError(err instanceof ApiError || err instanceof Error ? err.message : 'Không thể tải sản phẩm.');
     } finally {
       setIsLoading(false);
-    }
-  };
-
-  const handleAddToCart = async (product: Product) => {
-    if (product.stockQuantity <= 0) return;
-    const token = localStorage.getItem('token');
-    if (!token) {
-      toast.warning('Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng!', {
-        title: 'Chưa đăng nhập',
-        actionText: 'Đăng nhập ngay',
-        actionPath: '/login'
-      });
-      return;
-    }
-
-    try {
-      setAddingId(product.productID);
-      await cartService.addItem({
-        productId: product.productID,
-        quantity: 1,
-      });
-      window.dispatchEvent(new CustomEvent('cart-updated'));
-      toast.success(`Đã thêm "${product.productName}" vào giỏ hàng!`, {
-        title: 'Thành công',
-        actionText: 'Xem giỏ hàng',
-        actionPath: '/cart'
-      });
-    } catch (err: any) {
-      toast.error(err.message || 'Không thể thêm sản phẩm vào giỏ hàng.', {
-        title: 'Lỗi giỏ hàng'
-      });
-    } finally {
-      setAddingId(null);
     }
   };
 
@@ -129,6 +90,12 @@ export default function ProductListPage() {
           <span className="text-on-surface">Sản phẩm</span>
         </nav>
         <h1 className="text-3xl font-semibold text-on-surface">Khám phá Sản phẩm</h1>
+        {categoryError && (
+          <div role="alert" className="border border-error bg-error-container text-on-error-container rounded-lg p-4 mt-4 flex items-center justify-between gap-4">
+            <p>{categoryError}</p>
+            <button type="button" onClick={fetchCategories} className="underline font-medium">Thử lại</button>
+          </div>
+        )}
       </div>
 
       {/* Left Sidebar: Filters */}
@@ -177,7 +144,7 @@ export default function ProductListPage() {
         <section className="pb-6">
           <h3 className="text-xl font-semibold text-on-surface mb-4">Thương hiệu</h3>
           <div className="space-y-3">
-            {['Apple', 'Asus', 'Lenovo', 'Dell', 'Sony'].map((b) => (
+            {['Apple', 'ASUS', 'Lenovo', 'Dell', 'Sony'].map((b) => (
               <label key={b} className="flex items-center gap-3 cursor-pointer group">
                 <input 
                   type="radio" 
@@ -233,6 +200,11 @@ export default function ProductListPage() {
           <div className="flex justify-center items-center py-20">
             <span className="material-symbols-outlined animate-spin text-4xl text-primary">progress_activity</span>
           </div>
+        ) : loadError ? (
+          <div role="alert" className="border border-error bg-error-container text-on-error-container rounded-lg p-6 flex items-center justify-between gap-4">
+            <p>{loadError}</p>
+            <button type="button" onClick={fetchProducts} className="underline font-medium">Thử lại</button>
+          </div>
         ) : products.length === 0 ? (
           <div className="text-center py-20 text-secondary">
             <span className="material-symbols-outlined text-5xl mb-4 opacity-50">inventory_2</span>
@@ -266,14 +238,11 @@ export default function ProductListPage() {
                     <span className="text-xl font-semibold text-primary">{formatPrice(p.price)}</span>
                   </div>
                   <button 
-                    disabled={p.stockQuantity <= 0 || addingId === p.productID}
-                    onClick={() => handleAddToCart(p)}
-                    className="mt-4 w-full border border-primary text-primary hover:bg-primary hover:text-on-primary disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium py-2.5 rounded transition-colors flex items-center justify-center gap-2 cursor-pointer active:scale-98"
+                    disabled={p.stockQuantity <= 0}
+                    className="mt-4 w-full border border-primary text-primary hover:bg-primary hover:text-on-primary disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium py-2.5 rounded transition-colors flex items-center justify-center gap-2"
                   >
-                    <span className="material-symbols-outlined text-sm">
-                      {addingId === p.productID ? 'progress_activity' : 'shopping_cart'}
-                    </span>
-                    {addingId === p.productID ? 'Đang thêm...' : 'Thêm vào giỏ'}
+                    <span className="material-symbols-outlined text-sm">shopping_cart</span>
+                    Thêm vào giỏ
                   </button>
                 </div>
               </article>
